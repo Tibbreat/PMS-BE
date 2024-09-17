@@ -19,12 +19,12 @@ public class Class extends Auditable<String> {
     @OneToMany
     private Set<Children> children;
 
-    @OneToMany
-    private Set<User> teachers;
+    @OneToMany(mappedBy = "schoolClass")
+    private Set<ClassTeacher> teachers;
 
     @OneToOne
     private User manager;
 
-    @OneToMany
+    @OneToMany(mappedBy = "schoolClass")
     private Set<DailyMenu> dailyMenus;
 }

@@ -15,7 +15,7 @@ public class ClassTeacher extends Auditable<String> {
 
     @ManyToOne
     @JoinColumn(name = "class_id")
-    private Class classId;
+    private Class schoolClass;
 
     @ManyToOne
     @JoinColumn(name = "teacher_id")
