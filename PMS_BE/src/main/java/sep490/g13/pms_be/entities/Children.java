@@ -22,10 +22,9 @@ public class Children extends Auditable<String> {
     private Boolean isRegisteredForTransport;
     private Boolean isRegisteredForBoarding;
 
-    @OneToMany
+    @OneToMany(mappedBy = "children")
     private Set<ChildrenFee> childrenFees;
 
-    @OneToMany
+    @OneToMany(mappedBy = "childrenId")
     private Set<Relationship> relationships;
-
 }

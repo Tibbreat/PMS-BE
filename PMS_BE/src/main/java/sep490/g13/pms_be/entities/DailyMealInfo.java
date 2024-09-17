@@ -21,7 +21,7 @@ public class DailyMealInfo extends Auditable<String> {
 
     @ManyToOne
     @JoinColumn(name = "class_id")
-    private Class clazz;
+    private Classes clazz;
 
     private LocalDate mealDate;
 

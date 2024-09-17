@@ -25,9 +25,9 @@ public class TransportServiceProvider extends Auditable<String> {
     private String contractFile;
     private Boolean isActive;
 
-    @OneToMany
+    @OneToMany(mappedBy = "transport")
     private Set<Vehicle> vehicles;
 
-    @OneToMany
+    @OneToMany(mappedBy = "transportServiceProvider")
     private Set<User> drivers;
 }

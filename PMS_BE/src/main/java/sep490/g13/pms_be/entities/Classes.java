@@ -13,8 +13,10 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Class extends Auditable<String> {
+public class Classes extends Auditable<String> {
     private String className;
+
+    private String ageRange;
 
     @OneToMany
     private Set<Children> children;
