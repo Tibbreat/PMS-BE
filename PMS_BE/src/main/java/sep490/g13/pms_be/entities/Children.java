@@ -23,6 +23,9 @@ public class Children extends Auditable<String> {
     private Boolean isRegisteredForBoarding;
 
     @OneToMany
+    private Set<ChildrenFee> childrenFees;
+
+    @OneToMany
     private Set<Relationship> relationships;
 
 }

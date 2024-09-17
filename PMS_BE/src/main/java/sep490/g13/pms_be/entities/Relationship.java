@@ -22,4 +22,6 @@ public class Relationship extends Auditable<String> {
     private User parentId;
 
     private String relationship;
+
+    private Boolean isRepresentative;
 }

@@ -1,8 +1,7 @@
 package sep490.g13.pms_be.entities;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import lombok.*;
 
 @Entity
@@ -17,6 +16,6 @@ public class Vehicle extends Auditable<String> {
     private String model;
     private String brand;
 
-    @OneToOne
-    private User driver;
+    @ManyToOne
+    private TransportServiceProvider transport;
 }

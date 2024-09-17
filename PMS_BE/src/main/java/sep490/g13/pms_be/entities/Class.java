@@ -22,9 +22,9 @@ public class Class extends Auditable<String> {
     @OneToMany
     private Set<User> teachers;
 
-    @OneToMany
-    private Set<User> driver;
-
     @OneToOne
     private User manager;
+
+    @OneToMany
+    private Set<DailyMenu> dailyMenus;
 }

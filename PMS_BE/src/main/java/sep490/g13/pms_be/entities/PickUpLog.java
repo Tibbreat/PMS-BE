@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -20,11 +21,11 @@ public class PickUpLog extends Auditable<String>  {
     @JoinColumn(name = "child_id")
     private Children children;
 
+    @CreationTimestamp
     private LocalDate pickupDate;
 
+    @CreationTimestamp
     private LocalTime pickupTime;
-
-    private String imageLink; //photo evidence
 
     @ManyToOne
     @JoinColumn(name = "responsible_person_id")

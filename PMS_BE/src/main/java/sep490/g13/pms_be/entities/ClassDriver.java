@@ -19,5 +19,5 @@ public class ClassDriver extends Auditable<String> {
 
     @ManyToOne
     @JoinColumn(name = "driver_id")
-    private User teacherId;
+    private User driverId;
 }
