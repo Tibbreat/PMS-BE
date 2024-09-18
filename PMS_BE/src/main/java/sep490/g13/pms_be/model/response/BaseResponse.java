@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.Getter;
 import lombok.experimental.Accessors;
-import org.apache.coyote.Constants;
 import org.springframework.data.domain.Page;
 import sep490.g13.pms_be.exception.BusinessErrorCode;
 import sep490.g13.pms_be.exception.BusinessException;
@@ -25,6 +24,7 @@ public class BaseResponse<T> {
         this.data = data;
         this.meta = meta;
     }
+
     public BaseResponse() {
     }
 
@@ -50,6 +50,7 @@ public class BaseResponse<T> {
         response.meta.total = data.getTotalElements();
         return response;
     }
+
     public static <T> BaseResponse<List<T>> ofSucceeded(Page<T> data, Long totalErrors) {
         BaseResponse<List<T>> response = ofSucceeded(data);
         response.meta.totalErrors = totalErrors;
@@ -74,6 +75,7 @@ public class BaseResponse<T> {
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Getter
     public static class Metadata {
         String code;
         Integer page;
@@ -93,30 +95,5 @@ public class BaseResponse<T> {
             this.total = total;
             this.message = message;
         }
-
-        public String getCode() {
-            return code;
-        }
-
-        public Integer getPage() {
-            return page;
-        }
-
-        public Integer getSize() {
-            return size;
-        }
-
-        public Long getTotal() {
-            return total;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public Long getTotalErrors() {
-            return totalErrors;
-        }
-
     }
 }

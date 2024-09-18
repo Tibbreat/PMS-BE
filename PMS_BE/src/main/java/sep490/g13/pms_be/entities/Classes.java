@@ -21,12 +21,12 @@ public class Classes extends Auditable<String> {
     @OneToMany
     private Set<Children> children;
 
-    @OneToMany(mappedBy = "schoolClass")
+    @OneToMany(mappedBy = "schoolClasses")
     private Set<ClassTeacher> teachers;
 
     @OneToOne
     private User manager;
 
-    @OneToMany(mappedBy = "schoolClass")
+    @OneToMany(mappedBy = "schoolClasses")
     private Set<DailyMenu> dailyMenus;
 }
