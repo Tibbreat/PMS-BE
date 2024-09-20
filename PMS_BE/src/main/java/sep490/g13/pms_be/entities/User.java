@@ -13,6 +13,8 @@ import sep490.g13.pms_be.utils.enums.RoleEnums;
 public class User extends Auditable<String> {
     private String username;
     private String password;
+
+    private String fullName;
     private String email;
     private String address;
     private String phone;

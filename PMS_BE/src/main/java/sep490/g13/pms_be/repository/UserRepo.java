@@ -6,4 +6,7 @@ import sep490.g13.pms_be.entities.User;
 
 @Repository
 public interface UserRepo extends JpaRepository<User, String> {
+    User findByUsername(String username);
+
+    int countByFullName(String fullName);
 }
