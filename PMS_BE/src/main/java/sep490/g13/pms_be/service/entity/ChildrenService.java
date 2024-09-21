@@ -20,7 +20,7 @@ public class ChildrenService {
         List<Children> childrenList = childrenRepo.findAllById(childrenId);
 
         // Kiểm tra nếu có bất kỳ SkillTag nào không tồn tại trong cơ sở dữ liệu
-        if (childrenId.size() != childrenId.size()) {
+        if (childrenId.size() != childrenList.size()) {
             throw new IllegalArgumentException("Some Children were not found in the database");
         }
 

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import sep490.g13.pms_be.entities.Classes;
 import sep490.g13.pms_be.model.request.classes.UpdateClassRequest;
+import sep490.g13.pms_be.model.response.classes.ClassDetailResponse;
 
 @Repository
 public interface ClassRepo extends JpaRepository<Classes, String> {
@@ -30,11 +31,20 @@ public interface ClassRepo extends JpaRepository<Classes, String> {
     @Query("UPDATE Classes c SET " +
             "c.openingDay = :#{#updateRequest.openingDay}, " +
             "c.closingDay = :#{#updateRequest.closingDay}, " +
-            "c.manager.id = :#{#updateRequest.managerId}, " + // Chỉnh sửa tên trường
-            "c.lastModifiedBy = :#{#updateRequest.lastModifyById} " + // Chỉnh sửa tên trường
+            "c.manager.id = :#{#updateRequest.managerId}, " +
+            "c.lastModifiedBy = :#{#updateRequest.lastModifyById} " +
             "WHERE c.id = :classId")
     void updateClass(@Param("classId") String classId, @Param("updateRequest") UpdateClassRequest updateRequest);
 
+//    @Query("SELECT new sep490.g13.pms_be.model.response.classes.ClassDetailResponse(" +
+//            "c.className, " +
+//            "c.ageRange, " +
+//            "c.openingDay, " +
+//            "c.closingDay, " +
+//            "c.children, " +
+//            "c.teachers) " +
+//            "FROM Classes c WHERE c.id = :id")
+//    ClassDetailResponse findClassDetailById(@Param("id") String id);
 
 
 }

@@ -19,6 +19,7 @@ import sep490.g13.pms_be.model.request.classes.AddClassRequest;
 import sep490.g13.pms_be.model.request.classes.UpdateClassRequest;
 import sep490.g13.pms_be.model.response.base.PagedResponseModel;
 import sep490.g13.pms_be.model.response.base.ResponseModel;
+import sep490.g13.pms_be.model.response.classes.ClassDetailResponse;
 import sep490.g13.pms_be.service.entity.ChildrenService;
 import sep490.g13.pms_be.service.entity.ClassService;
 import sep490.g13.pms_be.service.entity.TeacherService;
@@ -136,7 +137,30 @@ public class ClassController {
     }
 
 
+//    @GetMapping("/classDetail/{classId}")
+//    public ResponseEntity<ResponseModel<?>> getClassDetail(@PathVariable String classId) {
+//        ClassDetailResponse classDetailResponse = classService.getClassDetailById(classId);
+//
+//        return ResponseEntity
+//                .status(HttpStatus.OK)
+//                .body(ResponseModel.<ClassDetailResponse>builder()
+//                        .message("Lấy dữ liệu lớp có id: " + classId)
+//                        .data(classDetailResponse)
+//                        .build());
+//    }
 
+
+    @DeleteMapping("/class/{classId}")
+    public ResponseEntity<String> deleteClass(@PathVariable String classId) {
+        try {
+            classService.deleteClass(classId);
+            return ResponseEntity.ok("Class deleted successfully.");
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (DataNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
 
 
 }

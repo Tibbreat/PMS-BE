@@ -15,7 +15,7 @@ public class TeacherService {
 
         List<ClassTeacher> teacherList = teacherRepo.findAllById(teacherId);
 
-        if (teacherId.size() != teacherId.size()) {
+        if (teacherId.size() != teacherList.size()) {
             throw new IllegalArgumentException("Some Teacher were not found in the database");
         }
 
