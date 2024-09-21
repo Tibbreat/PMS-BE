@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -24,9 +25,9 @@ public class AddClassRequest {
     @NotNull(message = "Closing Day không được để trống")
     private Date closingDay;
     @NotNull(message = "Danh sách trẻ không được để trống")
-    private Set<String> childrenId;
+    private List<String> childrenId;
     @NotNull(message = "Danh sách giáo viên không được để trống")
-    private Set<String> teacherId;
+    private List<String> teacherId;
     @NotNull(message = "Quản lý lớp không được để trống")
     private String ManagerId;
 

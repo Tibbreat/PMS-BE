@@ -28,14 +28,14 @@ public class ClassService {
         // Kiểm tra User (Manager) có tồn tại hay không
         Optional<User> managerOpt = userRepo.findById(c.getManager().getId());
         if (managerOpt.isEmpty()) {
-            throw new RuntimeException("Manager không tồn tại");
+            throw new DataNotFoundException("Manager không tồn tại");
         }
 
         // Kiểm tra danh sách giáo viên có tồn tại hay không (tuỳ thuộc vào logic yêu cầu)
         for (ClassTeacher teacher : c.getTeachers()) {
             Optional<User> teacherOpt = userRepo.findById(teacher.getTeacherId().getId());
             if (teacherOpt.isEmpty()) {
-                throw new RuntimeException("Giáo viên không tồn tại: " + teacher.getTeacherId().getId());
+                throw new DataNotFoundException("Giáo viên không tồn tại: " + teacher.getTeacherId().getId());
             }
         }
 
