@@ -2,12 +2,17 @@ package sep490.g13.pms_be.service.entity;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sep490.g13.pms_be.entities.ClassTeacher;
 import sep490.g13.pms_be.entities.Classes;
 import sep490.g13.pms_be.entities.User;
 import sep490.g13.pms_be.exception.other.DataNotFoundException;
 import sep490.g13.pms_be.exception.other.PermissionNotAcceptException;
+import sep490.g13.pms_be.model.request.classes.UpdateClassRequest;
 import sep490.g13.pms_be.repository.ClassRepo;
 import sep490.g13.pms_be.repository.UserRepo;
 import sep490.g13.pms_be.utils.LocalDateUtils;
@@ -76,5 +81,30 @@ public class ClassService {
         // Lưu lớp học vào database
         return classRepo.save(c);
     }
+
+    public Page<Classes> getClasses(Integer schoolYear, String ageRange, Long managerId, int page, int size) {
+        // Tạo Pageable để phân trang
+        Pageable pageable = PageRequest.of(page, size);
+        // Gọi repository để lấy danh sách lớp học theo bộ lọc
+        return classRepo.findClassesByFilters(schoolYear, ageRange, managerId, pageable);
+    }
+    @Transactional
+    public void updateClass(String classId, UpdateClassRequest updateClassRequest) {
+        Classes existingClass = classRepo.findById(classId)
+                .orElseThrow(() -> new DataNotFoundException("Class not found with id: " + classId));
+
+        existingClass.setOpeningDay(updateClassRequest.getOpeningDay());
+        existingClass.setClosingDay(updateClassRequest.getClosingDay());
+
+        // Cập nhật manager
+        User manager = userRepo.findById(updateClassRequest.getManagerId())
+                .orElseThrow(() -> new DataNotFoundException("Manager not found with id: " + updateClassRequest.getManagerId()));
+        existingClass.setManager(manager);
+
+        existingClass.setLastModifiedBy(updateClassRequest.getLastModifyById());
+
+        classRepo.save(existingClass);
+    }
+
 
 }

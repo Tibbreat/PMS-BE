@@ -1,14 +1,14 @@
 package sep490.g13.pms_be.controller;
 
 import jakarta.validation.Valid;
+import org.hibernate.Hibernate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import sep490.g13.pms_be.entities.Children;
 import sep490.g13.pms_be.entities.ClassTeacher;
 import sep490.g13.pms_be.entities.Classes;
@@ -16,6 +16,8 @@ import sep490.g13.pms_be.entities.User;
 import sep490.g13.pms_be.exception.other.DataNotFoundException;
 import sep490.g13.pms_be.exception.other.PermissionNotAcceptException;
 import sep490.g13.pms_be.model.request.classes.AddClassRequest;
+import sep490.g13.pms_be.model.request.classes.UpdateClassRequest;
+import sep490.g13.pms_be.model.response.base.PagedResponseModel;
 import sep490.g13.pms_be.model.response.base.ResponseModel;
 import sep490.g13.pms_be.service.entity.ChildrenService;
 import sep490.g13.pms_be.service.entity.ClassService;
@@ -25,6 +27,7 @@ import sep490.g13.pms_be.utils.ValidationUtils;
 import sep490.g13.pms_be.utils.enums.RoleEnums;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -74,11 +77,6 @@ public class ClassController {
         } else {
             throw new PermissionNotAcceptException("Người này không có vai trò là Quản lý lớp (Class_Manager)");
         }
-
-
-
-
-
         Classes savedClass = classService.addClass(newClass);
         return ResponseEntity.ok(
                 ResponseModel.builder()
@@ -87,6 +85,58 @@ public class ClassController {
                         .build()
         );
     }
+    @GetMapping()
+    public ResponseEntity<PagedResponseModel<Classes>> getClasses(
+            @RequestParam int page,
+            @RequestParam(required = false) Integer schoolYear,
+            @RequestParam(required = false) String ageRange,
+            @RequestParam(required = false) Long managerId) {
+
+        int size = 10; // Số lượng lớp học mỗi trang
+        Page<Classes> result = classService.getClasses(schoolYear, ageRange, managerId, page - 1, size);
+
+        // Initialize các liên kết cho các đối tượng lớp học
+        result.getContent().forEach(classes -> {
+            Hibernate.initialize(classes.getManager());
+            Hibernate.initialize(classes.getChildren());
+            Hibernate.initialize(classes.getTeachers());
+        });
+
+        List<Classes> classesList = result.getContent();
+
+        // Tạo response với phân trang
+        PagedResponseModel<Classes> pagedResponse = PagedResponseModel.<Classes>builder()
+                .total(result.getTotalElements())
+                .page(page)
+                .size(size)
+                .listData(classesList)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
+    }
+    @PutMapping("/change_class_description/{classId}")
+    public ResponseEntity<ResponseModel<?>> updateClassDescription(
+            @RequestBody @Valid UpdateClassRequest updateClassRequest,
+            BindingResult bindingResult,
+            @PathVariable String classId) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest()
+                    .body(ResponseModel.<String>builder()
+                            .message("Cập nhật không thành công")
+                            .data(ValidationUtils.getValidationErrors(bindingResult))
+                            .build());
+        }
+
+        classService.updateClass(classId, updateClassRequest);
+
+        return ResponseEntity.ok(ResponseModel.<String>builder()
+                .message("Cập nhật thông tin lớp học thành công")
+                .data(null)
+                .build());
+    }
+
+
+
 
 
 }
