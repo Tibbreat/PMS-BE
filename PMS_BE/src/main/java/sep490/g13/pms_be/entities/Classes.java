@@ -5,6 +5,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import lombok.*;
 
+import java.util.Date;
 import java.util.Set;
 
 @Entity
@@ -17,6 +18,10 @@ public class Classes extends Auditable<String> {
     private String className;
 
     private String ageRange;
+
+    private Date openingDay;
+
+    private Date closingDay;
 
     @OneToMany
     private Set<Children> children;
