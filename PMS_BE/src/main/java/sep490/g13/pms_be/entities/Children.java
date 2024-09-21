@@ -1,6 +1,8 @@
 package sep490.g13.pms_be.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.*;
 
@@ -27,4 +29,8 @@ public class Children extends Auditable<String> {
 
     @OneToMany(mappedBy = "childrenId")
     private Set<Relationship> relationships;
+
+    @ManyToOne
+    @JoinColumn(name = "class_id")
+    private Classes schoolClass;
 }

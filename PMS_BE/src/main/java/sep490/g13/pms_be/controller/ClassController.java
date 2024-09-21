@@ -14,12 +14,15 @@ import sep490.g13.pms_be.entities.ClassTeacher;
 import sep490.g13.pms_be.entities.Classes;
 import sep490.g13.pms_be.entities.User;
 import sep490.g13.pms_be.exception.other.DataNotFoundException;
+import sep490.g13.pms_be.exception.other.PermissionNotAcceptException;
 import sep490.g13.pms_be.model.request.classes.AddClassRequest;
 import sep490.g13.pms_be.model.response.base.ResponseModel;
 import sep490.g13.pms_be.service.entity.ChildrenService;
 import sep490.g13.pms_be.service.entity.ClassService;
 import sep490.g13.pms_be.service.entity.TeacherService;
 import sep490.g13.pms_be.service.entity.UserService;
+import sep490.g13.pms_be.utils.ValidationUtils;
+import sep490.g13.pms_be.utils.enums.RoleEnums;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -37,15 +40,25 @@ public class ClassController {
     private TeacherService teacherService;
 
 
-    @PostMapping("/job")
+    @PostMapping("/add")
     public ResponseEntity<ResponseModel<?>> addNewJob(
             @RequestBody @Valid AddClassRequest classRequest,
             BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
+            String validationErrors = ValidationUtils.getValidationErrors(bindingResult);
             return ResponseEntity.badRequest().body(
                     ResponseModel.builder()
                             .message("Thông tin lớp học không hợp lệ")
-                            .data(bindingResult.getAllErrors())
+                            .data(validationErrors)
+                            .build()
+            );
+        }
+        Set<Children> assignedChildren = childrenService.findChildrenWithClasses(classRequest.getChildrenId());
+        if (!assignedChildren.isEmpty()) {
+            return ResponseEntity.badRequest().body(
+                    ResponseModel.builder()
+                            .message("Một số trẻ đã được gán vào lớp khác: " + assignedChildren)
+                            .data(assignedChildren)
                             .build()
             );
         }
@@ -56,7 +69,15 @@ public class ClassController {
         Set<ClassTeacher> teachers = new HashSet<>(teacherService.findAllById(classRequest.getTeacherId()));
         newClass.setTeachers(teachers);
         User manager = userService.getUserById(classRequest.getManagerId());
-        newClass.setManager(manager);
+        if (manager.getRole().equals(RoleEnums.Class_Manager)) {
+            newClass.setManager(manager);
+        } else {
+            throw new PermissionNotAcceptException("Người này không có vai trò là Quản lý lớp (Class_Manager)");
+        }
+
+
+
+
 
         Classes savedClass = classService.addClass(newClass);
         return ResponseEntity.ok(

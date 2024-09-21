@@ -30,6 +30,8 @@ public class AddClassRequest {
     private List<String> teacherId;
     @NotNull(message = "Quản lý lớp không được để trống")
     private String ManagerId;
+    @NotNull(message= "Created By Không được để trống")
+    private String createdBy;
 
 
 }

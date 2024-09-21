@@ -3,9 +3,12 @@ package sep490.g13.pms_be.service.entity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sep490.g13.pms_be.entities.Children;
+import sep490.g13.pms_be.exception.other.DataNotFoundException;
 import sep490.g13.pms_be.repository.ChildrenRepo;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ChildrenService {
@@ -22,6 +25,11 @@ public class ChildrenService {
         }
 
         return childrenList;
+    }
+    public Set<Children> findChildrenWithClasses(List<String> childrenIds) {
+        return childrenRepo.findAllById(childrenIds).stream()
+                .filter(children -> children.getSchoolClass() != null)
+                .collect(Collectors.toSet());
     }
 
 }
