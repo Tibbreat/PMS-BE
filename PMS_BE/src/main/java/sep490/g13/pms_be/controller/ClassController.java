@@ -45,7 +45,7 @@ public class ClassController {
 
 
     @PostMapping("/add")
-    public ResponseEntity<ResponseModel<?>> addNewJob(
+    public ResponseEntity<ResponseModel<?>> addNewClass(
             @RequestBody @Valid AddClassRequest classRequest,
             BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -57,35 +57,59 @@ public class ClassController {
                             .build()
             );
         }
-        Set<Children> assignedChildren = childrenService.findChildrenWithClasses(classRequest.getChildrenId());
-        if (!assignedChildren.isEmpty()) {
+
+        Classes newClass = new Classes();
+        BeanUtils.copyProperties(classRequest, newClass);
+
+        Set<ClassTeacher> teachers = new HashSet<>();
+        for (String teacherId : classRequest.getTeacherId()) {
+            User teacher = userService.getUserById(teacherId);
+            if (teacher == null) {
+                return ResponseEntity.badRequest().body(
+                        ResponseModel.builder()
+                                .message("Giáo viên không tồn tại: " + teacherId)
+                                .build()
+                );
+            }
+            ClassTeacher classTeacher = new ClassTeacher();
+            classTeacher.setSchoolClasses(newClass);
+            classTeacher.setTeacherId(teacher);
+            teachers.add(classTeacher);
+        }
+        newClass.setTeachers(teachers);
+
+        User manager = userService.getUserById(classRequest.getManagerId());
+        if (manager == null) {
             return ResponseEntity.badRequest().body(
                     ResponseModel.builder()
-                            .message("Một số trẻ đã được gán vào lớp khác: " + assignedChildren)
-                            .data(assignedChildren)
+                            .message("Quản lý không tồn tại: " + classRequest.getManagerId())
                             .build()
             );
         }
-        Classes newClass = new Classes();
-        BeanUtils.copyProperties(classRequest, newClass);
-        Set<Children> childrens = new HashSet<>(childrenService.findAllById(classRequest.getChildrenId()));
-        newClass.setChildren(childrens);
-        Set<ClassTeacher> teachers = new HashSet<>(teacherService.findAllById(classRequest.getTeacherId()));
-        newClass.setTeachers(teachers);
-        User manager = userService.getUserById(classRequest.getManagerId());
-        if (manager.getRole().equals(RoleEnums.Class_Manager)) {
-            newClass.setManager(manager);
-        } else {
+
+        if (!manager.getRole().equals(RoleEnums.Class_Manager)) {
             throw new PermissionNotAcceptException("Người này không có vai trò là Quản lý lớp (Class_Manager)");
         }
-        Classes savedClass = classService.addClass(newClass);
-        return ResponseEntity.ok(
-                ResponseModel.builder()
-                        .message("Thêm lớp học thành công")
-                        .data(savedClass)
-                        .build()
-        );
+
+        newClass.setManager(manager);
+
+        try {
+            Classes savedClass = classService.addClass(newClass);
+            return ResponseEntity.ok(
+                    ResponseModel.builder()
+                            .message("Thêm lớp học thành công")
+                            .data(savedClass)
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ResponseModel.builder()
+                            .message("Lỗi khi thêm lớp học: " + e.getMessage())
+                            .build()
+            );
+        }
     }
+
     @GetMapping()
     public ResponseEntity<PagedResponseModel<Classes>> getClasses(
             @RequestParam int page,

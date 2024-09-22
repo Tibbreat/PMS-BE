@@ -24,12 +24,11 @@ public class AddClassRequest {
     private Date openingDay;
     @NotNull(message = "Closing Day không được để trống")
     private Date closingDay;
-    @NotNull(message = "Danh sách trẻ không được để trống")
-    private List<String> childrenId;
+
     @NotNull(message = "Danh sách giáo viên không được để trống")
     private List<String> teacherId;
     @NotNull(message = "Quản lý lớp không được để trống")
-    private String ManagerId;
+    private String managerId;
     @NotNull(message= "Created By Không được để trống")
     private String createdBy;
 

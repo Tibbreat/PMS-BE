@@ -6,4 +6,5 @@ import sep490.g13.pms_be.entities.Children;
 
 @Repository
 public interface ChildrenRepo extends JpaRepository<Children, String> {
+
 }
