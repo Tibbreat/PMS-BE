@@ -33,7 +33,8 @@ public class User extends Auditable<String> {
 
     @Enumerated(EnumType.STRING)
     private RoleEnums role;
+
     @OneToMany(mappedBy = "teacherId")
-    @JsonIgnore // Loại bỏ khỏi JSON để tránh vòng lặp
+    @JsonIgnore
     private Set<ClassTeacher> classTeachers = new HashSet<>();
 }

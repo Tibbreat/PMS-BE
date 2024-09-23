@@ -17,11 +17,11 @@ import lombok.*;
 public class ClassTeacher extends Auditable<String> {
     @ManyToOne
     @JoinColumn(name = "class_id")
-    @JsonBackReference // Điều này sẽ ngăn Jackson serialize phía ngược lại
+    @JsonBackReference
     private Classes schoolClasses;
 
     @ManyToOne
     @JoinColumn(name = "teacher_id")
-    @JsonIgnore // Loại bỏ khỏi JSON
+    @JsonIgnore
     private User teacherId;
 }

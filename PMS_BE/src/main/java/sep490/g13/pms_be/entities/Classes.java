@@ -31,7 +31,7 @@ public class Classes extends Auditable<String> {
     private Set<Children> children;
 
     @OneToMany(mappedBy = "schoolClasses", cascade = CascadeType.ALL,orphanRemoval = true)
-    @JsonManagedReference // Điều này giúp Jackson biết rằng đây là phía chính
+    @JsonManagedReference
     private Set<ClassTeacher> teachers = new HashSet<>();
 
     @OneToOne

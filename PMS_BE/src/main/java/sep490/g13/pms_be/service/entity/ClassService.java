@@ -111,11 +111,6 @@ public class ClassService {
     }
 
 
-//    public ClassDetailResponse getClassDetailById(String jobId) {
-//        ClassDetailResponse classDetailResponse = classRepo.findClassDetailById(jobId);
-//        return classDetailResponse;
-//    }
-
     public void deleteClass(String classId) {
         Classes clazz = classRepo.findById(classId)
                 .orElseThrow(() -> new DataNotFoundException("Class not found"));
