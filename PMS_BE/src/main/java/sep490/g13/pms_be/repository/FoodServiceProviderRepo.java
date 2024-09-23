@@ -1,0 +1,17 @@
+package sep490.g13.pms_be.repository;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import sep490.g13.pms_be.entities.FoodServiceProvider;
+
+public interface FoodServiceProviderRepo extends JpaRepository<FoodServiceProvider, String> {
+
+    @Query("SELECT fsp FROM FoodServiceProvider fsp WHERE " +
+            "(:status IS NULL OR fsp.isActive = :status)")
+    Page<FoodServiceProvider> findByProvider(
+            @Param("status") String status,
+            Pageable pageable);
+}
