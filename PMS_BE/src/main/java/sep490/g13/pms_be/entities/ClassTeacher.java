@@ -3,6 +3,7 @@ package sep490.g13.pms_be.entities;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.*;
@@ -20,7 +21,7 @@ public class ClassTeacher extends Auditable<String> {
     @JsonBackReference
     private Classes schoolClasses;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "teacher_id")
     @JsonIgnore
     private User teacherId;

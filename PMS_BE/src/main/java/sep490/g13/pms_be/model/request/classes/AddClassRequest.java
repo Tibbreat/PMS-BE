@@ -24,7 +24,6 @@ public class AddClassRequest {
     private Date openingDay;
     @NotNull(message = "Closing Day không được để trống")
     private Date closingDay;
-
     @NotNull(message = "Danh sách giáo viên không được để trống")
     private List<String> teacherId;
     @NotNull(message = "Quản lý lớp không được để trống")

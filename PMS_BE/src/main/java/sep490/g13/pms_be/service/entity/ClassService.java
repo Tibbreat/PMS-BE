@@ -123,4 +123,24 @@ public class ClassService {
             throw new PermissionNotAcceptException("Cannot delete class");
         }
     }
+    public ClassDetailResponse getClassDetailById(String id) {
+        // Lấy thông tin class từ repository
+        Classes classes = classRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy lớp học với id " + id));
+
+        // Chuyển đổi đối tượng Classes thành ClassDetailResponse
+        return ClassDetailResponse.builder()
+                .className(classes.getClassName())
+                .ageRange(classes.getAgeRange())
+                .openingDay(classes.getOpeningDay())
+                .closingDay(classes.getClosingDay())
+                .children(classes.getChildren().stream()
+                        .map(child -> child.getChildName()) // Giả sử Children có trường getChildName()
+                        .collect(Collectors.toSet()))
+                .teachers(classes.getTeachers().stream()
+                        .map(teacher -> teacher.getTeacherId().getFullName()) // Lấy tên giáo viên từ ClassTeacher
+                        .collect(Collectors.toSet()))
+                .build();
+    }
+
 }

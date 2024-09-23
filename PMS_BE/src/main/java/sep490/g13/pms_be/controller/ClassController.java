@@ -161,20 +161,20 @@ public class ClassController {
     }
 
 
-//    @GetMapping("/classDetail/{classId}")
-//    public ResponseEntity<ResponseModel<?>> getClassDetail(@PathVariable String classId) {
-//        ClassDetailResponse classDetailResponse = classService.getClassDetailById(classId);
-//
-//        return ResponseEntity
-//                .status(HttpStatus.OK)
-//                .body(ResponseModel.<ClassDetailResponse>builder()
-//                        .message("Lấy dữ liệu lớp có id: " + classId)
-//                        .data(classDetailResponse)
-//                        .build());
-//    }
+    @GetMapping("/class_detail/{classId}")
+    public ResponseEntity<ResponseModel<?>> getClassDetail(@PathVariable String classId) {
+        ClassDetailResponse classDetailResponse = classService.getClassDetailById(classId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResponseModel.<ClassDetailResponse>builder()
+                        .message("Lấy dữ liệu lớp có id: " + classId)
+                        .data(classDetailResponse)
+                        .build());
+    }
 
 
-    @DeleteMapping("/class/{classId}")
+    @DeleteMapping("/delete_class/{classId}")
     public ResponseEntity<String> deleteClass(@PathVariable String classId) {
         try {
             classService.deleteClass(classId);

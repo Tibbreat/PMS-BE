@@ -26,8 +26,8 @@ public class ClassDetailResponse {
     @NotNull(message = "Closing Day không được để trống")
     private Date closingDay;
     @NotNull(message = "Childrens không được để trống")
-    private Set<Children> children; // Add this line
+    private Set<String> children; // Add this line
     @NotNull(message = "Teachers không được để trống")
-    private Set<ClassTeacher> teachers; // Add this line
+    private Set<String> teachers; // Add this line
 
 }
