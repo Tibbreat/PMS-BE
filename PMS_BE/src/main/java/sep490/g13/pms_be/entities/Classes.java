@@ -27,8 +27,9 @@ public class Classes extends Auditable<String> {
 
     private Date closingDay;
 
-    @OneToMany
-    private Set<Children> children;
+    @OneToMany(mappedBy = "schoolClass", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private Set<Children> children = new HashSet<>();
 
     @OneToMany(mappedBy = "schoolClasses", cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonManagedReference

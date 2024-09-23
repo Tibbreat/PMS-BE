@@ -142,5 +142,8 @@ public class ClassService {
                         .collect(Collectors.toSet()))
                 .build();
     }
+    public Classes getClassById(String id){
+        return classRepo.findById(id).get();
+    }
 
 }

@@ -47,6 +47,7 @@ public class ClassController {
     @PostMapping("/add")
     public ResponseEntity<ResponseModel<?>> addNewClass(
             @RequestBody @Valid AddClassRequest classRequest,
+
             BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String validationErrors = ValidationUtils.getValidationErrors(bindingResult);
