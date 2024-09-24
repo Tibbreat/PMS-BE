@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import sep490.g13.pms_be.entities.FoodServiceProvider;
 import sep490.g13.pms_be.entities.User;
 import sep490.g13.pms_be.exception.other.DataNotFoundException;
+import sep490.g13.pms_be.exception.other.PermissionNotAcceptException;
 import sep490.g13.pms_be.model.request.foodsupplier.FoodProviderAddNewRequest;
 import sep490.g13.pms_be.repository.FoodServiceProviderRepo;
 import sep490.g13.pms_be.repository.UserRepo;
@@ -34,40 +35,47 @@ public class FoodServiceProviderService {
     @Autowired
     private DriveService driveService;
 
-    //        //Set createBy user
-//        User createdByUser = userRepo.findById(fpa.getCreatedBy())
-//                .orElseThrow(() -> new DataNotFoundException("Không tìm thấy người dùng nào có id: " + fpa.getCreatedBy()));
-//        newFoodProvider.setCreatedBy(String.valueOf(createdByUser));
-
     @Transactional
-    public FoodServiceProvider addFoodProvider(FoodProviderAddNewRequest fpa) throws IOException {
-
+    public FoodServiceProvider addFoodProvider(FoodProviderAddNewRequest fpa, MultipartFile contractFile) throws IOException {
         FoodServiceProvider newFoodProvider = new FoodServiceProvider();
         BeanUtils.copyProperties(fpa, newFoodProvider);
 
-        MultipartFile contractFile = fpa.getContractFile();
+        // Kiểm tra người tạo
+        if (fpa.getCreatedBy() == null) {
+            throw new IllegalArgumentException("CreatedBy field is null or invalid");
+        }
+
+        // Tìm kiếm user được tạo
+        User createdByUser = userRepo.findById(fpa.getCreatedBy())
+                .orElseThrow(() -> new DataNotFoundException("User not found with id: " + fpa.getCreatedBy()));
+        newFoodProvider.setCreatedBy(String.valueOf(createdByUser));
+
+        // Ensure that only ADMIN role can create a class
+        if (createdByUser.getRole() != RoleEnums.ADMIN) {
+            throw new PermissionNotAcceptException("Cant create class with other role");
+        }
+
+        // Xử lý tệp hợp đồng
         if (contractFile != null && !contractFile.isEmpty()) {
-            // Chuyển đổi MultipartFile thành File
-            File convFile = new File(contractFile.getOriginalFilename());
-            try (FileOutputStream fos = new FileOutputStream(convFile)) {
-                fos.write(contractFile.getBytes());
-            }
+            // Tạo tên file tạm với slug và đuôi file phù hợp
+            File tempFile = File.createTempFile("contract-" + fpa.getProviderName() + "-", ".pdf");
+
+            // Chuyển nội dung file từ MultipartFile sang file tạm
+            contractFile.transferTo(tempFile);
 
             // Upload file lên Google Drive
-            String contractLink = driveService.upload(convFile);
+            String contractLink = driveService.upload(tempFile);
             newFoodProvider.setContractFile(contractLink);
 
-            // Xoá file sau khi upload
-            if (!convFile.delete()) {
+            // Xóa file tạm sau khi upload
+            if (!tempFile.delete()) {
                 System.out.println("Warning: Temporary file deletion failed.");
             }
         }
 
+
         return foodServiceProviderRepo.save(newFoodProvider);
     }
-
-
-
 
     public Page<FoodServiceProvider> getProvider(Boolean status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);

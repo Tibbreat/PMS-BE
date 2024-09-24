@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import sep490.g13.pms_be.entities.FoodServiceProvider;
 import sep490.g13.pms_be.model.request.foodsupplier.FoodProviderAddNewRequest;
 import sep490.g13.pms_be.model.response.base.PagedResponseModel;
@@ -22,10 +23,10 @@ public class FoodServiceProviderController {
     @Autowired
     private FoodServiceProviderService foodServiceProviderService;
 
-
     @PostMapping("/add")
     public ResponseEntity<ResponseModel<?>> addNewProvider(
-            @ModelAttribute @Valid FoodProviderAddNewRequest fpa,
+            @RequestPart("fpa") @Valid FoodProviderAddNewRequest fpa,
+            @RequestPart("contractFile") MultipartFile contractFile,
             BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
@@ -39,9 +40,10 @@ public class FoodServiceProviderController {
                             .data(null)
                             .build());
         }
-        try {
 
-            FoodServiceProvider savedFSP = foodServiceProviderService.addFoodProvider(fpa);
+        try {
+            // Gọi service để thêm nhà cung cấp
+            FoodServiceProvider savedFSP = foodServiceProviderService.addFoodProvider(fpa, contractFile);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ResponseModel.<FoodServiceProvider>builder()
                             .message("Food Provider added successfully")
@@ -50,13 +52,11 @@ public class FoodServiceProviderController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ResponseModel.<FoodServiceProvider>builder()
-                            .message("Food Provider added failed: " + e.getMessage())
+                            .message("Food Provider addition failed: " + e.getMessage())
                             .data(null)
                             .build());
         }
-
     }
-
 
     @GetMapping
     public ResponseEntity<PagedResponseModel<FoodServiceProvider>> getProvider(

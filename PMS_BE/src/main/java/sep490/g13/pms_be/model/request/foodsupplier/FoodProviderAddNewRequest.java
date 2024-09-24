@@ -35,8 +35,6 @@ public class FoodProviderAddNewRequest {
     @NotBlank(message = "Số giấy phép kinh doanh không được để trống")
     private String providerLicenseNumber;
 
-    private MultipartFile contractFile;
-
     @NotNull(message= "Người tạo không được để trống")
     private String createdBy;
 }
