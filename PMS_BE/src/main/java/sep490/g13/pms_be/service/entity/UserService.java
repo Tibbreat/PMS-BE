@@ -21,12 +21,13 @@ public class UserService {
 
     public User addUser(AddUserRequest request) {
         String defaultPassword = StringUtils.randomString(8);
-        int count = userRepo.countByFullName(request.getFullName());
+        String accountName = StringUtils.generateUsername(request.getFullName());
+        int count = userRepo.countByUsernameContaining(accountName);
         String username = "";
         if (count == 0) {
-            username += StringUtils.generateUsername(request.getFullName());
+            username += accountName;
         } else {
-            username += StringUtils.generateUsername(request.getFullName()) + (count + 1);
+            username += accountName + (count + 1);
         }
 
         User user = new User();
