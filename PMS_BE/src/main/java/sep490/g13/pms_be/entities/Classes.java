@@ -40,4 +40,6 @@ public class Classes extends Auditable<String> {
 
     @OneToMany(mappedBy = "schoolClasses")
     private Set<DailyMenu> dailyMenus;
+
+    private String status = "Unactive";
 }

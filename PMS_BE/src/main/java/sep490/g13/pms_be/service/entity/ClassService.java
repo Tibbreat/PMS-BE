@@ -5,6 +5,7 @@ import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sep490.g13.pms_be.entities.Children;
@@ -111,16 +112,16 @@ public class ClassService {
     }
 
 
-    public void deleteClass(String classId) {
+    public void changeStatusClass(String classId) {
         Classes clazz = classRepo.findById(classId)
                 .orElseThrow(() -> new DataNotFoundException("Class not found"));
         LocalDate openingDay = dateUtils.convertToLocalDate(clazz.getOpeningDay());
         LocalDate closingDay = dateUtils.convertToLocalDate(clazz.getClosingDay());
         // Check if the opening day is in the future
-        if (openingDay.isAfter(LocalDate.now()) || closingDay.isBefore(LocalDate.now())) {
-            classRepo.delete(clazz);
+        if (openingDay.isBefore(LocalDate.now()) || closingDay.isAfter(LocalDate.now())) {
+            classRepo.updateClassesByStatus("Active",classId);
         } else {
-            throw new PermissionNotAcceptException("Cannot delete class");
+            throw new PermissionNotAcceptException("Cannot change class status");
         }
     }
     public ClassDetailResponse getClassDetailById(String id) {
@@ -145,5 +146,22 @@ public class ClassService {
     public Classes getClassById(String id){
         return classRepo.findById(id).get();
     }
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void closeClasses() {
+        LocalDate today = LocalDate.now();
+        List<Classes> classesToClose = classRepo.findByClosingDayBeforeAndStatus(today, "ACTIVE");
 
+        classesToClose.forEach(cls -> cls.setStatus("CLOSED"));
+        classRepo.saveAll(classesToClose);
+    }
+
+    // Scheduled task to automatically open classes that are ready to be started
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void openClasses() {
+        LocalDate today = LocalDate.now();
+        List<Classes> classesToOpen = classRepo.findByOpeningDayAfterAndStatus(today, "INACTIVE");
+
+        classesToOpen.forEach(cls -> cls.setStatus("ACTIVE"));
+        classRepo.saveAll(classesToOpen);
+    }
 }

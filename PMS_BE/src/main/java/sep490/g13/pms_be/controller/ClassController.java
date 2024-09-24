@@ -175,15 +175,14 @@ public class ClassController {
     }
 
 
-    @DeleteMapping("/delete_class/{classId}")
-    public ResponseEntity<String> deleteClass(@PathVariable String classId) {
+    @PutMapping("/change_status/{classId}")
+    public ResponseEntity<String> changStatusClass(@PathVariable String classId) {
         try {
-            classService.deleteClass(classId);
-            return ResponseEntity.ok("Class deleted successfully.");
-        } catch (IllegalStateException e) {
+            classService.changeStatusClass(classId);
+            return ResponseEntity.ok("Change Class status successfully.");
+
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (DataNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 

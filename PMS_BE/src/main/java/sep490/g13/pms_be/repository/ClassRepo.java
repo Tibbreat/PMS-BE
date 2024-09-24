@@ -12,6 +12,9 @@ import sep490.g13.pms_be.entities.Classes;
 import sep490.g13.pms_be.model.request.classes.UpdateClassRequest;
 import sep490.g13.pms_be.model.response.classes.ClassDetailResponse;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Repository
 public interface ClassRepo extends JpaRepository<Classes, String> {
     @Query("SELECT c FROM Classes c " +
@@ -36,15 +39,15 @@ public interface ClassRepo extends JpaRepository<Classes, String> {
             "WHERE c.id = :classId")
     void updateClass(@Param("classId") String classId, @Param("updateRequest") UpdateClassRequest updateRequest);
 
-//    @Query("SELECT new sep490.g13.pms_be.model.response.classes.ClassDetailResponse(" +
-//            "c.className, " +
-//            "c.ageRange, " +
-//            "c.openingDay, " +
-//            "c.closingDay, " +
-//            "c.children, " +
-//            "c.teachers) " +
-//            "FROM Classes c WHERE c.id = :id")
-//    ClassDetailResponse findClassDetailById(@Param("id") String id);
+    @Transactional
+    @Modifying
+    @Query("UPDATE Classes j SET " +
+            "j.status = :status " +
+            "WHERE j.id = :classId")
+    void updateClassesByStatus(@Param("status") String status,
+                         @Param("classId")  String id);
+    List<Classes> findByClosingDayBeforeAndStatus(LocalDate date, String status);
 
+    List<Classes> findByOpeningDayAfterAndStatus(LocalDate date, String status);
 
 }
