@@ -1,10 +1,7 @@
 package sep490.g13.pms_be.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -32,7 +29,8 @@ public class Children extends Auditable<String> {
     @OneToMany(mappedBy = "children")
     private Set<ChildrenFee> childrenFees;
 
-    @OneToMany(mappedBy = "childrenId")
+
+    @OneToMany(mappedBy = "childrenId", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Relationship> relationships;
 
     @ManyToOne

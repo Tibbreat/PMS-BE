@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 import sep490.g13.pms_be.model.request.RelationshipRequest;
 
 import java.time.LocalDate;
@@ -24,9 +25,11 @@ public class AddChildrenRequest {
     private LocalDate childBirthDate;
     @NotNull(message = "Children Address không được để trống")
     private String childAddress;
-
+    @NotNull(message = "Class Id không được để trống")
     private String classId; // ID của lớp mà đứa trẻ sẽ được thêm vào
 
     private List<RelationshipRequest> relationships;
+
     private String createdById;
+    private MultipartFile image;
 }
