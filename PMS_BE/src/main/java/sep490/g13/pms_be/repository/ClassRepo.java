@@ -23,7 +23,7 @@ public interface ClassRepo extends JpaRepository<Classes, String> {
     Page<Classes> findClassesByFilters(
             @Param("schoolYear") Integer schoolYear,
             @Param("ageRange") String ageRange,
-            @Param("managerId") Long managerId,
+            @Param("managerId") String managerId,
             Pageable pageable);
 
     @Modifying

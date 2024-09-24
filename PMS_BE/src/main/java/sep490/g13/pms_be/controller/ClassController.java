@@ -116,7 +116,7 @@ public class ClassController {
             @RequestParam int page,
             @RequestParam(required = false) Integer schoolYear,
             @RequestParam(required = false) String ageRange,
-            @RequestParam(required = false) Long managerId) {
+            @RequestParam(required = false) String managerId) {
 
         int size = 10; // Số lượng lớp học mỗi trang
         Page<Classes> result = classService.getClasses(schoolYear, ageRange, managerId, page - 1, size);

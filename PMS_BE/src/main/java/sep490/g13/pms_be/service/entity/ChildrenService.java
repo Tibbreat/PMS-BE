@@ -100,7 +100,7 @@ public class ChildrenService {
     @Transactional
     public void uploadImage(final String id, final MultipartFile file) {
         final Children children = this.childrenRepo.findById(id)
-                .orElseThrow(() -> new DataNotFoundException("Product not found"));
+                .orElseThrow(() -> new DataNotFoundException("Children not found"));
         FileUploadUtil.assertAllowedExtension(file, FileUploadUtil.IMAGE_PATTERN);
         final String fileName = FileUploadUtil.getFileName(file.getOriginalFilename());
         final CloudinaryResponse response = this.cloudinaryService.uploadFile(file, fileName);
@@ -111,5 +111,6 @@ public class ChildrenService {
     public Children updateChildren(Children child) {
         return childrenRepo.save(child); // Lưu lại đối tượng Children đã được cập nhật
     }
+
 
 }

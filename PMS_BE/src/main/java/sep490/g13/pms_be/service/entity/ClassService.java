@@ -86,7 +86,7 @@ public class ClassService {
         return classRepo.save(c);
     }
 
-    public Page<Classes> getClasses(Integer schoolYear, String ageRange, Long managerId, int page, int size) {
+    public Page<Classes> getClasses(Integer schoolYear, String ageRange, String managerId, int page, int size) {
         // Tạo Pageable để phân trang
         Pageable pageable = PageRequest.of(page, size);
         // Gọi repository để lấy danh sách lớp học theo bộ lọc
