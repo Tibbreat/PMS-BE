@@ -12,6 +12,6 @@ public interface FoodServiceProviderRepo extends JpaRepository<FoodServiceProvid
     @Query("SELECT fsp FROM FoodServiceProvider fsp WHERE " +
             "(:status IS NULL OR fsp.isActive = :status)")
     Page<FoodServiceProvider> findByProvider(
-            @Param("status") String status,
+            @Param("status") Boolean status,
             Pageable pageable);
 }
