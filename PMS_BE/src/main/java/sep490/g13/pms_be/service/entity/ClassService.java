@@ -105,9 +105,12 @@ public class ClassService {
         User manager = userRepo.findById(updateClassRequest.getManagerId())
                 .orElseThrow(() -> new DataNotFoundException("Manager not found with id: " + updateClassRequest.getManagerId()));
         existingClass.setManager(manager);
-
-        existingClass.setLastModifiedBy(updateClassRequest.getLastModifyById());
-
+        User lastMofifyBy = userRepo.findById(updateClassRequest.getManagerId()).get();
+        if(lastMofifyBy.getRole() != RoleEnums.ADMIN) {
+            throw new PermissionNotAcceptException("Cant update class with other role");
+        }else {
+            existingClass.setLastModifiedBy(updateClassRequest.getLastModifyById());
+        }
         classRepo.save(existingClass);
     }
 
@@ -151,7 +154,7 @@ public class ClassService {
         LocalDate today = LocalDate.now();
         List<Classes> classesToClose = classRepo.findByClosingDayBeforeAndStatus(today, "ACTIVE");
 
-        classesToClose.forEach(cls -> cls.setStatus("CLOSED"));
+        classesToClose.forEach(cls -> cls.setStatus("Deactive"));
         classRepo.saveAll(classesToClose);
     }
 
@@ -159,7 +162,7 @@ public class ClassService {
     @Scheduled(cron = "0 0 0 * * ?")
     public void openClasses() {
         LocalDate today = LocalDate.now();
-        List<Classes> classesToOpen = classRepo.findByOpeningDayAfterAndStatus(today, "INACTIVE");
+        List<Classes> classesToOpen = classRepo.findByOpeningDayAfterAndStatus(today, "DeACTIVE");
 
         classesToOpen.forEach(cls -> cls.setStatus("ACTIVE"));
         classRepo.saveAll(classesToOpen);
