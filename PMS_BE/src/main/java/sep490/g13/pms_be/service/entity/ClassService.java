@@ -115,18 +115,6 @@ public class ClassService {
     }
 
 
-    public void changeStatusClass(String classId) {
-        Classes clazz = classRepo.findById(classId)
-                .orElseThrow(() -> new DataNotFoundException("Class not found"));
-        LocalDate openingDay = dateUtils.convertToLocalDate(clazz.getOpeningDay());
-        LocalDate closingDay = dateUtils.convertToLocalDate(clazz.getClosingDay());
-        // Check if the opening day is in the future
-        if (openingDay.isBefore(LocalDate.now()) || closingDay.isAfter(LocalDate.now())) {
-            classRepo.updateClassesByStatus("Active",classId);
-        } else {
-            throw new PermissionNotAcceptException("Cannot change class status");
-        }
-    }
     public ClassDetailResponse getClassDetailById(String id) {
         // Lấy thông tin class từ repository
         Classes classes = classRepo.findById(id)
@@ -149,22 +137,37 @@ public class ClassService {
     public Classes getClassById(String id){
         return classRepo.findById(id).get();
     }
+    public void changeStatusClass(String classId) {
+        Classes clazz = classRepo.findById(classId)
+                .orElseThrow(() -> new DataNotFoundException("Class not found"));
+        LocalDate openingDay = dateUtils.convertToLocalDate(clazz.getOpeningDay());
+        LocalDate closingDay = dateUtils.convertToLocalDate(clazz.getClosingDay());
+
+        // Check if the opening day is in the future and update status accordingly
+        if (openingDay.isBefore(LocalDate.now()) || closingDay.isAfter(LocalDate.now())) {
+            clazz.setStatus(true);  // Active
+        } else {
+            throw new PermissionNotAcceptException("Cannot change class status");
+        }
+        classRepo.save(clazz);
+    }
+
     @Scheduled(cron = "0 0 0 * * ?")
     public void closeClasses() {
         LocalDate today = LocalDate.now();
-        List<Classes> classesToClose = classRepo.findByClosingDayBeforeAndStatus(today, "ACTIVE");
+        List<Classes> classesToClose = classRepo.findByClosingDayBeforeAndStatus(today, true); // true for active classes
 
-        classesToClose.forEach(cls -> cls.setStatus("Deactive"));
+        classesToClose.forEach(cls -> cls.setStatus(false));  // Set status to inactive
         classRepo.saveAll(classesToClose);
     }
 
-    // Scheduled task to automatically open classes that are ready to be started
     @Scheduled(cron = "0 0 0 * * ?")
     public void openClasses() {
         LocalDate today = LocalDate.now();
-        List<Classes> classesToOpen = classRepo.findByOpeningDayAfterAndStatus(today, "DeACTIVE");
+        List<Classes> classesToOpen = classRepo.findByOpeningDayAfterAndStatus(today, false); // false for deactive classes
 
-        classesToOpen.forEach(cls -> cls.setStatus("ACTIVE"));
+        classesToOpen.forEach(cls -> cls.setStatus(true));  // Set status to active
         classRepo.saveAll(classesToOpen);
     }
+
 }

@@ -46,8 +46,7 @@ public interface ClassRepo extends JpaRepository<Classes, String> {
             "WHERE j.id = :classId")
     void updateClassesByStatus(@Param("status") String status,
                          @Param("classId")  String id);
-    List<Classes> findByClosingDayBeforeAndStatus(LocalDate date, String status);
-
-    List<Classes> findByOpeningDayAfterAndStatus(LocalDate date, String status);
+    List<Classes> findByClosingDayBeforeAndStatus(LocalDate date, boolean status);
+    List<Classes> findByOpeningDayAfterAndStatus(LocalDate date, boolean status);
 
 }

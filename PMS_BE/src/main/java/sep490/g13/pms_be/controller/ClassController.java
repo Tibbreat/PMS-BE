@@ -140,7 +140,7 @@ public class ClassController {
 
         return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
     }
-    @PutMapping("/change_class_description/{classId}")
+    @PutMapping("/change-class-description/{classId}")
     public ResponseEntity<ResponseModel<?>> updateClassDescription(
             @RequestBody @Valid UpdateClassRequest updateClassRequest,
             BindingResult bindingResult,
@@ -162,7 +162,7 @@ public class ClassController {
     }
 
 
-    @GetMapping("/class_detail/{classId}")
+    @GetMapping("/class-detail/{classId}")
     public ResponseEntity<ResponseModel<?>> getClassDetail(@PathVariable String classId) {
         ClassDetailResponse classDetailResponse = classService.getClassDetailById(classId);
 
@@ -175,12 +175,11 @@ public class ClassController {
     }
 
 
-    @PutMapping("/change_status/{classId}")
+    @PutMapping("/change-status/{classId}")
     public ResponseEntity<String> changStatusClass(@PathVariable String classId) {
         try {
             classService.changeStatusClass(classId);
-            return ResponseEntity.ok("Change Class status successfully.");
-
+            return ResponseEntity.ok("Class status updated successfully.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
