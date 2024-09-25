@@ -4,7 +4,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Getter
@@ -12,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class FoodProviderAddNewRequest {
+public class AddFoodProviderRequest {
     @NotBlank(message = "Tên người đại diện không được bỏ trống")
     private String representativeName;
 

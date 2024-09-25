@@ -10,10 +10,13 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import sep490.g13.pms_be.entities.FoodServiceProvider;
-import sep490.g13.pms_be.model.request.foodsupplier.FoodProviderAddNewRequest;
+import sep490.g13.pms_be.model.request.foodsupplier.AddFoodProviderRequest;
+import sep490.g13.pms_be.model.request.foodsupplier.UpdateFoodProviderRequest;
 import sep490.g13.pms_be.model.response.base.PagedResponseModel;
 import sep490.g13.pms_be.model.response.base.ResponseModel;
 import sep490.g13.pms_be.service.entity.FoodServiceProviderService;
+import sep490.g13.pms_be.utils.ValidationUtils;
+
 import java.util.List;
 
 @RestController
@@ -25,7 +28,7 @@ public class FoodServiceProviderController {
 
     @PostMapping("/add")
     public ResponseEntity<ResponseModel<?>> addNewProvider(
-            @RequestPart("fpa") @Valid FoodProviderAddNewRequest fpa,
+            @RequestPart("fpa") @Valid AddFoodProviderRequest fpa,
             @RequestPart("contractFile") MultipartFile contractFile,
             BindingResult bindingResult) {
 
@@ -81,5 +84,27 @@ public class FoodServiceProviderController {
         return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
     }
 
+    @PutMapping("/change-information/{foodProviderId}")
+    public ResponseEntity<ResponseModel<?>> updateFoodProvider(
+            @RequestBody @Valid UpdateFoodProviderRequest updateFoodProviderRequest,
+            @PathVariable String foodProviderId,
+            BindingResult bindingResult){
+        if(bindingResult.hasErrors()){
+            String errorMessage = ValidationUtils.getValidationErrors(bindingResult);
+
+            return ResponseEntity.badRequest()
+                    .body(ResponseModel.<String>builder()
+                            .message("Update food provider failed: " + errorMessage)
+                            .data(errorMessage)
+                            .build());
+        }
+        foodServiceProviderService.updateFoodProvider(updateFoodProviderRequest, foodProviderId);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseModel.<String>builder()
+                        .message("Food Provider updated successfully")
+                        .data(null)
+                        .build());
+    }
 }
 

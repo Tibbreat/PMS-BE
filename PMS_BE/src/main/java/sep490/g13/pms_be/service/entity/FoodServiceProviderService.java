@@ -2,7 +2,6 @@ package sep490.g13.pms_be.service.entity;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,15 +12,16 @@ import sep490.g13.pms_be.entities.FoodServiceProvider;
 import sep490.g13.pms_be.entities.User;
 import sep490.g13.pms_be.exception.other.DataNotFoundException;
 import sep490.g13.pms_be.exception.other.PermissionNotAcceptException;
-import sep490.g13.pms_be.model.request.foodsupplier.FoodProviderAddNewRequest;
+import sep490.g13.pms_be.model.request.foodsupplier.AddFoodProviderRequest;
+import sep490.g13.pms_be.model.request.foodsupplier.UpdateFoodProviderRequest;
 import sep490.g13.pms_be.repository.FoodServiceProviderRepo;
 import sep490.g13.pms_be.repository.UserRepo;
 import sep490.g13.pms_be.service.utils.DriveService;
 import sep490.g13.pms_be.utils.enums.RoleEnums;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 
 @Service
 public class FoodServiceProviderService {
@@ -36,7 +36,7 @@ public class FoodServiceProviderService {
     private DriveService driveService;
 
     @Transactional
-    public FoodServiceProvider addFoodProvider(FoodProviderAddNewRequest fpa, MultipartFile contractFile) throws IOException {
+    public FoodServiceProvider addFoodProvider(AddFoodProviderRequest fpa, MultipartFile contractFile) throws IOException {
         FoodServiceProvider newFoodProvider = new FoodServiceProvider();
         BeanUtils.copyProperties(fpa, newFoodProvider);
 
@@ -52,7 +52,7 @@ public class FoodServiceProviderService {
 
         // Ensure that only ADMIN role can create a class
         if (createdByUser.getRole() != RoleEnums.ADMIN) {
-            throw new PermissionNotAcceptException("Cant create class with other role");
+            throw new PermissionNotAcceptException("Cant create food provider service with other role");
         }
 
         // Xử lý tệp hợp đồng
@@ -81,5 +81,20 @@ public class FoodServiceProviderService {
         Pageable pageable = PageRequest.of(page, size);
         return foodServiceProviderRepo.findByProvider(status, pageable);
     }
-}
 
+    @Transactional
+    public void updateFoodProvider(UpdateFoodProviderRequest updateFoodProviderRequest, String foodProviderId) {
+
+        FoodServiceProvider foodServiceProvider = foodServiceProviderRepo.findById(foodProviderId)
+                .orElseThrow(() -> new DataNotFoundException("Food Provider with ID " + foodProviderId + " not found"));
+
+        User lastMofifyBy = userRepo.findById(updateFoodProviderRequest.getLastModifyById()).get();
+        if(lastMofifyBy.getRole() != RoleEnums.ADMIN) {
+            throw new PermissionNotAcceptException("Cant update class with other role");
+        }else {
+            foodServiceProvider.setLastModifiedBy(updateFoodProviderRequest.getLastModifyById());
+        }
+
+        foodServiceProviderRepo.save(foodServiceProvider);
+    }
+}
