@@ -1,5 +1,6 @@
 package sep490.g13.pms_be.service.entity;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
@@ -14,6 +15,7 @@ import sep490.g13.pms_be.entities.Classes;
 import sep490.g13.pms_be.entities.User;
 import sep490.g13.pms_be.exception.other.DataNotFoundException;
 import sep490.g13.pms_be.exception.other.PermissionNotAcceptException;
+import sep490.g13.pms_be.model.request.classes.AddClassRequest;
 import sep490.g13.pms_be.model.request.classes.UpdateClassRequest;
 import sep490.g13.pms_be.model.response.classes.ClassDetailResponse;
 import sep490.g13.pms_be.repository.ClassRepo;
@@ -22,9 +24,7 @@ import sep490.g13.pms_be.utils.LocalDateUtils;
 import sep490.g13.pms_be.utils.enums.RoleEnums;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,52 +39,84 @@ public class ClassService {
     public List<Classes> findAll(){
         return classRepo.findAll();
     }
-    public Classes addClass(Classes c){
-        // Check User co ton tai hay khong
-        if (c.getCreatedBy()== null) {
+    public Classes createNewClass(AddClassRequest classRequest) {
+        // Tạo đối tượng Classes từ request
+        Classes newClass = new Classes();
+        BeanUtils.copyProperties(classRequest, newClass);
+
+        // Xử lý và validate danh sách giáo viên
+        Set<ClassTeacher> teachers = processTeachers(newClass, classRequest.getTeacherId());
+
+        // Validate và set manager cho lớp
+        User manager = validateManager(classRequest.getManagerId());
+
+        // Set các giá trị khác vào đối tượng class
+        newClass.setTeachers(teachers);
+        newClass.setManager(manager);
+
+        // Kiểm tra và validate các trường ngày mở và ngày đóng
+        validateClassDates(newClass.getOpeningDay(), newClass.getClosingDay());
+
+        // Kiểm tra quyền của người tạo
+        validateCreatedBy(classRequest.getCreatedBy());
+
+        // Lưu lớp học vào database
+        return classRepo.save(newClass);
+    }
+
+    private Set<ClassTeacher> processTeachers(Classes newClass, List<String> teacherIds) {
+        Set<ClassTeacher> teachers = new HashSet<>();
+        for (String teacherId : teacherIds) {
+            User teacher = userRepo.getById(teacherId);
+            if (teacher == null) {
+                throw new DataNotFoundException("Giáo viên không tồn tại: " + teacherId);
+            }
+            ClassTeacher classTeacher = new ClassTeacher();
+            classTeacher.setSchoolClasses(newClass);
+            classTeacher.setTeacherId(teacher);
+            teachers.add(classTeacher);
+        }
+        return teachers;
+    }
+
+    private User validateManager(String managerId) {
+        User manager = userRepo.getById(managerId);
+        if (manager == null) {
+            throw new DataNotFoundException("Quản lý không tồn tại: " + managerId);
+        }
+
+        if (!manager.getRole().equals(RoleEnums.Class_Manager)) {
+            throw new PermissionNotAcceptException("Người này không có vai trò là Quản lý lớp (Class_Manager)");
+        }
+
+        return manager;
+    }
+
+    private void validateCreatedBy(String createdBy) {
+        if (createdBy == null) {
             throw new IllegalArgumentException("CreatedBy field is null or invalid");
         }
 
-//         Fetch the user from the database based on the createdBy ID
-        User createdByUser = userRepo.findById(c.getCreatedBy())
-                .orElseThrow(() -> new DataNotFoundException("User not found with id: " + c.getCreatedBy()));
+        User createdByUser = userRepo.findById(createdBy)
+                .orElseThrow(() -> new DataNotFoundException("User not found with id: " + createdBy));
 
-        // Set the createdBy field in the class entity
-        c.setCreatedBy(createdByUser.getId());
-
-        // Ensure that only INTERVIEWER or ADMIN role can create a class
         if (createdByUser.getRole() != RoleEnums.ADMIN) {
             throw new PermissionNotAcceptException("Cant create class with other role");
         }
-        // Kiểm tra User (Manager) có tồn tại hay không
-        Optional<User> managerOpt = userRepo.findById(c.getManager().getId());
-        if (managerOpt.isEmpty()) {
-            throw new DataNotFoundException("Manager doesn't exist");
-        }
+    }
 
-
-        for (ClassTeacher teacher : c.getTeachers()) {
-            Optional<User> teacherOpt = userRepo.findById(teacher.getTeacherId().getId());
-            if (teacherOpt.isEmpty()) {
-                throw new DataNotFoundException("Teacher doesn't exist: " + teacher.getTeacherId().getId());
-            }
-        }
-        LocalDate openingDay = dateUtils.convertToLocalDate(c.getOpeningDay());
-        LocalDate closingDay = dateUtils.convertToLocalDate(c.getClosingDay());
+    private void validateClassDates(Date openingDay, Date closingDay) {
+        LocalDate openDay = dateUtils.convertToLocalDate(openingDay);
+        LocalDate closeDay = dateUtils.convertToLocalDate(closingDay);
         LocalDate today = LocalDate.now();
 
-        // Check if openingDay is after today
-        if (!openingDay.isAfter(today)) {
+        if (!openDay.isAfter(today)) {
             throw new IllegalArgumentException("Opening Day must be after today");
         }
 
-        // Check if closingDay is at least 6 months after openingDay
-        if (closingDay.isBefore(openingDay.plusMonths(6))) {
-            throw new IllegalArgumentException("Closing Day must be after Opening Day 6 months");
+        if (closeDay.isBefore(openDay.plusMonths(6))) {
+            throw new IllegalArgumentException("Closing Day must be at least 6 months after Opening Day");
         }
-
-        // Lưu lớp học vào database
-        return classRepo.save(c);
     }
 
     public Page<Classes> getClasses(Integer schoolYear, String ageRange, String managerId, int page, int size) {

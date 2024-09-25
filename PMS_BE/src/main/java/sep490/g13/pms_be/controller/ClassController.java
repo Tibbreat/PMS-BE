@@ -47,8 +47,8 @@ public class ClassController {
     @PostMapping("/add")
     public ResponseEntity<ResponseModel<?>> addNewClass(
             @RequestBody @Valid AddClassRequest classRequest,
-
             BindingResult bindingResult) {
+
         if (bindingResult.hasErrors()) {
             String validationErrors = ValidationUtils.getValidationErrors(bindingResult);
             return ResponseEntity.badRequest().body(
@@ -59,47 +59,18 @@ public class ClassController {
             );
         }
 
-        Classes newClass = new Classes();
-        BeanUtils.copyProperties(classRequest, newClass);
-
-        Set<ClassTeacher> teachers = new HashSet<>();
-        for (String teacherId : classRequest.getTeacherId()) {
-            User teacher = userService.getUserById(teacherId);
-            if (teacher == null) {
-                return ResponseEntity.badRequest().body(
-                        ResponseModel.builder()
-                                .message("Giáo viên không tồn tại: " + teacherId)
-                                .build()
-                );
-            }
-            ClassTeacher classTeacher = new ClassTeacher();
-            classTeacher.setSchoolClasses(newClass);
-            classTeacher.setTeacherId(teacher);
-            teachers.add(classTeacher);
-        }
-        newClass.setTeachers(teachers);
-
-        User manager = userService.getUserById(classRequest.getManagerId());
-        if (manager == null) {
-            return ResponseEntity.badRequest().body(
-                    ResponseModel.builder()
-                            .message("Quản lý không tồn tại: " + classRequest.getManagerId())
-                            .build()
-            );
-        }
-
-        if (!manager.getRole().equals(RoleEnums.Class_Manager)) {
-            throw new PermissionNotAcceptException("Người này không có vai trò là Quản lý lớp (Class_Manager)");
-        }
-
-        newClass.setManager(manager);
-
         try {
-            Classes savedClass = classService.addClass(newClass);
+            Classes savedClass = classService.createNewClass(classRequest);
             return ResponseEntity.ok(
                     ResponseModel.builder()
                             .message("Thêm lớp học thành công")
-                            .data(savedClass)
+                            .data(classRequest)
+                            .build()
+            );
+        } catch (DataNotFoundException | PermissionNotAcceptException | IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(
+                    ResponseModel.builder()
+                            .message(e.getMessage())
                             .build()
             );
         } catch (Exception e) {
@@ -110,6 +81,7 @@ public class ClassController {
             );
         }
     }
+
 
     @GetMapping()
     public ResponseEntity<PagedResponseModel<Classes>> getClasses(
