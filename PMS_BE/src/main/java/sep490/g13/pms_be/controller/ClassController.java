@@ -179,7 +179,7 @@ public class ClassController {
     public ResponseEntity<String> changStatusClass(@PathVariable String classId) {
         try {
             classService.changeStatusClass(classId);
-            return ResponseEntity.ok("Class status updated successfully.");
+            return ResponseEntity.ok("Cập nhật thông tin lớp thành công");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
