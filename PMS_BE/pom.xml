@@ -86,8 +86,6 @@
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.6.0</version>
         </dependency>
-
-
         <!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-jackson -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -105,29 +103,34 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.cloudinary/cloudinary-http44 -->
+        <!-- Google API Client -->
         <dependency>
-            <groupId>com.cloudinary</groupId>
-            <artifactId>cloudinary-http44</artifactId>
-            <version>1.32.2</version>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+            <version>2.6.0</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+
+        <!-- Google Drive API -->
         <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.15.1</version>
+            <groupId>com.google.apis</groupId>
+            <artifactId>google-api-services-drive</artifactId>
+            <version>v3-rev20240628-2.0.0</version>
         </dependency>
+
+        <!-- Google OAuth Client -->
         <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>2.25.1</version>
-            <scope>test</scope>
+            <groupId>com.google.oauth-client</groupId>
+            <artifactId>google-oauth-client-jetty</artifactId>
+            <version>1.32.1</version>
         </dependency>
+
+        <!-- Gson for JSON serialization/deserialization -->
         <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>2.20.0</version>
+            <groupId>com.google.http-client</groupId>
+            <artifactId>google-http-client-gson</artifactId>
+            <version>1.39.2</version>
         </dependency>
+
     </dependencies>
 
     <build>

@@ -1,5 +1,6 @@
 package sep490.g13.pms_be.entities;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,5 +21,6 @@ public class FoodServiceProvider extends Auditable<String> {
     private String providerRegisterNumber;
     private String providerLicenseNumber;
     private String contractFile;
-    private Boolean isActive;
+    @Column(nullable = false)
+    private Boolean isActive = false;
 }
