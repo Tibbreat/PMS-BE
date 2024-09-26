@@ -28,7 +28,8 @@ public interface FoodServiceProviderRepo extends JpaRepository<FoodServiceProvid
             "fsp.providerAddress = :#{#updateFPR.providerAddress}, " +
             "fsp.providerRegisterNumber = :#{#updateFPR.providerRegisterNumber}, " +
             "fsp.providerLicenseNumber = :#{#updateFPR.providerLicenseNumber}," +
-            "fsp.lastModifiedBy = :#{#updateFPR.lastModifyById} " +
+            "fsp.lastModifiedBy = :#{#updateFPR.lastModifyById}," +
+            "fsp.lastModifiedDate = CURRENT_TIMESTAMP " +
             "WHERE fsp.id = :foodProviderId")
     void updateFoodProvider(
             @Param("updateFPR") UpdateFoodProviderRequest updateFPR,

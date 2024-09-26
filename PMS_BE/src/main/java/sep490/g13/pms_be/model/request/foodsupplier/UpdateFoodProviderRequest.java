@@ -37,6 +37,8 @@ public class UpdateFoodProviderRequest {
     @NotBlank(message = "Số giấy phép kinh doanh không được để trống")
     private String providerLicenseNumber;
 
-    @NotNull(message = "Last Modify By Không được để trống")
+    @NotNull(message = "Last Modify By không được để trống")
     private String lastModifyById;
+
+    private Date lastModifyDate;
 }

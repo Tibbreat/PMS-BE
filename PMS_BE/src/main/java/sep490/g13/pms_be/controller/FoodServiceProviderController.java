@@ -49,13 +49,13 @@ public class FoodServiceProviderController {
             FoodServiceProvider savedFSP = foodServiceProviderService.addFoodProvider(fpa, contractFile);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ResponseModel.<FoodServiceProvider>builder()
-                            .message("Food Provider added successfully")
+                            .message("Nhà cung cấp thức ăn được thêm thành công")
                             .data(savedFSP)
                             .build());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ResponseModel.<FoodServiceProvider>builder()
-                            .message("Food Provider addition failed: " + e.getMessage())
+                            .message("Nhà cung cấp thức ăn thêm bị lỗi: " + e.getMessage())
                             .data(null)
                             .build());
         }
@@ -94,7 +94,7 @@ public class FoodServiceProviderController {
 
             return ResponseEntity.badRequest()
                     .body(ResponseModel.<String>builder()
-                            .message("Update food provider failed: " + errorMessage)
+                            .message("Cập nhật nhà cung cấp thức ăn lỗi: " + errorMessage)
                             .data(errorMessage)
                             .build());
         }
@@ -102,7 +102,7 @@ public class FoodServiceProviderController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ResponseModel.<String>builder()
-                        .message("Food Provider updated successfully")
+                        .message("Nhà cung cấp thức ăn được cập nhật thành công")
                         .data(null)
                         .build());
     }

@@ -42,23 +42,23 @@ public class FoodServiceProviderService {
 
         // Kiểm tra người tạo
         if (fpa.getCreatedBy() == null) {
-            throw new IllegalArgumentException("CreatedBy field is null or invalid");
+            throw new IllegalArgumentException("Người tạo không xác định hoặc null");
         }
 
         // Tìm kiếm user được tạo
         User createdByUser = userRepo.findById(fpa.getCreatedBy())
-                .orElseThrow(() -> new DataNotFoundException("User not found with id: " + fpa.getCreatedBy()));
-        newFoodProvider.setCreatedBy(String.valueOf(createdByUser));
+                .orElseThrow(() -> new DataNotFoundException("Người dùng với id: " + fpa.getCreatedBy() + "không được tìm thấy"));
+        newFoodProvider.setCreatedBy(fpa.getCreatedBy());
 
         // Ensure that only ADMIN role can create a class
         if (createdByUser.getRole() != RoleEnums.ADMIN) {
-            throw new PermissionNotAcceptException("Cant create food provider service with other role");
+            throw new PermissionNotAcceptException("Chỉ có thể tạo nhà cung cấp thức ăn với quyền Admin");
         }
 
         // Xử lý tệp hợp đồng
         if (contractFile != null && !contractFile.isEmpty()) {
             // Tạo tên file tạm với slug và đuôi file phù hợp
-            File tempFile = File.createTempFile("contract-" + fpa.getProviderName() + "-", ".pdf");
+            File tempFile = File.createTempFile("Hợp Đồng-" + fpa.getProviderName() + "-", ".pdf");
 
             // Chuyển nội dung file từ MultipartFile sang file tạm
             contractFile.transferTo(tempFile);
@@ -69,11 +69,9 @@ public class FoodServiceProviderService {
 
             // Xóa file tạm sau khi upload
             if (!tempFile.delete()) {
-                System.out.println("Warning: Temporary file deletion failed.");
+                System.out.println("Cảnh báo: Không xóa được tệp tạm thời.");
             }
         }
-
-
         return foodServiceProviderRepo.save(newFoodProvider);
     }
 
@@ -86,15 +84,14 @@ public class FoodServiceProviderService {
     public void updateFoodProvider(UpdateFoodProviderRequest updateFoodProviderRequest, String foodProviderId) {
 
         FoodServiceProvider foodServiceProvider = foodServiceProviderRepo.findById(foodProviderId)
-                .orElseThrow(() -> new DataNotFoundException("Food Provider with ID " + foodProviderId + " not found"));
+                .orElseThrow(() -> new DataNotFoundException("Nhà cung cấp thức ăn với id " + foodProviderId + " không được tìm thấy"));
 
         User lastMofifyBy = userRepo.findById(updateFoodProviderRequest.getLastModifyById()).get();
         if(lastMofifyBy.getRole() != RoleEnums.ADMIN) {
-            throw new PermissionNotAcceptException("Cant update class with other role");
+            throw new PermissionNotAcceptException("Không thể cập nhật nhà cung cấp thức ăn với quyền khác");
         }else {
             foodServiceProvider.setLastModifiedBy(updateFoodProviderRequest.getLastModifyById());
         }
-
-        foodServiceProviderRepo.save(foodServiceProvider);
+        foodServiceProviderRepo.updateFoodProvider(updateFoodProviderRequest, foodProviderId);
     }
 }
