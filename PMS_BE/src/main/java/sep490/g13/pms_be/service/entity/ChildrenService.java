@@ -64,7 +64,7 @@ public class ChildrenService {
         c.setCreatedBy(createdByUser.getId());
 
         // Chỉ cho phép ADMIN tạo học sinh
-        if (createdByUser.getRole() != RoleEnums.ADMIN && createdByUser.getRole() != RoleEnums.Class_Manager) {
+        if (createdByUser.getRole() != RoleEnums.ADMIN && createdByUser.getRole() != RoleEnums.CLASS_MANAGER) {
             throw new PermissionNotAcceptException("Just Admin and Class_Manager can create children");
         }
 

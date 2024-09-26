@@ -85,7 +85,7 @@ public class ClassService {
             throw new DataNotFoundException("Quản lý không tồn tại: " + managerId);
         }
 
-        if (!manager.getRole().equals(RoleEnums.Class_Manager)) {
+        if (!manager.getRole().equals(RoleEnums.CLASS_MANAGER)) {
             throw new PermissionNotAcceptException("Người này không có vai trò là Quản lý lớp (Class_Manager)");
         }
 
