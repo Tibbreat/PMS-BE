@@ -1,34 +1,28 @@
 package sep490.g13.pms_be.controller;
 
-import jakarta.validation.Valid;
-import org.springframework.beans.BeanUtils;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import sep490.g13.pms_be.entities.*;
-import sep490.g13.pms_be.exception.other.DataNotFoundException;
-import sep490.g13.pms_be.exception.other.PermissionNotAcceptException;
-import sep490.g13.pms_be.model.request.RelationshipRequest;
 import sep490.g13.pms_be.model.request.children.AddChildrenRequest;
-import sep490.g13.pms_be.model.request.classes.AddClassRequest;
 import sep490.g13.pms_be.model.response.CloudinaryResponse;
+import sep490.g13.pms_be.model.response.base.PagedResponseModel;
 import sep490.g13.pms_be.model.response.base.ResponseModel;
-import sep490.g13.pms_be.repository.ChildrenRepo;
-import sep490.g13.pms_be.service.CloudinaryService;
+import sep490.g13.pms_be.model.response.children.ChildrenDetailResponse;
+import sep490.g13.pms_be.model.response.classes.ClassDetailResponse;
+import sep490.g13.pms_be.service.utils.CloudinaryService;
 import sep490.g13.pms_be.service.entity.ChildrenService;
 import sep490.g13.pms_be.service.entity.ClassService;
 import sep490.g13.pms_be.service.entity.UserService;
-import sep490.g13.pms_be.utils.ValidationUtils;
-import sep490.g13.pms_be.utils.enums.RoleEnums;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @RestController
-@RequestMapping("/children")
+@RequestMapping("/pms/children")
 public class ChildrenController {
     @Autowired
     private ChildrenService childrenService;
@@ -41,7 +35,7 @@ public class ChildrenController {
 
 
 
-    @PostMapping("/addChild")
+    @PostMapping("/add")
     public ResponseEntity<ResponseModel<?>> addChild(
             @RequestPart("image") MultipartFile image,  // Sử dụng @RequestParam cho tệp ảnh
             @RequestPart("request") AddChildrenRequest request) {  // Sử dụng @RequestPart cho dữ liệu JSON
@@ -84,6 +78,46 @@ public class ChildrenController {
                             .build()
             );
         }
+    }
+    @GetMapping()
+    public ResponseEntity<PagedResponseModel<Children>> getChildren(
+            @RequestParam int page,
+            @RequestParam(required = false) String fullname,
+            @RequestParam(required = false) String classId) {
+
+        int size = 10; // Số lượng học sinh mỗi trang
+        Page<Children> result = childrenService.getChildrenByFilters(fullname, classId, page - 1, size);
+
+        // Initialize các liên kết cho các đối tượng học sinh (nếu có)
+        result.getContent().forEach(children -> {
+            Hibernate.initialize(children.getSchoolClass());
+            Hibernate.initialize(children.getRelationships());
+            Hibernate.initialize(children.getChildrenFees());
+        });
+
+        List<Children> childrenList = result.getContent();
+
+        // Tạo response với phân trang
+        PagedResponseModel<Children> pagedResponse = PagedResponseModel.<Children>builder()
+                .total(result.getTotalElements())
+                .page(page)
+                .size(size)
+                .listData(childrenList)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
+    }
+
+    @GetMapping("/children-detail/{childrenId}")
+    public ResponseEntity<ResponseModel<?>> getClassDetail(@PathVariable String childrenId) {
+        ChildrenDetailResponse childrenDetailResponse = childrenService.getChildrenDetailById(childrenId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResponseModel.<ChildrenDetailResponse>builder()
+                        .message("Lấy dữ liệu học sinh có id: " + childrenId)
+                        .data(childrenDetailResponse)
+                        .build());
     }
 
 }

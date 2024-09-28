@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/classes")
+@RequestMapping("/pms/classes")
 public class ClassController {
     @Autowired
     private ClassService classService;
@@ -147,7 +147,7 @@ public class ClassController {
     }
 
 
-    @PutMapping("/change-status/{classId}")
+    @PutMapping("/change-class-status/{classId}")
     public ResponseEntity<String> changStatusClass(@PathVariable String classId) {
         try {
             classService.changeStatusClass(classId);

@@ -1,25 +1,30 @@
 package sep490.g13.pms_be.service.entity;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import sep490.g13.pms_be.entities.Children;
+import sep490.g13.pms_be.entities.Classes;
 import sep490.g13.pms_be.entities.Relationship;
 import sep490.g13.pms_be.entities.User;
 import sep490.g13.pms_be.exception.other.DataNotFoundException;
 import sep490.g13.pms_be.exception.other.PermissionNotAcceptException;
 import sep490.g13.pms_be.model.request.RelationshipRequest;
+import sep490.g13.pms_be.model.request.user.AddUserRequest;
+import sep490.g13.pms_be.model.request.user.UpdateUserNameAndPasswordRequest;
 import sep490.g13.pms_be.model.response.CloudinaryResponse;
+import sep490.g13.pms_be.model.response.children.ChildrenDetailResponse;
 import sep490.g13.pms_be.repository.ChildrenRepo;
 import sep490.g13.pms_be.repository.UserRepo;
-import sep490.g13.pms_be.service.CloudinaryService;
+import sep490.g13.pms_be.service.utils.CloudinaryService;
 import sep490.g13.pms_be.utils.FileUploadUtil;
 import sep490.g13.pms_be.utils.enums.RoleEnums;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +33,8 @@ public class ChildrenService {
     private ChildrenRepo childrenRepo;
     @Autowired
     private CloudinaryService cloudinaryService;
+    @Autowired
+    private UserService userService;
     @Autowired
     private UserRepo userRepo;
 
@@ -59,7 +66,6 @@ public class ChildrenService {
         // Tìm user dựa trên createdBy ID
         User createdByUser = userRepo.findById(c.getCreatedBy())
                 .orElseThrow(() -> new DataNotFoundException("User not found with id: " + c.getCreatedBy()));
-
         // Thiết lập createdBy cho đối tượng Children
         c.setCreatedBy(createdByUser.getId());
 
@@ -78,6 +84,7 @@ public class ChildrenService {
                 User parent = userRepo.findById(request.getParentId())
                         .orElseThrow(() -> new DataNotFoundException("Parent not found with id: " + request.getParentId()));
 
+
                 // Tạo mới Relationship
                 Relationship relationship = new Relationship();
                 relationship.setParentId(parent);
@@ -86,7 +93,19 @@ public class ChildrenService {
                 relationship.setIsRepresentative(request.getIsRepresentative());
 
                 // Thêm từng Relationship vào danh sách của Children
-                relationships.add(relationship);
+                if (request.getIsRepresentative()) {
+                    // Chuẩn bị đối tượng cập nhật
+                    UpdateUserNameAndPasswordRequest updateUserRequest = new UpdateUserNameAndPasswordRequest();
+                    updateUserRequest.setFullName(parent.getFullName());
+                    updateUserRequest.setUserName(parent.getUsername()); // Có thể giữ nguyên username hoặc cập nhật mới
+                    updateUserRequest.setEmail(parent.getEmail()); // Giữ nguyên email hiện có
+                    updateUserRequest.setPassword("newRandomPassword"); // Hoặc dùng generator tạo password mới nếu cần
+
+                    // Cập nhật thông tin người dùng
+                    User updatedUser = userService.updateUserNameAndPassword(updateUserRequest);
+                    relationships.add(relationship);
+                    System.out.println("User updated with new password: " + updatedUser.getPassword());
+                }
             }
         }
         System.out.println(relationships.size());
@@ -111,6 +130,40 @@ public class ChildrenService {
     public Children updateChildren(Children child) {
         return childrenRepo.save(child); // Lưu lại đối tượng Children đã được cập nhật
     }
+    public Page<Children> getChildrenByFilters( String fullname, String classId, int page, int size) {
+        // Tạo Pageable để phân trang
+        Pageable pageable = PageRequest.of(page, size);
+        // Gọi repository để lấy danh sách lớp học theo bộ lọc
+        return childrenRepo.findChildrenByFilter(classId,fullname, pageable);
+    }
+    // Trong ChildrenService.java
+    public ChildrenDetailResponse getChildrenDetailById(String childId) {
+        // Tìm đứa trẻ theo ID
+        Optional<Children> childOptional = childrenRepo.findById(childId);
+
+        if (childOptional.isPresent()) {
+            Children child = childOptional.get();
+
+            // Tạo và trả về ChildrenDetailResponse
+            return ChildrenDetailResponse.builder()
+                    .childName(child.getChildName())
+                    .childAge(child.getChildAge())
+                    .childBirthDate(child.getChildBirthDate())
+                    .childAddress(child.getChildAddress())
+                    .classId(child.getSchoolClass().getId()) // Lấy ID của lớp mà trẻ sẽ được thêm vào
+                    .relationships(child.getRelationships().stream()
+                            .map(relationship -> new RelationshipRequest(
+                                    relationship.getParentId().getId(),
+                                    relationship.getRelationship(),
+                                    relationship.getIsRepresentative()))
+                            .collect(Collectors.toList())) // Chuyển đổi Set sang List
+                    .imageUrl(child.getImageUrl()) // Lấy URL hình ảnh
+                    .build();
+        } else {
+            throw new RuntimeException("Children not found with ID: " + childId);
+        }
+    }
+
 
 
 }
