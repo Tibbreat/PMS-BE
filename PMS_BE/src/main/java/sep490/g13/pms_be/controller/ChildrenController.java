@@ -1,14 +1,19 @@
 package sep490.g13.pms_be.controller;
 
+import jakarta.validation.Valid;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import sep490.g13.pms_be.entities.*;
+import sep490.g13.pms_be.exception.other.DataNotFoundException;
+import sep490.g13.pms_be.exception.other.PermissionNotAcceptException;
 import sep490.g13.pms_be.model.request.children.AddChildrenRequest;
+import sep490.g13.pms_be.model.request.children.UpdateChildrenRequest;
 import sep490.g13.pms_be.model.response.CloudinaryResponse;
 import sep490.g13.pms_be.model.response.base.PagedResponseModel;
 import sep490.g13.pms_be.model.response.base.ResponseModel;
@@ -18,6 +23,7 @@ import sep490.g13.pms_be.service.utils.CloudinaryService;
 import sep490.g13.pms_be.service.entity.ChildrenService;
 import sep490.g13.pms_be.service.entity.ClassService;
 import sep490.g13.pms_be.service.entity.UserService;
+import sep490.g13.pms_be.utils.ValidationUtils;
 
 import java.util.List;
 
@@ -38,7 +44,18 @@ public class ChildrenController {
     @PostMapping("/add")
     public ResponseEntity<ResponseModel<?>> addChild(
             @RequestPart("image") MultipartFile image,  // Sử dụng @RequestParam cho tệp ảnh
-            @RequestPart("request") AddChildrenRequest request) {  // Sử dụng @RequestPart cho dữ liệu JSON
+            @Valid @RequestPart("request") AddChildrenRequest request, BindingResult bindingResult) {
+
+
+        if (bindingResult.hasErrors()) {
+            String validationErrors = ValidationUtils.getValidationErrors(bindingResult);
+            return ResponseEntity.badRequest().body(
+                    ResponseModel.builder()
+                            .message("Thông tin trẻ không hợp lệ")
+                            .data(validationErrors)
+                            .build()
+            );
+        }
         try {
             // Tạo đối tượng Children
             Children child = new Children();
@@ -108,16 +125,54 @@ public class ChildrenController {
         return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
     }
 
-    @GetMapping("/children-detail/{childrenId}")
-    public ResponseEntity<ResponseModel<?>> getClassDetail(@PathVariable String childrenId) {
-        ChildrenDetailResponse childrenDetailResponse = childrenService.getChildrenDetailById(childrenId);
+    @GetMapping("/children-detail/{childId}")
+    public ResponseEntity<ResponseModel<?>> getClassDetail(@PathVariable String childId) {
+        ChildrenDetailResponse childrenDetailResponse = childrenService.getChildrenDetailById(childId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ResponseModel.<ChildrenDetailResponse>builder()
-                        .message("Lấy dữ liệu học sinh có id: " + childrenId)
+                        .message("Lấy dữ liệu học sinh có id: " + childId)
                         .data(childrenDetailResponse)
                         .build());
     }
+
+    @PutMapping("/update-transport/{childId}")
+    public ResponseEntity<String> updateTransportRegistration(
+            @PathVariable String childId,
+            @RequestParam Boolean isRegisteredForTransport) {
+        childrenService.updateTransportRegistration(childId, isRegisteredForTransport);
+        return ResponseEntity.ok("Transport registration updated successfully");
+    }
+
+    @PutMapping("update-boarding/{childId}")
+    public ResponseEntity<String> updateBoardingRegistration(
+            @PathVariable String childId,
+            @RequestParam Boolean isRegisteredForBoarding) {
+        childrenService.updateBoardingRegistration(childId, isRegisteredForBoarding);
+        return ResponseEntity.ok("Boarding registration updated successfully");
+    }
+    @PutMapping("/change-information/{childId}")
+    public ResponseEntity<ResponseModel<?>> updateChild(
+            @PathVariable String childId,
+            @Valid @RequestPart(value = "request") UpdateChildrenRequest updateChildrenRequest,
+            @RequestPart (value = "image", required = false) MultipartFile image, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            String validationErrors = ValidationUtils.getValidationErrors(bindingResult);
+            return ResponseEntity.badRequest().body(
+                    ResponseModel.builder()
+                            .message("Thông tin trẻ không hợp lệ")
+                            .data(validationErrors)
+                            .build()
+            );
+        }
+        // Gọi phương thức updateChildren trong service và truyền thêm hình ảnh (nếu có)
+        childrenService.updateChildren(childId, updateChildrenRequest, image);
+
+        // Trả về phản hồi thành công
+        return ResponseEntity.ok(new ResponseModel<>("Cập nhật trẻ em thành công", null));
+    }
+
 
 }

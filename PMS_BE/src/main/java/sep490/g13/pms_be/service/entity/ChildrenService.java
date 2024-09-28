@@ -14,11 +14,13 @@ import sep490.g13.pms_be.entities.User;
 import sep490.g13.pms_be.exception.other.DataNotFoundException;
 import sep490.g13.pms_be.exception.other.PermissionNotAcceptException;
 import sep490.g13.pms_be.model.request.RelationshipRequest;
+import sep490.g13.pms_be.model.request.children.UpdateChildrenRequest;
 import sep490.g13.pms_be.model.request.user.AddUserRequest;
 import sep490.g13.pms_be.model.request.user.UpdateUserNameAndPasswordRequest;
 import sep490.g13.pms_be.model.response.CloudinaryResponse;
 import sep490.g13.pms_be.model.response.children.ChildrenDetailResponse;
 import sep490.g13.pms_be.repository.ChildrenRepo;
+import sep490.g13.pms_be.repository.ClassRepo;
 import sep490.g13.pms_be.repository.UserRepo;
 import sep490.g13.pms_be.service.utils.CloudinaryService;
 import sep490.g13.pms_be.utils.FileUploadUtil;
@@ -37,6 +39,8 @@ public class ChildrenService {
     private UserService userService;
     @Autowired
     private UserRepo userRepo;
+    @Autowired
+    private ClassRepo classRepo;
 
     public List<Children> findAllById(List<String> childrenId) {
         // Tìm tất cả các SkillTag theo danh sách ID được cung cấp
@@ -163,6 +167,87 @@ public class ChildrenService {
             throw new RuntimeException("Children not found with ID: " + childId);
         }
     }
+    @Transactional
+    public void updateTransportRegistration(String childId, Boolean isRegisteredForTransport) {
+        Optional<Children> childOpt = childrenRepo.findById(childId);
+        if (childOpt.isPresent()) {
+            Children child = childOpt.get();
+            child.setIsRegisteredForTransport(isRegisteredForTransport);
+            childrenRepo.save(child);
+        } else {
+            throw new RuntimeException("Child not found with id: " + childId);
+        }
+    }
+
+    @Transactional
+    public void updateBoardingRegistration(String childId, Boolean isRegisteredForBoarding) {
+        Optional<Children> childOpt = childrenRepo.findById(childId);
+        if (childOpt.isPresent()) {
+            Children child = childOpt.get();
+            child.setIsRegisteredForBoarding(isRegisteredForBoarding);
+            childrenRepo.save(child);
+        } else {
+            throw new RuntimeException("Child not found with id: " + childId);
+        }
+    }
+    @Transactional
+    public void updateChildren(String childId, UpdateChildrenRequest updateChildrenRequest, MultipartFile image) {
+        // Tìm đối tượng Children dựa trên childId
+        Children existingChild = childrenRepo.findById(childId)
+                .orElseThrow(() -> new DataNotFoundException("Child not found with id: " + childId));
+
+        // Cập nhật thông tin cơ bản của đứa trẻ
+        existingChild.setChildName(updateChildrenRequest.getChildName());
+        existingChild.setChildAge(updateChildrenRequest.getChildAge());
+        existingChild.setChildBirthDate(updateChildrenRequest.getChildBirthDate());
+        existingChild.setChildAddress(updateChildrenRequest.getChildAddress());
+
+        // Cập nhật lớp học
+        Classes schoolClass = classRepo.findById(updateChildrenRequest.getClassId())
+                .orElseThrow(() -> new DataNotFoundException("Class not found with id: " + updateChildrenRequest.getClassId()));
+        existingChild.setSchoolClass(schoolClass);
+
+        // Cập nhật thông tin người chỉnh sửa cuối cùng
+        User lastModifiedBy = userRepo.findById(updateChildrenRequest.getLastModifiedById())
+                .orElseThrow(() -> new DataNotFoundException("User not found with id: " + updateChildrenRequest.getLastModifiedById()));
+        if (!lastModifiedBy.getRole().equals(RoleEnums.ADMIN)) {
+            throw new PermissionNotAcceptException("Only ADMIN can modify this child.");
+        }
+
+        existingChild.setLastModifiedBy(updateChildrenRequest.getLastModifiedById());
+
+        // Cập nhật relationships (nếu có)
+        if (updateChildrenRequest.getRelationships() != null) {
+            // Xóa các mối quan hệ hiện tại và đặt các mối quan hệ mới
+            existingChild.getRelationships().clear();
+            updateChildrenRequest.getRelationships().forEach(relationshipRequest -> {
+                Relationship relationship = new Relationship();
+                User parent = userRepo.findById(relationshipRequest.getParentId())
+                        .orElseThrow(() -> new DataNotFoundException("Parent not found with id: " + relationshipRequest.getParentId()));
+
+                relationship.setChildrenId(existingChild);
+                relationship.setParentId(parent);
+                relationship.setRelationship(relationshipRequest.getRelationship());
+                relationship.setIsRepresentative(relationshipRequest.getIsRepresentative());
+
+                existingChild.getRelationships().add(relationship);
+            });
+        }
+
+        // Xử lý tải ảnh nếu có
+        if (image != null && !image.isEmpty()) {
+            FileUploadUtil.assertAllowedExtension(image, FileUploadUtil.IMAGE_PATTERN);
+            final String fileName = FileUploadUtil.getFileName(image.getOriginalFilename());
+            final CloudinaryResponse response = this.cloudinaryService.uploadFile(image, fileName);
+
+            existingChild.setImageUrl(response.getUrl());
+            existingChild.setCloudinaryImageId(response.getPublicId());
+        }
+
+        // Lưu lại đối tượng Children đã được cập nhật
+        childrenRepo.save(existingChild);
+    }
+
 
 
 
