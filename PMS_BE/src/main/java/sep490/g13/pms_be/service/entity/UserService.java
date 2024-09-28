@@ -86,7 +86,9 @@ public class UserService {
         }
     }
 
-
+    public User findByEmail(String email) {
+        return userRepo.findByEmail(email).get();
+    }
     public User getUserById(String id){
         return userRepo.findById(id).orElse(null);
     }
