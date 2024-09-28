@@ -49,12 +49,14 @@ public class UserService {
         // Tìm user dựa trên email (hoặc một định danh duy nhất khác)
         Optional<User> existingUserOpt = userRepo.findByEmail(request.getEmail());
 
+
         if (existingUserOpt.isPresent()) {
             // Lấy user hiện tại
             User user = existingUserOpt.get();
-
+            if(user.getUsername() !=null){
             // Nếu fullName có trong request, tạo lại username dựa trên fullName
             if (request.getFullName() != null && !request.getFullName().isEmpty()) {
+
                 String accountName = StringUtils.generateUsername(request.getFullName());
                 int count = userRepo.countByUsernameContaining(accountName);
                 String username = "";
@@ -64,6 +66,7 @@ public class UserService {
                     username += accountName + (count + 1);
                 }
                 user.setUsername(username.trim());
+            }
             }
 
             // Cập nhật password nếu có trong request, hoặc tạo password mặc định

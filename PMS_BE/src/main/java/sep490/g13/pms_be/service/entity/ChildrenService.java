@@ -79,7 +79,6 @@ public class ChildrenService {
         }
 
 
-
         // Xử lý relationship nếu có
         Set<Relationship> relationships = new HashSet<>();
         if (relationshipRequests != null && !relationshipRequests.isEmpty()) {
@@ -101,9 +100,9 @@ public class ChildrenService {
                     // Chuẩn bị đối tượng cập nhật
                     UpdateUserNameAndPasswordRequest updateUserRequest = new UpdateUserNameAndPasswordRequest();
                     updateUserRequest.setFullName(parent.getFullName());
-                    updateUserRequest.setUserName(parent.getUsername()); // Có thể giữ nguyên username hoặc cập nhật mới
-                    updateUserRequest.setEmail(parent.getEmail()); // Giữ nguyên email hiện có
-                    updateUserRequest.setPassword("newRandomPassword"); // Hoặc dùng generator tạo password mới nếu cần
+                    updateUserRequest.setUserName(parent.getUsername());
+                    updateUserRequest.setEmail(parent.getEmail());
+
 
                     // Cập nhật thông tin người dùng
                     User updatedUser = userService.updateUserNameAndPassword(updateUserRequest);
@@ -131,15 +130,18 @@ public class ChildrenService {
         children.setCloudinaryImageId(response.getPublicId());
         this.childrenRepo.save(children);
     }
+
     public Children updateChildren(Children child) {
         return childrenRepo.save(child); // Lưu lại đối tượng Children đã được cập nhật
     }
-    public Page<Children> getChildrenByFilters( String fullname, String classId, int page, int size) {
+
+    public Page<Children> getChildrenByFilters(String fullname, String classId, int page, int size) {
         // Tạo Pageable để phân trang
         Pageable pageable = PageRequest.of(page, size);
         // Gọi repository để lấy danh sách lớp học theo bộ lọc
-        return childrenRepo.findChildrenByFilter(classId,fullname, pageable);
+        return childrenRepo.findChildrenByFilter(classId, fullname, pageable);
     }
+
     // Trong ChildrenService.java
     public ChildrenDetailResponse getChildrenDetailById(String childId) {
         // Tìm đứa trẻ theo ID
@@ -167,6 +169,7 @@ public class ChildrenService {
             throw new RuntimeException("Children not found with ID: " + childId);
         }
     }
+
     @Transactional
     public void updateTransportRegistration(String childId, Boolean isRegisteredForTransport) {
         Optional<Children> childOpt = childrenRepo.findById(childId);
@@ -190,8 +193,9 @@ public class ChildrenService {
             throw new RuntimeException("Child not found with id: " + childId);
         }
     }
+
     @Transactional
-    public void updateChildren(String childId, UpdateChildrenRequest updateChildrenRequest, MultipartFile image) {
+    public Children updateChildrenInformation(String childId, UpdateChildrenRequest updateChildrenRequest) {
         // Tìm đối tượng Children dựa trên childId
         Children existingChild = childrenRepo.findById(childId)
                 .orElseThrow(() -> new DataNotFoundException("Child not found with id: " + childId));
@@ -235,17 +239,10 @@ public class ChildrenService {
         }
 
         // Xử lý tải ảnh nếu có
-        if (image != null && !image.isEmpty()) {
-            FileUploadUtil.assertAllowedExtension(image, FileUploadUtil.IMAGE_PATTERN);
-            final String fileName = FileUploadUtil.getFileName(image.getOriginalFilename());
-            final CloudinaryResponse response = this.cloudinaryService.uploadFile(image, fileName);
 
-            existingChild.setImageUrl(response.getUrl());
-            existingChild.setCloudinaryImageId(response.getPublicId());
-        }
 
         // Lưu lại đối tượng Children đã được cập nhật
-        childrenRepo.save(existingChild);
+        return childrenRepo.save(existingChild);
     }
 
 

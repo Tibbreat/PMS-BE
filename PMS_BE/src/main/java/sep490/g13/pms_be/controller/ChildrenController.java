@@ -153,25 +153,25 @@ public class ChildrenController {
         return ResponseEntity.ok("Boarding registration updated successfully");
     }
     @PutMapping("/change-information/{childId}")
-    public ResponseEntity<ResponseModel<?>> updateChild(
+    public ResponseEntity<ResponseModel<?>> updateChildren(
             @PathVariable String childId,
-            @Valid @RequestPart(value = "request") UpdateChildrenRequest updateChildrenRequest,
-            @RequestPart (value = "image", required = false) MultipartFile image, BindingResult bindingResult) {
+            @RequestPart("updateRequest") UpdateChildrenRequest updateChildrenRequest,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
 
-        if (bindingResult.hasErrors()) {
-            String validationErrors = ValidationUtils.getValidationErrors(bindingResult);
-            return ResponseEntity.badRequest().body(
-                    ResponseModel.builder()
-                            .message("Thông tin trẻ không hợp lệ")
-                            .data(validationErrors)
-                            .build()
-            );
+        try {
+            Children updateChildren = childrenService.updateChildrenInformation(childId, updateChildrenRequest);
+            if (image != null && !image.isEmpty()) {
+                CloudinaryResponse cloudinaryResponse = cloudinaryService.uploadFile(image, childId);
+
+                updateChildren.setImageUrl(cloudinaryResponse.getUrl());
+                updateChildren.setCloudinaryImageId(cloudinaryResponse.getPublicId());
+                // Lưu lại đối tượng Children đã cập nhật
+                childrenService.updateChildren(updateChildren);
+            }
+            return ResponseEntity.ok(new ResponseModel<>("Update successful", updateChildrenRequest));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ResponseModel<>(e.getMessage(), null));
         }
-        // Gọi phương thức updateChildren trong service và truyền thêm hình ảnh (nếu có)
-        childrenService.updateChildren(childId, updateChildrenRequest, image);
-
-        // Trả về phản hồi thành công
-        return ResponseEntity.ok(new ResponseModel<>("Cập nhật trẻ em thành công", null));
     }
 
 
