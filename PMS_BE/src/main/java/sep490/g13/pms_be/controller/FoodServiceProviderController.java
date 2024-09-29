@@ -14,6 +14,7 @@ import sep490.g13.pms_be.model.request.foodsupplier.AddFoodProviderRequest;
 import sep490.g13.pms_be.model.request.foodsupplier.UpdateFoodProviderRequest;
 import sep490.g13.pms_be.model.response.base.PagedResponseModel;
 import sep490.g13.pms_be.model.response.base.ResponseModel;
+import sep490.g13.pms_be.model.response.foodsupplier.GetFoodProviderResponse;
 import sep490.g13.pms_be.service.entity.FoodServiceProviderService;
 import sep490.g13.pms_be.utils.ValidationUtils;
 
@@ -29,7 +30,7 @@ public class FoodServiceProviderController {
     @PostMapping("/add")
     public ResponseEntity<ResponseModel<?>> addNewProvider(
             @RequestPart("fpa") @Valid AddFoodProviderRequest fpa,
-            @RequestPart("contractFile") MultipartFile contractFile,
+            @RequestParam("contractFile") MultipartFile contractFile,
             BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
@@ -106,5 +107,29 @@ public class FoodServiceProviderController {
                         .data(null)
                         .build());
     }
+
+    @PutMapping("/change-status")
+    public ResponseEntity<ResponseModel<FoodServiceProvider>> changeStatus(
+            @RequestParam String id,
+            @RequestParam Boolean status) {
+        FoodServiceProvider updatedFoodProvider = foodServiceProviderService.updateStatus(id, status);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseModel.<FoodServiceProvider>builder()
+                        .message("Trạng thái nhà cung cấp đã được cập nhật thành công")
+                        .data(updatedFoodProvider)
+                        .build());
+    }
+
+    @GetMapping("/{providerId}")
+    public ResponseEntity<ResponseModel<?>> getFoodProviderDetail(@PathVariable String providerId) {
+        GetFoodProviderResponse getFoodProviderResponse= foodServiceProviderService.getFoodProviderDetailById(providerId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResponseModel.<GetFoodProviderResponse>builder()
+                        .message("Thành công")
+                        .data(getFoodProviderResponse)
+                        .build());
+    }
+
 }
 

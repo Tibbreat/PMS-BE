@@ -14,14 +14,13 @@ import sep490.g13.pms_be.exception.other.DataNotFoundException;
 import sep490.g13.pms_be.exception.other.PermissionNotAcceptException;
 import sep490.g13.pms_be.model.request.foodsupplier.AddFoodProviderRequest;
 import sep490.g13.pms_be.model.request.foodsupplier.UpdateFoodProviderRequest;
+import sep490.g13.pms_be.model.response.foodsupplier.GetFoodProviderResponse;
 import sep490.g13.pms_be.repository.FoodServiceProviderRepo;
 import sep490.g13.pms_be.repository.UserRepo;
 import sep490.g13.pms_be.service.utils.DriveService;
 import sep490.g13.pms_be.utils.enums.RoleEnums;
-
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
 
 @Service
 public class FoodServiceProviderService {
@@ -93,5 +92,34 @@ public class FoodServiceProviderService {
             foodServiceProvider.setLastModifiedBy(updateFoodProviderRequest.getLastModifyById());
         }
         foodServiceProviderRepo.updateFoodProvider(updateFoodProviderRequest, foodProviderId);
+    }
+
+    public FoodServiceProvider updateStatus(String foodProviderId, Boolean status) {
+        FoodServiceProvider foodServiceProvider =foodServiceProviderRepo.findById(foodProviderId).orElseThrow(()
+                -> new DataNotFoundException("Không tìm thấy nhà cung cấp nào"));
+        foodServiceProvider.setIsActive(status);
+        return foodServiceProviderRepo.save(foodServiceProvider);
+    }
+
+    public GetFoodProviderResponse getFoodProviderDetailById(String id) {
+        FoodServiceProvider foodServiceProvider = foodServiceProviderRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhà cung cấp thức ăn nào với id " + id));
+
+        // Chuyển đổi đối tượng Classes thành ClassDetailResponse
+        return GetFoodProviderResponse.builder()
+                .providerName(foodServiceProvider.getProviderName())
+                .providerPhone(foodServiceProvider.getProviderPhone())
+                .providerEmail(foodServiceProvider.getProviderEmail())
+                .providerAddress(foodServiceProvider.getProviderAddress())
+                .providerRegisterNumber(foodServiceProvider.getProviderRegisterNumber())
+                .providerLicenseNumber(foodServiceProvider.getProviderLicenseNumber())
+                .representativeName(foodServiceProvider.getRepresentativeName())
+                .isActive(foodServiceProvider.getIsActive())
+                .contractFile(foodServiceProvider.getContractFile())
+                .createdBy(foodServiceProvider.getCreatedBy())
+                .createdDate(foodServiceProvider.getCreatedDate())
+                .lastModifiedDate(foodServiceProvider.getLastModifiedDate())
+                .lastModifiedBy(foodServiceProvider.getLastModifiedBy())
+                .build();
     }
 }
