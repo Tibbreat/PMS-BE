@@ -1,6 +1,7 @@
 package sep490.g13.pms_be.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,7 +27,8 @@ public class Children extends Auditable<String> {
 
     private String cloudinaryImageId;
 
-    @OneToMany(mappedBy = "children")
+    @OneToMany(mappedBy = "children", cascade = CascadeType.ALL, orphanRemoval = true)
+
     private Set<ChildrenFee> childrenFees;
 
 
