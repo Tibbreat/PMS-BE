@@ -196,22 +196,20 @@ public class ChildrenService {
 
     @Transactional
     public Children updateChildrenInformation(String childId, UpdateChildrenRequest updateChildrenRequest) {
-        // Tìm đối tượng Children dựa trên childId
+
         Children existingChild = childrenRepo.findById(childId)
                 .orElseThrow(() -> new DataNotFoundException("Child not found with id: " + childId));
 
-        // Cập nhật thông tin cơ bản của đứa trẻ
         existingChild.setChildName(updateChildrenRequest.getChildName());
         existingChild.setChildAge(updateChildrenRequest.getChildAge());
         existingChild.setChildBirthDate(updateChildrenRequest.getChildBirthDate());
         existingChild.setChildAddress(updateChildrenRequest.getChildAddress());
 
-        // Cập nhật lớp học
         Classes schoolClass = classRepo.findById(updateChildrenRequest.getClassId())
                 .orElseThrow(() -> new DataNotFoundException("Class not found with id: " + updateChildrenRequest.getClassId()));
         existingChild.setSchoolClass(schoolClass);
 
-        // Cập nhật thông tin người chỉnh sửa cuối cùng
+
         User lastModifiedBy = userRepo.findById(updateChildrenRequest.getLastModifiedById())
                 .orElseThrow(() -> new DataNotFoundException("User not found with id: " + updateChildrenRequest.getLastModifiedById()));
         if (!lastModifiedBy.getRole().equals(RoleEnums.ADMIN)) {
@@ -220,7 +218,6 @@ public class ChildrenService {
 
         existingChild.setLastModifiedBy(updateChildrenRequest.getLastModifiedById());
 
-        // Cập nhật relationships (nếu có)
         if (updateChildrenRequest.getRelationships() != null) {
             // Xóa các mối quan hệ hiện tại và đặt các mối quan hệ mới
             existingChild.getRelationships().clear();
@@ -237,10 +234,6 @@ public class ChildrenService {
                 existingChild.getRelationships().add(relationship);
             });
         }
-
-        // Xử lý tải ảnh nếu có
-
-
         // Lưu lại đối tượng Children đã được cập nhật
         return childrenRepo.save(existingChild);
     }
