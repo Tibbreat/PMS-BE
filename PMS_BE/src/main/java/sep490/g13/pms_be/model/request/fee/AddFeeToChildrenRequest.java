@@ -5,12 +5,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class AddFeeRequest {
-    private String feeTitle;
-    private Boolean isActive;
-    private String createdById;
+public class AddFeeToChildrenRequest {
+    private String childId;
+    private String feeId;
+    private String amount;
+    private LocalDate dueDate;
 }
