@@ -8,9 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sep490.g13.pms_be.entities.ChildrenFee;
-import sep490.g13.pms_be.entities.Classes;
 import sep490.g13.pms_be.entities.Fee;
-import sep490.g13.pms_be.model.request.fee.AddFeeRequest;
+import sep490.g13.pms_be.model.request.fee.AddFeeToChildrenRequest;
 import sep490.g13.pms_be.model.request.fee.UpdatePaymentStatusRequest;
 import sep490.g13.pms_be.model.response.base.PagedResponseModel;
 import sep490.g13.pms_be.model.response.base.ResponseModel;
@@ -19,8 +18,6 @@ import sep490.g13.pms_be.service.entity.FeeService;
 
 import java.time.LocalDate;
 import java.util.List;
-
-import static java.util.stream.DoubleStream.builder;
 
 @RestController
 @RequestMapping("/pms/fee")
@@ -72,7 +69,7 @@ public class FeeController {
         }
     }
     @PostMapping("/add-fee")
-    public ResponseEntity<ResponseModel<ChildrenFee>> addFeeToStudent(@RequestBody AddFeeRequest request) {
+    public ResponseEntity<ResponseModel<ChildrenFee>> addFeeToStudent(@RequestBody AddFeeToChildrenRequest request) {
         LocalDate parsedDueDate = request.getDueDate();
         ChildrenFee childrenFee = childrenFeeService.addFeeToStudent(request.getChildId(), request.getFeeId(), request.getAmount(), parsedDueDate);
 
