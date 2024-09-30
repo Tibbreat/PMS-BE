@@ -3,6 +3,7 @@ package sep490.g13.pms_be.entities;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,13 +20,10 @@ public class DailyMealInfo extends Auditable<String> {
     @ManyToOne
     private Children child;
 
-    @ManyToOne
-    @JoinColumn(name = "class_id")
-    private Classes clazz;
+    @OneToOne
+    private DailyMenu dailyMenu;
 
-    private LocalDate mealDate;
-
-    private Boolean isOptedOut;
+    private Boolean isOptedOut = Boolean.FALSE;
 
     private String reasonForOptOut;
 }
