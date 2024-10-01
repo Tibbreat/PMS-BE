@@ -13,7 +13,9 @@ import sep490.g13.pms_be.entities.TransportServiceProvider;
 import sep490.g13.pms_be.entities.User;
 import sep490.g13.pms_be.exception.other.DataNotFoundException;
 import sep490.g13.pms_be.exception.other.PermissionNotAcceptException;
+import sep490.g13.pms_be.model.request.foodsupplier.UpdateFoodProviderRequest;
 import sep490.g13.pms_be.model.request.transportsupplier.AddTransportProviderRequest;
+import sep490.g13.pms_be.model.request.transportsupplier.UpdateTransportRequest;
 import sep490.g13.pms_be.repository.TransportServiceProviderRepo;
 import sep490.g13.pms_be.repository.UserRepo;
 import sep490.g13.pms_be.service.utils.DriveService;
@@ -80,5 +82,20 @@ public class TransportServiceProviderService {
     public Page<TransportServiceProvider> getTransportProvider(Boolean status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return transportServiceProviderRepo.findByFilter(status, pageable);
+    }
+
+    @Transactional
+    public void updateTransportProvider(UpdateTransportRequest updateTransportRequest, String transportProviderId) {
+
+        TransportServiceProvider transportServiceProvider = transportServiceProviderRepo.findById(transportProviderId)
+                .orElseThrow(() -> new DataNotFoundException("Nhà cung cấp dịch vụ vận chuyển với id " + transportProviderId + " không được tìm thấy"));
+
+        User lastMofifyBy = userRepo.findById(updateTransportRequest.getLastModifyById()).get();
+        if(lastMofifyBy.getRole() != RoleEnums.ADMIN) {
+            throw new PermissionNotAcceptException("Không thể cập nhật nhà cung cấp dịch vụ vận chuyển với quyền khác");
+        }else {
+            transportServiceProvider.setLastModifiedBy(updateTransportRequest.getLastModifyById());
+        }
+        transportServiceProviderRepo.updateTransportProvider(updateTransportRequest, transportProviderId);
     }
 }

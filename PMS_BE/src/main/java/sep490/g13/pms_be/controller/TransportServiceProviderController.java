@@ -9,12 +9,13 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import sep490.g13.pms_be.entities.FoodServiceProvider;
 import sep490.g13.pms_be.entities.TransportServiceProvider;
 import sep490.g13.pms_be.model.request.transportsupplier.AddTransportProviderRequest;
+import sep490.g13.pms_be.model.request.transportsupplier.UpdateTransportRequest;
 import sep490.g13.pms_be.model.response.base.PagedResponseModel;
 import sep490.g13.pms_be.model.response.base.ResponseModel;
 import sep490.g13.pms_be.service.entity.TransportServiceProviderService;
+import sep490.g13.pms_be.utils.ValidationUtils;
 
 import java.util.List;
 
@@ -81,5 +82,28 @@ public class TransportServiceProviderController {
                 .listData(tsp)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
+    }
+
+    @PutMapping("/change-information/{transportProviderId}")
+    public ResponseEntity<ResponseModel<?>> updateTransportProvider(
+            @RequestBody @Valid UpdateTransportRequest updateTransportRequest,
+            @PathVariable String transportProviderId,
+            BindingResult bindingResult){
+        if(bindingResult.hasErrors()){
+            String errorMessage = ValidationUtils.getValidationErrors(bindingResult);
+
+            return ResponseEntity.badRequest()
+                    .body(ResponseModel.<String>builder()
+                            .message("Cập nhật nhà cung cấp dịch vụ vận chuyển lỗi: " + errorMessage)
+                            .data(errorMessage)
+                            .build());
+        }
+        transportServiceProviderService.updateTransportProvider(updateTransportRequest, transportProviderId);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseModel.<String>builder()
+                        .message("Nhà cung cấp dịch vụ vận chuyển được cập nhật thành công")
+                        .data(null)
+                        .build());
     }
 }
