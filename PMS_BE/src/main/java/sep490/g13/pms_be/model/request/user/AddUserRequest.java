@@ -2,7 +2,7 @@ package sep490.g13.pms_be.model.request.user;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
+import lombok.*;
 import sep490.g13.pms_be.utils.enums.RoleEnums;
 @Setter
 @AllArgsConstructor
