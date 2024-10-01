@@ -5,10 +5,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import sep490.g13.pms_be.entities.User;
 
+import java.util.Optional;
+
 @Repository
 public interface UserRepo extends JpaRepository<User, String> {
     User findByUsername(String username);
 
     @Query("SELECT COUNT(u.id) FROM User u WHERE u.username LIKE %:accountName%")
     int countByUsernameContaining(String accountName);
+
+    Optional<User> findByEmail(String email);
+
 }

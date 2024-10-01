@@ -1,6 +1,8 @@
 package sep490.g13.pms_be.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.*;
 
@@ -17,5 +19,7 @@ public class Vehicle extends Auditable<String> {
     private String brand;
 
     @ManyToOne
+    @JoinColumn(name = "transportId", nullable = false)
+    @JsonBackReference
     private TransportServiceProvider transport;
 }

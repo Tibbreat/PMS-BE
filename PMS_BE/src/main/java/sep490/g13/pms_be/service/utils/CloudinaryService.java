@@ -1,4 +1,4 @@
-package sep490.g13.pms_be.service;
+package sep490.g13.pms_be.service.utils;
 
 import com.cloudinary.Cloudinary;
 import org.springframework.beans.factory.annotation.Autowired;
