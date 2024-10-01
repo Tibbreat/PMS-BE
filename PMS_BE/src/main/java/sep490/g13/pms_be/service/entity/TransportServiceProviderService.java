@@ -98,4 +98,11 @@ public class TransportServiceProviderService {
         }
         transportServiceProviderRepo.updateTransportProvider(updateTransportRequest, transportProviderId);
     }
+
+    public TransportServiceProvider updateStatus(String transportProviderId, Boolean status) {
+        TransportServiceProvider transportServiceProvider = transportServiceProviderRepo.findById(transportProviderId).orElseThrow(()
+                -> new DataNotFoundException("Không tìm thấy nhà cung cấp nào"));
+        transportServiceProvider.setIsActive(status);
+        return transportServiceProviderRepo.save(transportServiceProvider);
+    }
 }

@@ -9,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import sep490.g13.pms_be.entities.FoodServiceProvider;
 import sep490.g13.pms_be.entities.TransportServiceProvider;
 import sep490.g13.pms_be.model.request.transportsupplier.AddTransportProviderRequest;
 import sep490.g13.pms_be.model.request.transportsupplier.UpdateTransportRequest;
@@ -104,6 +105,18 @@ public class TransportServiceProviderController {
                 .body(ResponseModel.<String>builder()
                         .message("Nhà cung cấp dịch vụ vận chuyển được cập nhật thành công")
                         .data(null)
+                        .build());
+    }
+
+    @PutMapping("/change-status")
+    public ResponseEntity<ResponseModel<?>> changeStatus(
+            @RequestParam String transportProviderId,
+            @RequestParam Boolean status) {
+        TransportServiceProvider updateStatus = transportServiceProviderService.updateStatus(transportProviderId, status);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseModel.<TransportServiceProvider>builder()
+                        .message("Trạng thái nhà cung cấp đã được cập nhật thành công")
+                        .data(updateStatus)
                         .build());
     }
 }
