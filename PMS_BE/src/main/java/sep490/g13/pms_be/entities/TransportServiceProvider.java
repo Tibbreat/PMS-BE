@@ -30,7 +30,4 @@ public class TransportServiceProvider extends Auditable<String> {
 
     @OneToMany(mappedBy = "transport")
     private Set<Vehicle> vehicles;
-
-    @OneToMany(mappedBy = "transportServiceProvider")
-    private Set<User> drivers;
 }

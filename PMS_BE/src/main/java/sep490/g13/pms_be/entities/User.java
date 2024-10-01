@@ -18,7 +18,7 @@ import java.util.Set;
 public class User extends Auditable<String> {
     private String username;
     private String password;
-
+    private String idCardNumber;
     private String fullName;
     private String email;
     private String address;
@@ -27,9 +27,6 @@ public class User extends Auditable<String> {
     private String imageLink;
 
     private Boolean isActive;
-
-    @ManyToOne
-    private TransportServiceProvider transportServiceProvider;
 
     @Enumerated(EnumType.STRING)
     private RoleEnums role;
