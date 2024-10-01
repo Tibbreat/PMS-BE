@@ -24,8 +24,6 @@ import sep490.g13.pms_be.service.auth.AuthService;
 import sep490.g13.pms_be.service.entity.UserService;
 import sep490.g13.pms_be.utils.StringUtils;
 
-import java.util.concurrent.CompletableFuture;
-
 @RestController
 @RequestMapping("/pms/auth")
 public class AuthController {
@@ -48,16 +46,18 @@ public class AuthController {
             throw new BadCredentialsException("Thông tin đăng nhập không chính xác");
         }
         User userData = userRepo.findByUsername(loginRequest.getUsername());
-        if (!userData.getIsActive()) {
+        if (Boolean.FALSE.equals(userData.getIsActive())) {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(AuthResponse.builder()
                             .role(null)
                             .token(token)
+                            .message("Đăng nhập thành công")
                             .tokenType("Bearer")
                             .build());
         } else {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(AuthResponse.builder()
+                            .message("Tài khoản của bạn đã bị hạn chế, liên hệ quản lý để xử lý")
                             .role(userData.getRole().name())
                             .token(token)
                             .tokenType("Bearer")

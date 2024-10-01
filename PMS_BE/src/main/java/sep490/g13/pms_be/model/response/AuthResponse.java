@@ -11,4 +11,5 @@ public class AuthResponse {
     private String tokenType = "Bearer";
     private String token;
     private String role;
+    private String message;
 }
