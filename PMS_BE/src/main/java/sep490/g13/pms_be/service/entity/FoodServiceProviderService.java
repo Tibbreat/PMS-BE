@@ -62,8 +62,11 @@ public class FoodServiceProviderService {
             // Chuyển nội dung file từ MultipartFile sang file tạm
             contractFile.transferTo(tempFile);
 
+            // Chọn folder tương ứng để upload (ví dụ: folder cho nhà cung cấp thức ăn)
+            String folderId = "1wSUxaEk0WTd4FqJEo7_yQdzjKYyZmasT";
+
             // Upload file lên Google Drive
-            String contractLink = driveService.upload(tempFile);
+            String contractLink = driveService.upload(tempFile, folderId);
             newFoodProvider.setContractFile(contractLink);
 
             // Xóa file tạm sau khi upload
@@ -73,6 +76,7 @@ public class FoodServiceProviderService {
         }
         return foodServiceProviderRepo.save(newFoodProvider);
     }
+
 
     public Page<FoodServiceProvider> getProvider(Boolean status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
