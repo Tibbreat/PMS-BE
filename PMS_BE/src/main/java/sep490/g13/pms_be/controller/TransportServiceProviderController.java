@@ -9,12 +9,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import sep490.g13.pms_be.entities.FoodServiceProvider;
 import sep490.g13.pms_be.entities.TransportServiceProvider;
 import sep490.g13.pms_be.model.request.transportsupplier.AddTransportProviderRequest;
 import sep490.g13.pms_be.model.request.transportsupplier.UpdateTransportRequest;
 import sep490.g13.pms_be.model.response.base.PagedResponseModel;
 import sep490.g13.pms_be.model.response.base.ResponseModel;
+import sep490.g13.pms_be.model.response.transportsupplier.GetTransportDetailResponse;
 import sep490.g13.pms_be.service.entity.TransportServiceProviderService;
 import sep490.g13.pms_be.utils.ValidationUtils;
 
@@ -117,6 +117,17 @@ public class TransportServiceProviderController {
                 .body(ResponseModel.<TransportServiceProvider>builder()
                         .message("Trạng thái nhà cung cấp đã được cập nhật thành công")
                         .data(updateStatus)
+                        .build());
+    }
+
+    @GetMapping("/{providerId}")
+    public ResponseEntity<ResponseModel<?>> getFoodProviderDetail(@PathVariable String providerId) {
+        GetTransportDetailResponse getTransportDetailResponse = transportServiceProviderService.getTransportProviderDetailById(providerId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResponseModel.<GetTransportDetailResponse>builder()
+                        .message("Thành công")
+                        .data(getTransportDetailResponse)
                         .build());
     }
 }

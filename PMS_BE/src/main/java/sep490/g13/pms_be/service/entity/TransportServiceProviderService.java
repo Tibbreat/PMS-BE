@@ -8,14 +8,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import sep490.g13.pms_be.entities.FoodServiceProvider;
 import sep490.g13.pms_be.entities.TransportServiceProvider;
 import sep490.g13.pms_be.entities.User;
 import sep490.g13.pms_be.exception.other.DataNotFoundException;
 import sep490.g13.pms_be.exception.other.PermissionNotAcceptException;
-import sep490.g13.pms_be.model.request.foodsupplier.UpdateFoodProviderRequest;
 import sep490.g13.pms_be.model.request.transportsupplier.AddTransportProviderRequest;
 import sep490.g13.pms_be.model.request.transportsupplier.UpdateTransportRequest;
+import sep490.g13.pms_be.model.response.transportsupplier.GetTransportDetailResponse;
 import sep490.g13.pms_be.repository.TransportServiceProviderRepo;
 import sep490.g13.pms_be.repository.UserRepo;
 import sep490.g13.pms_be.service.utils.DriveService;
@@ -104,5 +103,26 @@ public class TransportServiceProviderService {
                 -> new DataNotFoundException("Không tìm thấy nhà cung cấp nào"));
         transportServiceProvider.setIsActive(status);
         return transportServiceProviderRepo.save(transportServiceProvider);
+    }
+
+    public GetTransportDetailResponse getTransportProviderDetailById(String transportProviderId) {
+        TransportServiceProvider transportServiceProvider = transportServiceProviderRepo.findById(transportProviderId)
+                .orElseThrow(() -> new DataNotFoundException("Nhà cung cấp dịch vụ vận chuyển với id " + transportProviderId + " không được tìm thấy"));
+        // Chuyển đổi đối tượng Classes thành ClassDetailResponse
+        return GetTransportDetailResponse.builder()
+                .providerName(transportServiceProvider.getProviderName())
+                .providerPhone(transportServiceProvider.getProviderPhone())
+                .providerEmail(transportServiceProvider.getProviderEmail())
+                .providerAddress(transportServiceProvider.getProviderAddress())
+                .providerRegisterNumber(transportServiceProvider.getProviderRegisterNumber())
+                .providerLicenseNumber(transportServiceProvider.getProviderLicenseNumber())
+                .representativeName(transportServiceProvider.getRepresentativeName())
+                .isActive(transportServiceProvider.getIsActive())
+                .contractFile(transportServiceProvider.getContractFile())
+                .createdBy(transportServiceProvider.getCreatedBy())
+                .createdDate(transportServiceProvider.getCreatedDate())
+                .lastModifiedDate(transportServiceProvider.getLastModifiedDate())
+                .lastModifiedBy(transportServiceProvider.getLastModifiedBy())
+                .build();
     }
 }
