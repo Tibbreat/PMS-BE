@@ -35,7 +35,7 @@ public class UserController {
         User newUser = userService.addUser(addUserRequest);
 
         String message = newUser == null? "Thêm người dùng không thành công" : "Thêm người dùng thành công";
-        HttpStatus responseCode = newUser == null? HttpStatus.CREATED : HttpStatus.BAD_REQUEST;
+        HttpStatus responseCode = newUser == null? HttpStatus.BAD_REQUEST : HttpStatus.CREATED;
 
         return ResponseEntity.status(responseCode)
                 .body(ResponseModel.<User>builder()
