@@ -14,6 +14,14 @@ public class AddUserRequest {
     @NotEmpty(message = "Họ và tên không được để trống")
     private String fullName;
 
+    @NotNull(message = "Số căn cước không được để trống")
+    private String idCardNumber;
+
+    @NotNull(message = "Địa chỉ không được để trống")
+    private String address;
+
+    @NotNull(message = "Số điện thoại không được để trống")
+
     @NotNull(message = "Role không được để trống")
     private RoleEnums role;
 }
