@@ -2,9 +2,13 @@ package sep490.g13.pms_be.service.entity;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import sep490.g13.pms_be.entities.FoodServiceProvider;
 import sep490.g13.pms_be.entities.TransportServiceProvider;
 import sep490.g13.pms_be.entities.User;
 import sep490.g13.pms_be.exception.other.DataNotFoundException;
@@ -71,5 +75,10 @@ public class TransportServiceProviderService {
             }
         }
         return transportServiceProviderRepo.save(newTransportProvider);
+    }
+
+    public Page<TransportServiceProvider> getTransportProvider(Boolean status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return transportServiceProviderRepo.findByFilter(status, pageable);
     }
 }

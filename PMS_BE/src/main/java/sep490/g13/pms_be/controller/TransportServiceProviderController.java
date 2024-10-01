@@ -2,16 +2,21 @@ package sep490.g13.pms_be.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import sep490.g13.pms_be.entities.FoodServiceProvider;
 import sep490.g13.pms_be.entities.TransportServiceProvider;
 import sep490.g13.pms_be.model.request.transportsupplier.AddTransportProviderRequest;
+import sep490.g13.pms_be.model.response.base.PagedResponseModel;
 import sep490.g13.pms_be.model.response.base.ResponseModel;
 import sep490.g13.pms_be.service.entity.TransportServiceProviderService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/transportServiceProvider")
@@ -53,5 +58,28 @@ public class TransportServiceProviderController {
                             .data(null)
                             .build());
         }
+    }
+
+    @GetMapping
+    public ResponseEntity<PagedResponseModel<TransportServiceProvider>> getTransportProvider(
+            @RequestParam int page,
+            @RequestParam(required = false) Boolean status) {
+        int size = 10;
+        Page<TransportServiceProvider> results = transportServiceProviderService.getTransportProvider(status, page - 1, size);
+        List<TransportServiceProvider> tsp = results.getContent();
+        String msg = "";
+        if (tsp.isEmpty()) {
+            msg = "Không có nhà cung cấp dịch vụ vận chuyển nào";
+        } else {
+            msg = "Có " + tsp.size() + " nhà cung cấp dịch vụ vận chuyển";
+        }
+        PagedResponseModel<TransportServiceProvider> pagedResponse = PagedResponseModel.<TransportServiceProvider>builder()
+                .page(page)
+                .total(results.getTotalElements())
+                .size(size)
+                .msg(msg)
+                .listData(tsp)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
     }
 }
