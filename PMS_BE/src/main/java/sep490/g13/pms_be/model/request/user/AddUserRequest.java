@@ -21,6 +21,7 @@ public class AddUserRequest {
     private String address;
 
     @NotNull(message = "Số điện thoại không được để trống")
+    private String phone;
 
     @NotNull(message = "Role không được để trống")
     private RoleEnums role;

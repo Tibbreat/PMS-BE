@@ -25,6 +25,5 @@ public class TeacherService {
     @Autowired
     private ClassRepo classRepo;
 
-
 }
 

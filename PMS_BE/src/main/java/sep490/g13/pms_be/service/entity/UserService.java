@@ -3,13 +3,18 @@ package sep490.g13.pms_be.service.entity;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sep490.g13.pms_be.entities.User;
+import sep490.g13.pms_be.exception.other.DataNotFoundException;
 import sep490.g13.pms_be.model.request.user.AddUserRequest;
 import sep490.g13.pms_be.model.request.user.UpdateUserNameAndPasswordRequest;
 import sep490.g13.pms_be.repository.UserRepo;
 import sep490.g13.pms_be.utils.StringUtils;
+import sep490.g13.pms_be.utils.enums.RoleEnums;
 
 import java.util.Optional;
 
@@ -38,9 +43,7 @@ public class UserService {
         user.setUsername(username.trim());
         user.setIsActive(true);
         user.setPassword(passwordEncoder.encode(defaultPassword));
-
-        System.out.println("Default password: " + defaultPassword);
-        System.out.println("Username: " + username);
+        user.setEmail(username.trim() + "@pms.com");
 
         return userRepo.save(user);
     }
@@ -82,7 +85,7 @@ public class UserService {
             // Lưu user đã được cập nhật vào cơ sở dữ liệu
             return userRepo.save(user);
         } else {
-            throw new RuntimeException("User not found with the provided email: " + request.getEmail());
+            throw new DataNotFoundException("User not found with the provided email: " + request.getEmail());
         }
     }
 
@@ -90,6 +93,21 @@ public class UserService {
         return userRepo.findByEmail(email).get();
     }
     public User getUserById(String id){
-        return userRepo.findById(id).orElse(null);
+        return userRepo.findById(id).orElseThrow(() -> new DataNotFoundException("Không tìm thấy người dùng với id: " + id));
+    }
+
+
+    public Page<User> getAllByRole(String role, Boolean isActive, int size, int page){
+        Pageable pageable = PageRequest.of(page, size);
+        RoleEnums roleEnum = null;
+        if (role != null) {
+            try {
+                roleEnum = RoleEnums.valueOf(role);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Role không tồn tại: " + role, e);
+            }
+        }
+        return userRepo.getUserByRole(roleEnum, isActive, pageable);
+
     }
 }

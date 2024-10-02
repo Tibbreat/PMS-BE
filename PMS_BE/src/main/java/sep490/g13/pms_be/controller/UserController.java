@@ -2,18 +2,19 @@ package sep490.g13.pms_be.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import sep490.g13.pms_be.entities.User;
 import sep490.g13.pms_be.model.request.user.AddUserRequest;
+import sep490.g13.pms_be.model.response.base.PagedResponseModel;
 import sep490.g13.pms_be.model.response.base.ResponseModel;
 import sep490.g13.pms_be.service.entity.UserService;
 import sep490.g13.pms_be.utils.ValidationUtils;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/pms/users")
@@ -42,5 +43,35 @@ public class UserController {
                         .message(message)
                         .data(newUser)
                         .build());
+    }
+
+    @GetMapping
+    public ResponseEntity<PagedResponseModel<User>> getUsers(
+            @RequestParam int page,
+            @RequestParam(required = false) String role,
+            @RequestParam(required = false) Boolean isActive){
+        int size = 10;
+        Page<User> results = userService.getAllByRole(role, isActive,  size, page - 1);
+        List<User> users = results.getContent();
+        String msg = users.isEmpty() ? "Không có dữ liệu" : "Tìm thấy " + results.getTotalElements();
+
+        PagedResponseModel<User> pagedResponse = PagedResponseModel.<User>builder()
+                .page(page)
+                .size(size)
+                .msg(msg)
+                .total(results.getTotalElements())
+                .listData(users)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<ResponseModel<?>> getUser(@PathVariable String userId) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseModel.<User>builder()
+                        .message("Tìm thấy người dùng có ID: " + userId)
+                        .data(userService.getUserById(userId))
+                        .build());
+
     }
 }
