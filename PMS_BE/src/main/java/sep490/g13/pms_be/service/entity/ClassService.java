@@ -2,14 +2,12 @@ package sep490.g13.pms_be.service.entity;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sep490.g13.pms_be.entities.Children;
 import sep490.g13.pms_be.entities.ClassTeacher;
 import sep490.g13.pms_be.entities.Classes;
 import sep490.g13.pms_be.entities.User;
@@ -17,6 +15,7 @@ import sep490.g13.pms_be.exception.other.DataNotFoundException;
 import sep490.g13.pms_be.exception.other.PermissionNotAcceptException;
 import sep490.g13.pms_be.model.request.classes.AddClassRequest;
 import sep490.g13.pms_be.model.request.classes.UpdateClassRequest;
+import sep490.g13.pms_be.model.response.classes.ClassListResponse;
 import sep490.g13.pms_be.model.response.classes.ClassDetailResponse;
 import sep490.g13.pms_be.repository.ClassRepo;
 import sep490.g13.pms_be.repository.UserRepo;
@@ -119,7 +118,7 @@ public class ClassService {
         }
     }
 
-    public Page<Classes> getClasses(Integer schoolYear, String ageRange, String managerId, int page, int size) {
+    public Page<ClassListResponse> getClasses(Integer schoolYear, String ageRange, String managerId, int page, int size) {
         // Tạo Pageable để phân trang
         Pageable pageable = PageRequest.of(page, size);
         // Gọi repository để lấy danh sách lớp học theo bộ lọc

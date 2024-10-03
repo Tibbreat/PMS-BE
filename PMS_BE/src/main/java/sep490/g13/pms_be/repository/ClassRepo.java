@@ -10,20 +10,21 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import sep490.g13.pms_be.entities.Classes;
 import sep490.g13.pms_be.model.request.classes.UpdateClassRequest;
-import sep490.g13.pms_be.model.response.classes.ClassDetailResponse;
+import sep490.g13.pms_be.model.response.classes.ClassListResponse;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Repository
 public interface ClassRepo extends JpaRepository<Classes, String> {
-    @Query("SELECT c FROM Classes c " +
-            "LEFT JOIN FETCH c.manager " +
+    @Query("SELECT new sep490.g13.pms_be.model.response.classes.ClassListResponse(c.id, c.className, c.ageRange, c.closingDay, c.openingDay, c.manager.id) " +
+            "FROM Classes c " +
+            "LEFT JOIN c.manager " +
             "WHERE (:schoolYear IS NULL OR YEAR(c.openingDay) = :schoolYear) " +
             "AND (:ageRange IS NULL OR c.ageRange = :ageRange) " +
             "AND (:managerId IS NULL OR c.manager.id = :managerId) " +
             "ORDER BY c.createdDate, c.ageRange, c.openingDay DESC")
-    Page<Classes> findClassesByFilters(
+    Page<ClassListResponse> findClassesByFilters(
             @Param("schoolYear") Integer schoolYear,
             @Param("ageRange") String ageRange,
             @Param("managerId") String managerId,
