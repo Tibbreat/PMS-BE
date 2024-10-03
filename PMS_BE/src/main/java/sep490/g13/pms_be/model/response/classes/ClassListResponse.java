@@ -15,4 +15,5 @@ public class ClassListResponse {
     private Date openingDay;
     private String managerId;
     private String managerName;
+    private boolean status;
 }

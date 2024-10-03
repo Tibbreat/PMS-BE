@@ -17,14 +17,15 @@ import java.util.List;
 
 @Repository
 public interface ClassRepo extends JpaRepository<Classes, String> {
-    @Query("SELECT new sep490.g13.pms_be.model.response.classes.ClassListResponse(c.id, c.className, c.ageRange, c.closingDay, c.openingDay, c.manager.id, c.manager.username) " +
+    @Query("SELECT new sep490.g13.pms_be.model.response.classes.ClassListResponse(c.id, c.className, c.ageRange, " +
+            "c.closingDay, c.openingDay, c.manager.id, c.manager.username, c.status) " +
             "FROM Classes c " +
             "LEFT JOIN c.manager " +
             "WHERE (:schoolYear IS NULL OR YEAR(c.openingDay) = :schoolYear) " +
             "AND (:ageRange IS NULL OR c.ageRange = :ageRange) " +
             "AND (:managerId IS NULL OR c.manager.id = :managerId) " +
             "ORDER BY c.createdDate, c.ageRange, c.openingDay DESC")
-    Page<ClassListResponse> findClassesByFilters(
+    Page<ClassListResponse>  findClassesByFilters(
             @Param("schoolYear") Integer schoolYear,
             @Param("ageRange") String ageRange,
             @Param("managerId") String managerId,
