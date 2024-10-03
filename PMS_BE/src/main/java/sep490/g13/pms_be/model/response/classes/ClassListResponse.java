@@ -14,4 +14,5 @@ public class ClassListResponse {
     private Date closingDay;
     private Date openingDay;
     private String managerId;
+    private String managerName;
 }

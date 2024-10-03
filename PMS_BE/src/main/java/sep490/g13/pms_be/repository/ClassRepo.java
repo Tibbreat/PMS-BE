@@ -17,7 +17,7 @@ import java.util.List;
 
 @Repository
 public interface ClassRepo extends JpaRepository<Classes, String> {
-    @Query("SELECT new sep490.g13.pms_be.model.response.classes.ClassListResponse(c.id, c.className, c.ageRange, c.closingDay, c.openingDay, c.manager.id) " +
+    @Query("SELECT new sep490.g13.pms_be.model.response.classes.ClassListResponse(c.id, c.className, c.ageRange, c.closingDay, c.openingDay, c.manager.id, c.manager.username) " +
             "FROM Classes c " +
             "LEFT JOIN c.manager " +
             "WHERE (:schoolYear IS NULL OR YEAR(c.openingDay) = :schoolYear) " +

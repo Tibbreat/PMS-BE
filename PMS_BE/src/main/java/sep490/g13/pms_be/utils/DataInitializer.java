@@ -182,7 +182,5 @@ public class DataInitializer {
                     .password(passwordEncoder.encode("12345678"))
                     .build());
         }
-
-
     }
 }

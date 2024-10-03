@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sep490.g13.pms_be.entities.Children;
 import sep490.g13.pms_be.entities.ClassTeacher;
 import sep490.g13.pms_be.entities.Classes;
 import sep490.g13.pms_be.entities.User;
@@ -35,31 +36,15 @@ public class ClassService {
     @Autowired
     private LocalDateUtils dateUtils;
 
-    public List<Classes> findAll(){
-        return classRepo.findAll();
-    }
     public Classes createNewClass(AddClassRequest classRequest) {
-        // Tạo đối tượng Classes từ request
         Classes newClass = new Classes();
         BeanUtils.copyProperties(classRequest, newClass);
-
-        // Xử lý và validate danh sách giáo viên
         Set<ClassTeacher> teachers = processTeachers(newClass, classRequest.getTeacherId());
-
-        // Validate và set manager cho lớp
         User manager = validateManager(classRequest.getManagerId());
-
-        // Set các giá trị khác vào đối tượng class
         newClass.setTeachers(teachers);
         newClass.setManager(manager);
-
-        // Kiểm tra và validate các trường ngày mở và ngày đóng
         validateClassDates(newClass.getOpeningDay(), newClass.getClosingDay());
-
-        // Kiểm tra quyền của người tạo
         validateCreatedBy(classRequest.getCreatedBy());
-
-        // Lưu lớp học vào database
         return classRepo.save(newClass);
     }
 
@@ -158,10 +143,10 @@ public class ClassService {
                 .openingDay(classes.getOpeningDay())
                 .closingDay(classes.getClosingDay())
                 .children(classes.getChildren().stream()
-                        .map(child -> child.getChildName()) // Giả sử Children có trường getChildName()
+                        .map(Children::getChildName)
                         .collect(Collectors.toSet()))
                 .teachers(classes.getTeachers().stream()
-                        .map(teacher -> teacher.getTeacherId().getFullName()) // Lấy tên giáo viên từ ClassTeacher
+                        .map(teacher -> teacher.getTeacherId().getFullName())
                         .collect(Collectors.toSet()))
                 .build();
     }
