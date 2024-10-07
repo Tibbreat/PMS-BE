@@ -57,7 +57,7 @@ public class ClassController {
             return ResponseEntity.ok(
                     ResponseModel.builder()
                             .message("Thêm lớp học thành công")
-                            .data(savedClass)
+                            .data(classRequest)
                             .build()
             );
         } catch (DataNotFoundException | PermissionNotAcceptException | IllegalArgumentException e) {
