@@ -63,7 +63,7 @@ public class ClassService {
         return classRepo.save(newClass);
     }
 
-    private Set<ClassTeacher> processTeachers(Classes newClass, List<String> teacherIds) {
+    public Set<ClassTeacher> processTeachers(Classes newClass, List<String> teacherIds) {
         Set<ClassTeacher> teachers = new HashSet<>();
         for (String teacherId : teacherIds) {
             User teacher = userRepo.getById(teacherId);
@@ -78,7 +78,7 @@ public class ClassService {
         return teachers;
     }
 
-    private User validateManager(String managerId) {
+    public User validateManager(String managerId) {
         User manager = userRepo.getById(managerId);
         if (manager == null) {
             throw new DataNotFoundException("Quản lý không tồn tại: " + managerId);
@@ -91,7 +91,7 @@ public class ClassService {
         return manager;
     }
 
-    private void validateCreatedBy(String createdBy) {
+    public void validateCreatedBy(String createdBy) {
         if (createdBy == null) {
             throw new IllegalArgumentException("CreatedBy field is null or invalid");
         }
@@ -104,7 +104,7 @@ public class ClassService {
         }
     }
 
-    private void validateClassDates(Date openingDay, Date closingDay) {
+    public void validateClassDates(Date openingDay, Date closingDay) {
         LocalDate openDay = dateUtils.convertToLocalDate(openingDay);
         LocalDate closeDay = dateUtils.convertToLocalDate(closingDay);
         LocalDate today = LocalDate.now();

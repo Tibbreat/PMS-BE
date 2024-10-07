@@ -1,6 +1,7 @@
 package sep490.g13.pms_be.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,4 +26,7 @@ public class AttendanceLog extends Auditable<String>  {
 
     @CreationTimestamp
     private LocalTime attendanceTime;
+    @ManyToOne
+    @JoinColumn(name = "responsible_person_id")
+    private User user;
 }
