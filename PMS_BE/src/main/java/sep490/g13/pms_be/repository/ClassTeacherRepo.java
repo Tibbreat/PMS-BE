@@ -17,3 +17,4 @@ public interface ClassTeacherRepo extends CrudRepository<ClassTeacher, Integer> 
     @Query("SELECT ct.schoolClasses FROM ClassTeacher ct WHERE ct.teacherId.id = :teacherId")
     Page<Classes> findClassesByTeacherId(String teacherId, Pageable page);
 }
+

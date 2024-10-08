@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import sep490.g13.pms_be.entities.Classes;
 import sep490.g13.pms_be.model.request.classes.UpdateClassRequest;
+import sep490.g13.pms_be.model.response.classes.ClassDetailResponse;
 import sep490.g13.pms_be.model.response.classes.ClassListResponse;
 
 import java.time.LocalDate;
@@ -51,4 +52,11 @@ public interface ClassRepo extends JpaRepository<Classes, String> {
     List<Classes> findByClosingDayBeforeAndStatus(LocalDate date, boolean status);
     List<Classes> findByOpeningDayAfterAndStatus(LocalDate date, boolean status);
 
+    @Query("SELECT new sep490.g13.pms_be.model.response.classes.ClassDetailResponse(c.className, c.ageRange, c.openingDay, c.closingDay, " +
+            "c.childrens, c.teachers) " +
+            "FROM Classes c " +
+            "JOIN Children children ON children.schoolClass.id = c.id " +
+            "JOIN User teacher ON teacher.classTeachers." +
+            "WHERE c.id = :id")
+    ClassDetailResponse findClassById(String id);
 }

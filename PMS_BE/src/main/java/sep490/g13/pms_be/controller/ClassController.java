@@ -148,4 +148,13 @@ public class ClassController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
     }
+
+    @GetMapping("/class/{classId}")
+    public ResponseEntity<ResponseModel<?>> getClassById(@PathVariable String classId) {
+        Classes classes = classService.getClassById(classId);
+        return ResponseEntity.ok(ResponseModel.<Classes>builder()
+                .message("Lấy thông tin lớp học thành công")
+                .data(classes)
+                .build());
+    }
 }
