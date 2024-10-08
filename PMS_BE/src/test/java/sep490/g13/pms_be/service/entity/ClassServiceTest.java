@@ -100,7 +100,6 @@ class ClassServiceTest {
         // Given
         AddClassRequest request = new AddClassRequest();
         request.setManagerId("2");
-        request.setTeacherId(Arrays.asList("5"));
         request.setOpeningDay(new Date());
         request.setClosingDay(new Date(System.currentTimeMillis() + 30L * 24 * 60 * 60 * 1000)); // Ngày đóng nhỏ hơn 6 tháng
 // When
@@ -127,7 +126,7 @@ class ClassServiceTest {
         request.setClosingDay(closingDate);
         request.setManagerId("2");
         request.setCreatedBy("1");
-        request.setTeacherId(Arrays.asList("5"));
+
         // Mock the conversion of Date to LocalDate
         LocalDate openingLocalDate = LocalDate.now().plusDays(1); // Ngày mở lớp hiện tại
         LocalDate closingLocalDate = openingLocalDate.plusDays(190); // Ngày đóng lớp (lớn hơn 6 tháng)
@@ -164,7 +163,7 @@ class ClassServiceTest {
         request.setClosingDay(closingDate);
         request.setManagerId("2");
         request.setCreatedBy("1");
-        request.setTeacherId(Arrays.asList("5"));
+
 
         // Mock the conversion of Date to LocalDate
         LocalDate openingLocalDate = LocalDate.now().plusDays(1);
@@ -199,7 +198,7 @@ class ClassServiceTest {
         request.setClosingDay(closingDate);
         request.setManagerId("2");
         request.setCreatedBy("1");
-        request.setTeacherId(Arrays.asList("5"));
+
 
         // Mock the conversion of Date to LocalDate
         LocalDate openingLocalDate = LocalDate.now().plusDays(1);
@@ -234,7 +233,7 @@ class ClassServiceTest {
         request.setClosingDay(closingDate);
         request.setManagerId("2");
         request.setCreatedBy("1");
-        request.setTeacherId(Arrays.asList("5"));
+
 
         // Mock the conversion of Date to LocalDate
         LocalDate openingLocalDate = LocalDate.now().minusDays(1); // Hôm qua

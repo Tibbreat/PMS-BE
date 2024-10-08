@@ -15,11 +15,7 @@ import sep490.g13.pms_be.model.request.classes.UpdateClassRequest;
 import sep490.g13.pms_be.model.response.classes.ClassListResponse;
 import sep490.g13.pms_be.model.response.base.PagedResponseModel;
 import sep490.g13.pms_be.model.response.base.ResponseModel;
-import sep490.g13.pms_be.model.response.classes.ClassDetailResponse;
-import sep490.g13.pms_be.service.entity.ChildrenService;
-import sep490.g13.pms_be.service.entity.ClassService;
-import sep490.g13.pms_be.service.entity.TeacherService;
-import sep490.g13.pms_be.service.entity.UserService;
+import sep490.g13.pms_be.service.entity.*;
 import sep490.g13.pms_be.utils.ValidationUtils;
 
 import java.util.List;
@@ -35,6 +31,9 @@ public class ClassController {
     private ChildrenService childrenService;
     @Autowired
     private TeacherService teacherService;
+
+    @Autowired
+    private ClassTeacherService classTeacherService;
 
 
     @PostMapping("/add")
@@ -54,6 +53,8 @@ public class ClassController {
 
         try {
             Classes savedClass = classService.createNewClass(classRequest);
+            String savedClassId = savedClass.getId();
+            classTeacherService.addTeacherIntoClass(savedClassId, classRequest.getTeacherId());
             return ResponseEntity.ok(
                     ResponseModel.builder()
                             .message("Thêm lớp học thành công")
@@ -82,10 +83,8 @@ public class ClassController {
             @RequestParam(required = false) Integer schoolYear,
             @RequestParam(required = false) String ageRange,
             @RequestParam(required = false) String managerId
-
-
     ) {
-        int size = 10; // Số lượng lớp học mỗi trang
+        int size = 10;
         Page<ClassListResponse> result = classService.getClasses(schoolYear, ageRange, managerId, page - 1, size);
 
         List<ClassListResponse> classList = result.getContent();
@@ -121,20 +120,6 @@ public class ClassController {
                 .build());
     }
 
-
-    @GetMapping("/class-detail/{classId}")
-    public ResponseEntity<ResponseModel<?>> getClassDetail(@PathVariable String classId) {
-        ClassDetailResponse classDetailResponse = classService.getClassDetailById(classId);
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(ResponseModel.<ClassDetailResponse>builder()
-                        .message("Lấy dữ liệu lớp có id: " + classId)
-                        .data(classDetailResponse)
-                        .build());
-    }
-
-
     @PutMapping("/change-class-status/{classId}")
     public ResponseEntity<String> changStatusClass(@PathVariable String classId) {
         try {
@@ -145,5 +130,22 @@ public class ClassController {
         }
     }
 
+    @GetMapping("/class/teacher/{teacherId}")
+    public ResponseEntity<PagedResponseModel<Classes>> getClassByTeacherId(
+            @PathVariable String teacherId,
+            @RequestParam int page){
+    int size = 10;
+    Page<Classes> results = classTeacherService.getClassByTeacherId(teacherId, size, page - 1);
+    List<Classes> classes = results.getContent();
+    String msg = classes.isEmpty() ? "Không có dữ liệu" : "Tìm thấy" + results.getTotalElements() + "dữ liệu";
 
+        PagedResponseModel<Classes> pagedResponse = PagedResponseModel.<Classes>builder()
+                .page(page)
+                .size(size)
+                .msg(msg)
+                .total(results.getTotalElements())
+                .listData(classes)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
+    }
 }

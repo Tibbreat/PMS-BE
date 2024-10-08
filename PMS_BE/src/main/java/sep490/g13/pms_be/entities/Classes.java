@@ -8,8 +8,6 @@ import lombok.*;
 
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -17,7 +15,6 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Classes extends Auditable<String> {
     private String className;
 
@@ -27,19 +24,8 @@ public class Classes extends Auditable<String> {
 
     private Date closingDay;
 
-    @OneToMany(mappedBy = "schoolClass", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore // Add this annotation
-    private Set<Children> children = new HashSet<>();
-
-    @OneToMany(mappedBy = "schoolClasses", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore // Add this annotation
-    private Set<ClassTeacher> teachers = new HashSet<>();
-
     @ManyToOne
     private User manager;
 
-    @OneToMany(mappedBy = "schoolClasses")
-    private Set<DailyMenu> dailyMenus;
-
-    private boolean status = false;
+    private boolean status = true;
 }

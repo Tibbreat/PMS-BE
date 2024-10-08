@@ -23,4 +23,5 @@ public interface ChildrenRepo extends JpaRepository<Children, String> {
             @Param("childName") String childName,
             Pageable pageable);
 
+    Page<Children> findAllBySchoolClassId(String classId, Pageable pageable);
 }

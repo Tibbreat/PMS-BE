@@ -111,7 +111,7 @@ public class ChildrenService {
             }
         }
         System.out.println(relationships.size());
-        c.setRelationships(relationships);
+
 
         // Lưu đối tượng Children vào database
         return childrenRepo.save(c);
@@ -155,14 +155,7 @@ public class ChildrenService {
                     .childAge(child.getChildAge())
                     .childBirthDate(child.getChildBirthDate())
                     .childAddress(child.getChildAddress())
-                    .classId(child.getSchoolClass().getId()) // Lấy ID của lớp mà trẻ sẽ được thêm vào
-                    .relationships(child.getRelationships().stream()
-                            .map(relationship -> new RelationshipRequest(
-                                    relationship.getParentId().getId(),
-                                    relationship.getRelationship(),
-                                    relationship.getIsRepresentative()))
-                            .collect(Collectors.toList())) // Chuyển đổi Set sang List
-                    .imageUrl(child.getImageUrl()) // Lấy URL hình ảnh
+                    .classId(child.getSchoolClass().getId())
                     .build();
         } else {
             throw new RuntimeException("Children not found with ID: " + childId);
@@ -218,8 +211,6 @@ public class ChildrenService {
         existingChild.setLastModifiedBy(updateChildrenRequest.getLastModifiedById());
 
         if (updateChildrenRequest.getRelationships() != null) {
-            // Xóa các mối quan hệ hiện tại và đặt các mối quan hệ mới
-            existingChild.getRelationships().clear();
             updateChildrenRequest.getRelationships().forEach(relationshipRequest -> {
                 Relationship relationship = new Relationship();
                 User parent = userRepo.findById(relationshipRequest.getParentId())
@@ -229,15 +220,16 @@ public class ChildrenService {
                 relationship.setParentId(parent);
                 relationship.setRelationship(relationshipRequest.getRelationship());
                 relationship.setIsRepresentative(relationshipRequest.getIsRepresentative());
-
-                existingChild.getRelationships().add(relationship);
             });
         }
         // Lưu lại đối tượng Children đã được cập nhật
         return childrenRepo.save(existingChild);
     }
 
-
+    public Page<Children> getChildrenByClass(String classId, int size, int page){
+        Pageable pageable = PageRequest.of(page, size);
+        return childrenRepo.findAllBySchoolClassId(classId, pageable);
+    }
 
 
 }

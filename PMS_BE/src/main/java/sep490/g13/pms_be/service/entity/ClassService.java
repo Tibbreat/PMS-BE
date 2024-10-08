@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sep490.g13.pms_be.entities.Children;
 import sep490.g13.pms_be.entities.ClassTeacher;
 import sep490.g13.pms_be.entities.Classes;
 import sep490.g13.pms_be.entities.User;
@@ -17,7 +16,6 @@ import sep490.g13.pms_be.exception.other.PermissionNotAcceptException;
 import sep490.g13.pms_be.model.request.classes.AddClassRequest;
 import sep490.g13.pms_be.model.request.classes.UpdateClassRequest;
 import sep490.g13.pms_be.model.response.classes.ClassListResponse;
-import sep490.g13.pms_be.model.response.classes.ClassDetailResponse;
 import sep490.g13.pms_be.repository.ClassRepo;
 import sep490.g13.pms_be.repository.UserRepo;
 import sep490.g13.pms_be.utils.LocalDateUtils;
@@ -25,7 +23,6 @@ import sep490.g13.pms_be.utils.enums.RoleEnums;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ClassService {
@@ -39,9 +36,7 @@ public class ClassService {
     public Classes createNewClass(AddClassRequest classRequest) {
         Classes newClass = new Classes();
         BeanUtils.copyProperties(classRequest, newClass);
-        Set<ClassTeacher> teachers = processTeachers(newClass, classRequest.getTeacherId());
         User manager = validateManager(classRequest.getManagerId());
-        newClass.setTeachers(teachers);
         newClass.setManager(manager);
         validateClassDates(newClass.getOpeningDay(), newClass.getClosingDay());
         validateCreatedBy(classRequest.getCreatedBy());
@@ -131,25 +126,7 @@ public class ClassService {
     }
 
 
-    public ClassDetailResponse getClassDetailById(String id) {
-        // Lấy thông tin class từ repository
-        Classes classes = classRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy lớp học với id " + id));
 
-        // Chuyển đổi đối tượng Classes thành ClassDetailResponse
-        return ClassDetailResponse.builder()
-                .className(classes.getClassName())
-                .ageRange(classes.getAgeRange())
-                .openingDay(classes.getOpeningDay())
-                .closingDay(classes.getClosingDay())
-                .children(classes.getChildren().stream()
-                        .map(Children::getChildName)
-                        .collect(Collectors.toSet()))
-                .teachers(classes.getTeachers().stream()
-                        .map(teacher -> teacher.getTeacherId().getFullName())
-                        .collect(Collectors.toSet()))
-                .build();
-    }
     public Classes getClassById(String id){
         return classRepo.findById(id).get();
     }

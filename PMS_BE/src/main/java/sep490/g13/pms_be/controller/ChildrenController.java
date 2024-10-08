@@ -96,25 +96,25 @@ public class ChildrenController {
             );
         }
     }
+
+
     @GetMapping()
     public ResponseEntity<PagedResponseModel<Children>> getChildren(
             @RequestParam int page,
             @RequestParam(required = false) String fullname,
             @RequestParam(required = false) String classId) {
 
-        int size = 10; // Số lượng học sinh mỗi trang
+        int size = 10;
         Page<Children> result = childrenService.getChildrenByFilters(fullname, classId, page - 1, size);
 
-        // Initialize các liên kết cho các đối tượng học sinh (nếu có)
+
         result.getContent().forEach(children -> {
             Hibernate.initialize(children.getSchoolClass());
-            Hibernate.initialize(children.getRelationships());
-            Hibernate.initialize(children.getChildrenFees());
         });
 
         List<Children> childrenList = result.getContent();
 
-        // Tạo response với phân trang
+
         PagedResponseModel<Children> pagedResponse = PagedResponseModel.<Children>builder()
                 .total(result.getTotalElements())
                 .page(page)
@@ -175,4 +175,21 @@ public class ChildrenController {
     }
 
 
+    @GetMapping("/children-by-class/{classId}")
+    public ResponseEntity<PagedResponseModel<Children>> getChildrenByClass(
+            @PathVariable String classId,
+            @RequestParam int page){
+        int size = 10;
+        Page<Children> results = childrenService.getChildrenByClass(classId, size, page - 1);
+        List<Children> children = results.getContent();
+        String msg = children.isEmpty() ? "Không có dữ liệu" : "Tìm thấy " + results.getTotalElements() + " dữ liệu";
+        PagedResponseModel<Children> pagedResponse = PagedResponseModel.<Children>builder()
+                .page(page)
+                .size(size)
+                .msg(msg)
+                .total(results.getTotalElements())
+                .listData(children)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
+    }
 }
