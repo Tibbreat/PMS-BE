@@ -1,5 +1,7 @@
 package sep490.g13.pms_be.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,6 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Classes extends Auditable<String> {
     private String className;
 
@@ -25,11 +28,11 @@ public class Classes extends Auditable<String> {
     private Date closingDay;
 
     @OneToMany(mappedBy = "schoolClass", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonIgnore // Add this annotation
     private Set<Children> children = new HashSet<>();
 
-    @OneToMany(mappedBy = "schoolClasses", cascade = CascadeType.ALL,orphanRemoval = true)
-    @JsonManagedReference
+    @OneToMany(mappedBy = "schoolClasses", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore // Add this annotation
     private Set<ClassTeacher> teachers = new HashSet<>();
 
     @ManyToOne
