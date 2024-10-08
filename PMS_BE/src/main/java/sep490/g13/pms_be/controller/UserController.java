@@ -7,10 +7,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import sep490.g13.pms_be.entities.User;
 import sep490.g13.pms_be.model.request.user.AddUserRequest;
 import sep490.g13.pms_be.model.response.base.PagedResponseModel;
 import sep490.g13.pms_be.model.response.base.ResponseModel;
+import sep490.g13.pms_be.model.response.user.GetUsersOptionResponse;
 import sep490.g13.pms_be.service.entity.UserService;
 import sep490.g13.pms_be.utils.ValidationUtils;
 
@@ -23,20 +25,27 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/user")
-    public ResponseEntity<ResponseModel<?>> addUser(@RequestBody @Valid AddUserRequest addUserRequest, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            String errorMessage = ValidationUtils.getValidationErrors(bindingResult);
-            return ResponseEntity.badRequest()
-                    .body(ResponseModel.<String>builder()
-                            .message("Thêm người dùng không thành công")
-                            .data(errorMessage)
-                            .build());
-        }
-        User newUser = userService.addUser(addUserRequest);
+ @PostMapping("/user")
+public ResponseEntity<ResponseModel<?>> addUser(
+        @RequestPart("user") @Valid AddUserRequest addUserRequest,
+        @RequestPart(value = "image", required = false) MultipartFile image,
+        BindingResult bindingResult) {
 
-        String message = newUser == null? "Thêm người dùng không thành công" : "Thêm người dùng thành công";
-        HttpStatus responseCode = newUser == null? HttpStatus.BAD_REQUEST : HttpStatus.CREATED;
+    if (bindingResult.hasErrors()) {
+        String errorMessage = ValidationUtils.getValidationErrors(bindingResult);
+        return ResponseEntity.badRequest()
+                .body(ResponseModel.<String>builder()
+                        .message("Thêm người dùng không thành công")
+                        .data(errorMessage)
+                        .build());
+    }
+
+
+
+        User newUser = userService.addUser(addUserRequest, image); // Pass the image to the service
+
+        String message = newUser == null ? "Thêm người dùng không thành công" : "Thêm người dùng thành công";
+        HttpStatus responseCode = newUser == null ? HttpStatus.BAD_REQUEST : HttpStatus.CREATED;
 
         return ResponseEntity.status(responseCode)
                 .body(ResponseModel.<User>builder()
@@ -45,14 +54,17 @@ public class UserController {
                         .build());
     }
 
+
     @GetMapping
     public ResponseEntity<PagedResponseModel<User>> getUsers(
             @RequestParam int page,
-            @RequestParam(required = false) String role,
-            @RequestParam(required = false) Boolean isActive){
+            @RequestParam(required = false) List<String> role, // Accept multiple roles
+            @RequestParam(required = false) Boolean isActive) {
+
         int size = 10;
-        Page<User> results = userService.getAllByRole(role, isActive,  size, page - 1);
+        Page<User> results = userService.getAllByRole(role, isActive, size, page - 1);
         List<User> users = results.getContent();
+
         String msg = users.isEmpty() ? "Không có dữ liệu" : "Tìm thấy " + results.getTotalElements();
 
         PagedResponseModel<User> pagedResponse = PagedResponseModel.<User>builder()
@@ -62,6 +74,7 @@ public class UserController {
                 .total(results.getTotalElements())
                 .listData(users)
                 .build();
+
         return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
     }
 
@@ -73,5 +86,24 @@ public class UserController {
                         .data(userService.getUserById(userId))
                         .build());
 
+    }
+    @PutMapping("/user/{userId}/status")
+    public ResponseEntity<ResponseModel<?>> changeUserStatus(@PathVariable String userId) {
+        userService.changeUserStatus(userId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseModel.<String>builder()
+                        .message("User status updated successfully")
+                        .build());
+    }
+
+    @GetMapping("/options")
+    public ResponseEntity<ResponseModel<?>> getUsersOption(
+            @RequestParam String role
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseModel.<List<GetUsersOptionResponse>>builder()
+                        .message("Get users option successfully")
+                        .data(userService.getUsers(role))
+                        .build());
     }
 }

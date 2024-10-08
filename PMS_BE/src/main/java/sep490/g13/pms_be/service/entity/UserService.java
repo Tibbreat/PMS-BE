@@ -8,14 +8,19 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import sep490.g13.pms_be.entities.User;
 import sep490.g13.pms_be.exception.other.DataNotFoundException;
 import sep490.g13.pms_be.model.request.user.AddUserRequest;
 import sep490.g13.pms_be.model.request.user.UpdateUserNameAndPasswordRequest;
+import sep490.g13.pms_be.model.response.user.GetUsersOptionResponse;
 import sep490.g13.pms_be.repository.UserRepo;
+import sep490.g13.pms_be.service.utils.CloudinaryService;
 import sep490.g13.pms_be.utils.StringUtils;
 import sep490.g13.pms_be.utils.enums.RoleEnums;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,17 +31,14 @@ public class UserService {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
-    public User addUser(AddUserRequest request) {
+    public User addUser(AddUserRequest request, MultipartFile image) {
         String defaultPassword = StringUtils.randomString(8);
         String accountName = StringUtils.generateUsername(request.getFullName());
         int count = userRepo.countByUsernameContaining(accountName);
-        String username = "";
-        if (count == 0) {
-            username += accountName;
-        } else {
-            username += accountName + (count + 1);
-        }
+        String username = count == 0 ? accountName : accountName + (count + 1);
 
         User user = new User();
         BeanUtils.copyProperties(request, user);
@@ -45,8 +47,14 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(defaultPassword));
         user.setEmail(username.trim() + "@pms.com");
 
+        if (image != null && !image.isEmpty()) {
+            String imagePath = cloudinaryService.saveImage(image) ;
+            user.setImageLink(imagePath);
+        }
+
         return userRepo.save(user);
     }
+
 
     public User updateUserNameAndPassword(UpdateUserNameAndPasswordRequest request) {
         // Tìm user dựa trên email (hoặc một định danh duy nhất khác)
@@ -96,18 +104,40 @@ public class UserService {
         return userRepo.findById(id).orElseThrow(() -> new DataNotFoundException("Không tìm thấy người dùng với id: " + id));
     }
 
-
-    public Page<User> getAllByRole(String role, Boolean isActive, int size, int page){
+    public Page<User> getAllByRole(List<String> roles, Boolean isActive, int size, int page) {
         Pageable pageable = PageRequest.of(page, size);
-        RoleEnums roleEnum = null;
-        if (role != null) {
-            try {
-                roleEnum = RoleEnums.valueOf(role);
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Role không tồn tại: " + role, e);
+        List<RoleEnums> roleEnums = new ArrayList<>();
+
+        if (roles != null && !roles.isEmpty()) {
+            for (String role : roles) {
+                try {
+                    RoleEnums roleEnum = RoleEnums.valueOf(role);
+                    roleEnums.add(roleEnum);
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("Role không tồn tại: " + role, e);
+                }
             }
         }
-        return userRepo.getUserByRole(roleEnum, isActive, pageable);
 
+        return userRepo.getUsersByRoles(roleEnums, isActive, pageable);
+    }
+
+
+    public void changeUserStatus(String userId) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new DataNotFoundException("Không tìm thấy người dùng với id: " + userId));
+        Boolean newStatus = !user.getIsActive();
+        int updatedRows = userRepo.updateUserStatus(userId, newStatus);
+        if (updatedRows == 0) {
+            throw new DataNotFoundException("Không tìm thấy người dùng với id: " + userId);
+        }
+    }
+
+    public List<GetUsersOptionResponse> getUsers(String role) {
+        try {
+            RoleEnums roleEnum = RoleEnums.valueOf(role);
+            return userRepo.findAllByRole(roleEnum);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Role không tồn tại: " + role, e);
+        }
     }
 }

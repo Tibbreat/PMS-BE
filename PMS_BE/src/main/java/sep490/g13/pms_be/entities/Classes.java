@@ -1,10 +1,7 @@
 package sep490.g13.pms_be.entities;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.*;
 
 
@@ -35,7 +32,7 @@ public class Classes extends Auditable<String> {
     @JsonManagedReference
     private Set<ClassTeacher> teachers = new HashSet<>();
 
-    @OneToOne
+    @ManyToOne
     private User manager;
 
     @OneToMany(mappedBy = "schoolClasses")

@@ -41,29 +41,43 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) {
-        String token = authService.login(loginRequest.getUsername(), loginRequest.getPassword());
-        if (token == null) {
+        // Fetch user details from the repository
+        User userData = userRepo.findByUsername(loginRequest.getUsername());
+
+        // Check if the user exists
+        if (userData == null) {
             throw new BadCredentialsException("Thông tin đăng nhập không chính xác");
         }
-        User userData = userRepo.findByUsername(loginRequest.getUsername());
-        if (Boolean.FALSE.equals(userData.getIsActive())) {
+
+        // If the user is active, proceed with authentication
+        if (Boolean.TRUE.equals(userData.getIsActive())) {
+            // Authenticate the user and generate a token
+            String token = authService.login(loginRequest.getUsername(), loginRequest.getPassword());
+            if (token == null) {
+                throw new BadCredentialsException("Thông tin đăng nhập không chính xác");
+            }
+
+            // Return a successful response with the token and role
             return ResponseEntity.status(HttpStatus.OK)
                     .body(AuthResponse.builder()
-                            .role(null)
+                            .role(userData.getRole().name())  // Include the role here
                             .token(token)
                             .message("Đăng nhập thành công")
                             .tokenType("Bearer")
                             .build());
-        } else {
+        }
+        // If the user is inactive, return a message without a token
+        else {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(AuthResponse.builder()
                             .message("Tài khoản của bạn đã bị hạn chế, liên hệ quản lý để xử lý")
-                            .role(userData.getRole().name())
-                            .token(token)
+                            .role(userData.getRole().name())  // Include the role here as well
+                            .token(null)  // No token for inactive users
                             .tokenType("Bearer")
                             .build());
         }
     }
+
 
     @GetMapping("/account")
     public ResponseEntity<UserDataResponse> getAccount(HttpServletRequest request) {
@@ -96,10 +110,8 @@ public class AuthController {
         if (token == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token không hợp lệ");
         }
-        // Xác thực token và lấy thông tin người dùng từ token
         String username = jwtTokenProvider.getUserName(token);
 
-        // Nếu không tìm thấy người dùng từ token, trả về thông báo lỗi
         if (username == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Không thể xác thực người dùng");
         }
@@ -114,23 +126,16 @@ public class AuthController {
     }
     @PostMapping("/reset-password")
     public ResponseEntity<ResponseModel<String>> sendCode(@RequestParam String email) {
-
-        // Tìm người dùng trong cơ sở dữ liệu dựa trên email
         User user = userService.findByEmail(email);
 
-        // Nếu không tìm thấy người dùng, ném ngoại lệ DataNotFoundException
         if (user == null) {
             throw new DataNotFoundException("Người dùng có email " + email + " không tồn tại");
         }
-
-        // Nếu tìm thấy người dùng, tạo mật khẩu mới ngẫu nhiên
         String newPassword = StringUtils.randomString(8);
         user.setPassword(passwordEncoder.encode(newPassword));
         System.out.println(newPassword);
-        // Lưu mật khẩu mới đã hash vào cơ sở dữ liệu
         userRepo.save(user);
 
-        // Trả về phản hồi với mã trạng thái OK và thông báo rằng đặt lại mật khẩu thành công
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ResponseModel
                         .<String>builder()
@@ -139,16 +144,10 @@ public class AuthController {
     }
     @PostMapping("/change-password")
     public ResponseEntity<ResponseModel<String>> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
-
-        // Tìm người dùng trong cơ sở dữ liệu dựa trên email
         User user = userService.findByEmail(changePasswordRequest.getEmail());
-
-        // Nếu không tìm thấy người dùng, ném ngoại lệ DataNotFoundException
         if (user == null) {
             throw new DataNotFoundException("Người dùng có email " + changePasswordRequest.getEmail() + " không tồn tại");
         }
-
-        // Kiểm tra mật khẩu hiện tại có khớp với mật khẩu đã lưu trong cơ sở dữ liệu không
         if (!passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword())) {
             return ResponseEntity
                     .status(HttpStatus.NOT_MODIFIED)
@@ -158,7 +157,6 @@ public class AuthController {
                             .build());
         }
 
-        // Kiểm tra mật khẩu mới và mật khẩu xác nhận có giống nhau không
         if (!changePasswordRequest.getNewPassword().equals(changePasswordRequest.getConfirmPassword())) {
             return ResponseEntity
                     .status(HttpStatus.NOT_MODIFIED)
@@ -168,11 +166,9 @@ public class AuthController {
                             .build());
         }
 
-        // Nếu thỏa mãn tất cả điều kiện, hash mật khẩu mới và lưu vào cơ sở dữ liệu
         user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
         userRepo.save(user);
 
-        // Trả về phản hồi với mã trạng thái OK và thông báo rằng thay đổi mật khẩu thành công
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ResponseModel

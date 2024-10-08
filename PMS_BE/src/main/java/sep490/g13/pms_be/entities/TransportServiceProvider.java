@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Date;
 import java.util.Set;
 
 @Entity
@@ -25,6 +26,11 @@ public class TransportServiceProvider extends Auditable<String> {
     private String providerLicenseNumber;
     private String contractFile;
 
+    private String providerTaxNumber;
+    private Date contractStartDate;
+    private Date contractEndDate;
+
+    private Integer numberOfVehicles;
     @Column(nullable = false)
     private Boolean isActive = false;
 

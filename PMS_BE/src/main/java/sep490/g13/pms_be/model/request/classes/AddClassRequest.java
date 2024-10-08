@@ -30,6 +30,4 @@ public class AddClassRequest {
     private String managerId;
     @NotNull(message= "Created By Không được để trống")
     private String createdBy;
-
-
 }
