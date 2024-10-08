@@ -43,7 +43,7 @@ public class ChildrenController {
 
     @PostMapping("/add")
     public ResponseEntity<ResponseModel<?>> addChild(
-            @RequestPart("image") MultipartFile image,  // Sử dụng @RequestParam cho tệp ảnh
+            @RequestPart("image") MultipartFile image,
             @Valid @RequestPart("request") AddChildrenRequest request, BindingResult bindingResult) {
 
 
