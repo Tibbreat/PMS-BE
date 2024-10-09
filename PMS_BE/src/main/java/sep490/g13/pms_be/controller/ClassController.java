@@ -15,6 +15,7 @@ import sep490.g13.pms_be.model.request.classes.UpdateClassRequest;
 import sep490.g13.pms_be.model.response.classes.ClassListResponse;
 import sep490.g13.pms_be.model.response.base.PagedResponseModel;
 import sep490.g13.pms_be.model.response.base.ResponseModel;
+import sep490.g13.pms_be.model.response.user.TeacherOfClassResponse;
 import sep490.g13.pms_be.service.entity.*;
 import sep490.g13.pms_be.utils.ValidationUtils;
 
@@ -155,6 +156,15 @@ public class ClassController {
         return ResponseEntity.ok(ResponseModel.<Classes>builder()
                 .message("Lấy thông tin lớp học thành công")
                 .data(classes)
+                .build());
+    }
+
+    @GetMapping("/teacher/class/{classId}")
+    public ResponseEntity<ResponseModel<?>> getTeacherOfClass(@PathVariable String classId) {
+        List<TeacherOfClassResponse> teachers = classService.getTeachersOfClass(classId);
+        return ResponseEntity.ok(ResponseModel.<List<TeacherOfClassResponse>>builder()
+                .message("Lấy thông tin giáo viên của lớp học thành công")
+                .data(teachers)
                 .build());
     }
 }

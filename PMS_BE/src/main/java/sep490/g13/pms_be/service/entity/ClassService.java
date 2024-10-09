@@ -16,6 +16,7 @@ import sep490.g13.pms_be.exception.other.PermissionNotAcceptException;
 import sep490.g13.pms_be.model.request.classes.AddClassRequest;
 import sep490.g13.pms_be.model.request.classes.UpdateClassRequest;
 import sep490.g13.pms_be.model.response.classes.ClassListResponse;
+import sep490.g13.pms_be.model.response.user.TeacherOfClassResponse;
 import sep490.g13.pms_be.repository.ClassRepo;
 import sep490.g13.pms_be.repository.UserRepo;
 import sep490.g13.pms_be.utils.LocalDateUtils;
@@ -148,7 +149,7 @@ public class ClassService {
     @Scheduled(cron = "0 0 0 * * ?")
     public void closeClasses() {
         LocalDate today = LocalDate.now();
-        List<Classes> classesToClose = classRepo.findByClosingDayBeforeAndStatus(today, true); // true for active classes
+        List<Classes> classesToClose = classRepo.findByClosingDayBeforeAndStatus(today, true);
 
         classesToClose.forEach(cls -> cls.setStatus(false));  // Set status to inactive
         classRepo.saveAll(classesToClose);
@@ -157,10 +158,12 @@ public class ClassService {
     @Scheduled(cron = "0 0 0 * * ?")
     public void openClasses() {
         LocalDate today = LocalDate.now();
-        List<Classes> classesToOpen = classRepo.findByOpeningDayAfterAndStatus(today, false); // false for deactive classes
+        List<Classes> classesToOpen = classRepo.findByOpeningDayAfterAndStatus(today, false);
 
         classesToOpen.forEach(cls -> cls.setStatus(true));  // Set status to active
         classRepo.saveAll(classesToOpen);
     }
-
+    public List<TeacherOfClassResponse> getTeachersOfClass(String classId) {
+        return classRepo.getTeacherOfClass(classId);
+    }
 }

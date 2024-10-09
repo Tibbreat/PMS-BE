@@ -8,6 +8,8 @@ import lombok.*;
 
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -23,6 +25,14 @@ public class Classes extends Auditable<String> {
     private Date openingDay;
 
     private Date closingDay;
+
+    @OneToMany(mappedBy = "schoolClass", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Set<Children> children = new HashSet<>();
+
+    @OneToMany(mappedBy = "schoolClasses", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Set<ClassTeacher> teachers = new HashSet<>();
 
     @ManyToOne
     private User manager;

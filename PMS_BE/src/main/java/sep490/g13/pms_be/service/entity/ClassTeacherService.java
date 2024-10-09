@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import sep490.g13.pms_be.entities.ClassTeacher;
 import sep490.g13.pms_be.entities.Classes;
 import sep490.g13.pms_be.entities.User;
+import sep490.g13.pms_be.model.response.user.TeacherOfClassResponse;
 import sep490.g13.pms_be.repository.ClassRepo;
 import sep490.g13.pms_be.repository.ClassTeacherRepo;
 import sep490.g13.pms_be.repository.UserRepo;
@@ -25,6 +26,8 @@ public class ClassTeacherService {
 
     @Autowired
     private ClassRepo classesRepo;
+    @Autowired
+    private ClassRepo classRepo;
 
     public void addTeacherIntoClass(String classId, List<String> teacherIds) {
         Optional<Classes> schoolClassOpt = classesRepo.findById(classId);
@@ -37,8 +40,6 @@ public class ClassTeacherService {
 
                 if (teacherOpt.isPresent()) {
                     User teacher = teacherOpt.get();
-
-                    // Check if the teacher is already assigned to the class
                     ClassTeacher classTeacher = new ClassTeacher();
                     classTeacher.setSchoolClasses(schoolClass);
                     classTeacher.setTeacherId(teacher);
@@ -53,4 +54,6 @@ public class ClassTeacherService {
         Pageable pageable = PageRequest.of(page, size);
         return classTeacherRepo.findClassesByTeacherId(teacherId, pageable);
     }
+
+
 }
