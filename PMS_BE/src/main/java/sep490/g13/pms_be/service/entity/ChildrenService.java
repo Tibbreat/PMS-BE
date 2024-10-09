@@ -42,14 +42,10 @@ public class ChildrenService {
     private ClassRepo classRepo;
 
     public List<Children> findAllById(List<String> childrenId) {
-        // Tìm tất cả các SkillTag theo danh sách ID được cung cấp
         List<Children> childrenList = childrenRepo.findAllById(childrenId);
-
-        // Kiểm tra nếu có bất kỳ SkillTag nào không tồn tại trong cơ sở dữ liệu
         if (childrenId.size() != childrenList.size()) {
             throw new IllegalArgumentException("Some Children were not found in the database");
         }
-
         return childrenList;
     }
 
