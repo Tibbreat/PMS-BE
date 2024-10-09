@@ -21,7 +21,7 @@ import sep490.g13.pms_be.utils.ValidationUtils;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/foodServiceProvider")
+@RequestMapping("/pms/foodServiceProvider")
 public class FoodServiceProviderController {
 
     @Autowired
