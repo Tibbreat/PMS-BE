@@ -12,5 +12,6 @@ public class VehicleDetailResponse {
     private String color;
     private String model;
     private String brand;
-    private String transportProviderId; // ID of the transport provider
+    private String transportProviderId;
+    private Boolean isActive;// ID of the transport provider
 }

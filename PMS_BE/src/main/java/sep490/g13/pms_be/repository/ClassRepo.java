@@ -58,4 +58,8 @@ public interface ClassRepo extends JpaRepository<Classes, String> {
             "FROM ClassTeacher teacher " +
             "WHERE teacher.schoolClasses.id = :id")
     List<TeacherOfClassResponse> getTeacherOfClass(String id);
+    @Query("SELECT c FROM Classes c " +
+            "WHERE (:managerId IS NULL OR c.manager.id = :managerId) " +
+            "AND (:teacherId IS NULL OR EXISTS (SELECT ct FROM ClassTeacher ct WHERE ct.schoolClasses.id = c.id AND ct.teacherId.id = :teacherId))")
+    List<Classes> findClassesByTeacherIdOrManagerId(String teacherId, String managerId);
 }

@@ -22,12 +22,9 @@ public interface TransportServiceProviderRepo extends JpaRepository<TransportSer
     @Transactional
     @Query("UPDATE TransportServiceProvider tsp SET " +
             "tsp.representativeName = :#{#updateTransportRequest.representativeName}, " +
-            "tsp.providerName = :#{#updateTransportRequest.providerName}, " +
             "tsp.providerPhone = :#{#updateTransportRequest.providerPhone}, " +
             "tsp.providerEmail = :#{#updateTransportRequest.providerEmail}, " +
             "tsp.providerAddress = :#{#updateTransportRequest.providerAddress}, " +
-            "tsp.providerRegisterNumber = :#{#updateTransportRequest.providerRegisterNumber}, " +
-            "tsp.providerLicenseNumber = :#{#updateTransportRequest.providerLicenseNumber}," +
             "tsp.lastModifiedBy = :#{#updateTransportRequest.lastModifyById}," +
             "tsp.lastModifiedDate = CURRENT_TIMESTAMP " +
             "WHERE tsp.id = :transportProviderId")

@@ -17,6 +17,7 @@ public class Vehicle extends Auditable<String> {
     private String color;
     private String model;
     private String brand;
+    private Boolean isActive = Boolean.FALSE;
 
     @ManyToOne
     @JoinColumn(name = "transportId", nullable = false)

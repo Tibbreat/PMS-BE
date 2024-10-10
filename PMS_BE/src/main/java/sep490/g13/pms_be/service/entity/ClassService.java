@@ -16,6 +16,7 @@ import sep490.g13.pms_be.exception.other.PermissionNotAcceptException;
 import sep490.g13.pms_be.model.request.classes.AddClassRequest;
 import sep490.g13.pms_be.model.request.classes.UpdateClassRequest;
 import sep490.g13.pms_be.model.response.classes.ClassListResponse;
+import sep490.g13.pms_be.model.response.classes.ClassOption;
 import sep490.g13.pms_be.model.response.user.TeacherOfClassResponse;
 import sep490.g13.pms_be.repository.ClassRepo;
 import sep490.g13.pms_be.repository.UserRepo;
@@ -24,6 +25,7 @@ import sep490.g13.pms_be.utils.enums.RoleEnums;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ClassService {
@@ -165,5 +167,11 @@ public class ClassService {
     }
     public List<TeacherOfClassResponse> getTeachersOfClass(String classId) {
         return classRepo.getTeacherOfClass(classId);
+    }
+    public List<ClassOption> getClassesByTeacherIdOrManagerId(String teacherId, String managerId) {
+        List<Classes> classesList = classRepo.findClassesByTeacherIdOrManagerId(teacherId, managerId);
+        return classesList.stream()
+                .map(cls -> new ClassOption(cls.getId(), cls.getClassName()))
+                .collect(Collectors.toList());
     }
 }

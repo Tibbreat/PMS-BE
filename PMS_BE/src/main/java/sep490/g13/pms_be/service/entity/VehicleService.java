@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sep490.g13.pms_be.entities.Fee;
 import sep490.g13.pms_be.entities.TransportServiceProvider;
 import sep490.g13.pms_be.entities.User;
 import sep490.g13.pms_be.entities.Vehicle;
@@ -83,6 +84,7 @@ public class VehicleService {
                     .color(vehicle.getColor())
                     .model(vehicle.getModel())
                     .brand(vehicle.getBrand())
+                    .isActive(vehicle.getIsActive())
                     .transportProviderId(vehicle.getTransport().getId()) // Get ID of the transport provider
                     .build();
         } else {
@@ -110,5 +112,16 @@ public class VehicleService {
         }
 
         return vehicleRepo.save(existingVehicle);
+    }
+    @Transactional
+    public Vehicle changeVehicleStatus(String feeId, Boolean newStatus) {
+        Optional<Vehicle> optionalVehicle = vehicleRepo.findById(feeId);
+        if (optionalVehicle.isPresent()) {
+            Vehicle vehicle = optionalVehicle.get();
+            vehicle.setIsActive(newStatus);
+            return vehicleRepo.save(vehicle);
+        } else {
+            throw new IllegalArgumentException("Vehicle not found with ID: " + feeId);
+        }
     }
 }

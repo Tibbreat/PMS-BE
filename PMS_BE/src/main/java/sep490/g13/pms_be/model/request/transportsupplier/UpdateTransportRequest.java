@@ -12,9 +12,6 @@ public class UpdateTransportRequest {
     @NotBlank(message = "Tên người đại diện không được bỏ trống")
     private String representativeName;
 
-    @NotBlank(message = "Tên nhà cung cấp không được để trống")
-    private String providerName;
-
     @NotBlank(message = "Số điện thoại nhà cung cấp k")
     private String providerPhone;
 
@@ -24,12 +21,6 @@ public class UpdateTransportRequest {
 
     @NotBlank(message = "Địa chỉ nhà cung cấp không được để trống")
     private String providerAddress;
-
-    @NotBlank(message = "Số đăng ký kinh doanh không được để trống")
-    private String providerRegisterNumber;
-
-    @NotBlank(message = "Số giấy phép kinh doanh không được để trống")
-    private String providerLicenseNumber;
 
     @NotNull(message = "Last Modify By không được để trống")
     private String lastModifyById;

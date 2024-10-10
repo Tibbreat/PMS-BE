@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import sep490.g13.pms_be.entities.Vehicle;
+import sep490.g13.pms_be.entities.Vehicle;
 import sep490.g13.pms_be.model.request.vehicle.AddVehicleRequest;
 import sep490.g13.pms_be.model.request.vehicle.UpdateVehicleRequest;
 import sep490.g13.pms_be.model.response.base.PagedResponseModel;
@@ -112,5 +113,14 @@ public class VehicleController {
                 .message("Vehicle information updated successfully")
                 .data(null)
                 .build());
+    }
+    @PutMapping("/change-vehicle-status/{vehicleId}")
+    public ResponseEntity<ResponseModel<Vehicle>> changeVehicleStatus(@PathVariable String vehicleId, @RequestParam Boolean newStatus) {
+        try {
+            Vehicle updatedVehicle = vehicleService.changeVehicleStatus(vehicleId, newStatus);
+            return ResponseEntity.ok(ResponseModel.<Vehicle>builder().data(updatedVehicle).build());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 }
