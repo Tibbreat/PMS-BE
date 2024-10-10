@@ -18,8 +18,10 @@ import sep490.g13.pms_be.model.request.children.UpdateChildrenRequest;
 import sep490.g13.pms_be.model.request.user.UpdateUserNameAndPasswordRequest;
 import sep490.g13.pms_be.model.response.CloudinaryResponse;
 import sep490.g13.pms_be.model.response.children.ChildrenDetailResponse;
+import sep490.g13.pms_be.model.response.children.ChildrenListResponse;
 import sep490.g13.pms_be.repository.ChildrenRepo;
 import sep490.g13.pms_be.repository.ClassRepo;
+import sep490.g13.pms_be.repository.RelationshipRepo;
 import sep490.g13.pms_be.repository.UserRepo;
 import sep490.g13.pms_be.service.utils.CloudinaryService;
 import sep490.g13.pms_be.utils.FileUploadUtil;
@@ -40,6 +42,8 @@ public class ChildrenService {
     private UserRepo userRepo;
     @Autowired
     private ClassRepo classRepo;
+    @Autowired
+    private RelationshipRepo relationshipRepo;
 
     public List<Children> findAllById(List<String> childrenId) {
         List<Children> childrenList = childrenRepo.findAllById(childrenId);
@@ -146,11 +150,27 @@ public class ChildrenService {
             Children child = childOptional.get();
 
             // Tạo và trả về ChildrenDetailResponse
+            List<Relationship> relationships = relationshipRepo.findByChildrenId(child);
+
+            // Chuyển đổi List<Relationship> thành List<RelationshipRequest>
+            List<RelationshipRequest> relationshipRequests = relationships.stream()
+                    .map(relationship -> RelationshipRequest.builder()
+                            .parentId(relationship.getParentId().getId()) // hoặc phương thức lấy ID phù hợp
+                            .relationship(relationship.getRelationship())
+                            .isRepresentative(relationship.getIsRepresentative())
+                            .build())
+                    .collect(Collectors.toList());
+
+            // Tạo và trả về ChildrenDetailResponse
             return ChildrenDetailResponse.builder()
                     .childName(child.getChildName())
                     .childAge(child.getChildAge())
                     .childBirthDate(child.getChildBirthDate())
                     .childAddress(child.getChildAddress())
+                    .isRegisterForTransport(child.getIsRegisteredForTransport())
+                    .isRegisterForBoarding(child.getIsRegisteredForBoarding())
+                    .imageUrl(child.getImageUrl())
+                    .relationships(relationshipRequests)
                     .classId(child.getSchoolClass().getId())
                     .build();
         } else {
@@ -222,7 +242,7 @@ public class ChildrenService {
         return childrenRepo.save(existingChild);
     }
 
-    public Page<Children> getChildrenByClass(String classId, int size, int page){
+    public Page<ChildrenListResponse> getChildrenByClass(String classId, int size, int page){
         Pageable pageable = PageRequest.of(page, size);
         return childrenRepo.findAllBySchoolClassId(classId, pageable);
     }

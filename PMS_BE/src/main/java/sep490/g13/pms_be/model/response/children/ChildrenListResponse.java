@@ -1,8 +1,6 @@
 package sep490.g13.pms_be.model.response.children;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
 import sep490.g13.pms_be.model.request.RelationshipRequest;
 
 import java.time.LocalDate;
@@ -13,7 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ChildrenDetailResponse {
+public class ChildrenListResponse {
+    private String id;
 
     private String childName;
 
@@ -24,8 +23,4 @@ public class ChildrenDetailResponse {
     private String childAddress;
 
     private String classId; // ID của lớp mà đứa trẻ sẽ được thêm vào
-    private Boolean isRegisterForBoarding;
-    private Boolean isRegisterForTransport;
-    private List<RelationshipRequest> relationships;
-    private String imageUrl;
 }

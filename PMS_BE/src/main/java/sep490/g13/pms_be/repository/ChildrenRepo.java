@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import sep490.g13.pms_be.entities.Children;
 import org.springframework.data.domain.Pageable;
+import sep490.g13.pms_be.model.response.children.ChildrenListResponse;
 
 import java.util.Optional;
 
@@ -23,5 +24,9 @@ public interface ChildrenRepo extends JpaRepository<Children, String> {
             @Param("childName") String childName,
             Pageable pageable);
 
-    Page<Children> findAllBySchoolClassId(String classId, Pageable pageable);
+    @Query("SELECT new sep490.g13.pms_be.model.response.children.ChildrenListResponse("
+            + "c.id, c.childName, c.childAge, c.childBirthDate, c.childAddress, "
+            + "c.schoolClass.id) "
+            + "FROM Children c WHERE c.schoolClass.id = :classId")
+    Page<ChildrenListResponse> findAllBySchoolClassId(String classId, Pageable pageable);
 }

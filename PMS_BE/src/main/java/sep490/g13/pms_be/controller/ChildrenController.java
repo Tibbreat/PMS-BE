@@ -16,6 +16,7 @@ import sep490.g13.pms_be.model.response.CloudinaryResponse;
 import sep490.g13.pms_be.model.response.base.PagedResponseModel;
 import sep490.g13.pms_be.model.response.base.ResponseModel;
 import sep490.g13.pms_be.model.response.children.ChildrenDetailResponse;
+import sep490.g13.pms_be.model.response.children.ChildrenListResponse;
 import sep490.g13.pms_be.service.utils.CloudinaryService;
 import sep490.g13.pms_be.service.entity.ChildrenService;
 import sep490.g13.pms_be.service.entity.ClassService;
@@ -173,14 +174,14 @@ public class ChildrenController {
 
 
     @GetMapping("/children-by-class/{classId}")
-    public ResponseEntity<PagedResponseModel<Children>> getChildrenByClass(
+    public ResponseEntity<PagedResponseModel<ChildrenListResponse>> getChildrenByClass(
             @PathVariable String classId,
             @RequestParam int page){
         int size = 10;
-        Page<Children> results = childrenService.getChildrenByClass(classId, size, page - 1);
-        List<Children> children = results.getContent();
+        Page<ChildrenListResponse> results = childrenService.getChildrenByClass(classId, size, page - 1);
+        List<ChildrenListResponse> children = results.getContent();
         String msg = children.isEmpty() ? "Không có dữ liệu" : "Tìm thấy " + results.getTotalElements() + " dữ liệu";
-        PagedResponseModel<Children> pagedResponse = PagedResponseModel.<Children>builder()
+        PagedResponseModel<ChildrenListResponse> pagedResponse = PagedResponseModel.<ChildrenListResponse>builder()
                 .page(page)
                 .size(size)
                 .msg(msg)
