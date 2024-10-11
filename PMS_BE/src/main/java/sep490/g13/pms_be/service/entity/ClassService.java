@@ -1,5 +1,6 @@
 package sep490.g13.pms_be.service.entity;
 
+import org.apache.poi.ss.usermodel.Row;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,9 +21,13 @@ import sep490.g13.pms_be.model.response.classes.ClassOption;
 import sep490.g13.pms_be.model.response.user.TeacherOfClassResponse;
 import sep490.g13.pms_be.repository.ClassRepo;
 import sep490.g13.pms_be.repository.UserRepo;
+import sep490.g13.pms_be.utils.ExcelUtils;
 import sep490.g13.pms_be.utils.LocalDateUtils;
 import sep490.g13.pms_be.utils.enums.RoleEnums;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -174,4 +179,26 @@ public class ClassService {
                 .map(cls -> new ClassOption(cls.getId(), cls.getClassName()))
                 .collect(Collectors.toList());
     }
+
+    public ByteArrayInputStream exportClassToExcel() throws IOException {
+        String[] cols = {"Mã lớp", "Tên lớp", "Độ tuổi", "Ngày mở lớp", "Ngày kết thúc", "Trạng thái"};
+
+        // Định dạng ngày theo định dạng dd-MM-yyyy
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+
+        // Lấy tất cả danh sách các lớp học từ database
+        List<Classes> data = classRepo.findAll();
+
+        // Sử dụng ExcelUtils để tạo file Excel
+        return ExcelUtils.dataToExcel(data, cols, "Danh sách lớp học", (Row row, Classes classes) -> {
+            row.createCell(0).setCellValue(classes.getId()); // Mã lớp
+            row.createCell(1).setCellValue(classes.getClassName()); // Tên lớp
+            row.createCell(2).setCellValue(classes.getAgeRange()); // Độ tuổi
+            row.createCell(3).setCellValue(dateFormat.format(classes.getOpeningDay())); // Ngày mở lớp (dd-MM-yyyy)
+            row.createCell(4).setCellValue(dateFormat.format(classes.getClosingDay())); // Ngày kết thúc (dd-MM-yyyy)
+            row.createCell(5).setCellValue(classes.isStatus() ? "Active" : "Inactive"); // Trạng thái
+        });
+    }
+
+
 }
