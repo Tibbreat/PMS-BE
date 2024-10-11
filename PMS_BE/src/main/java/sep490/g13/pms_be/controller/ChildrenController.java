@@ -83,7 +83,7 @@ public class ChildrenController {
             return ResponseEntity.ok(
                     ResponseModel.builder()
                             .message("Thêm học sinh thành công")
-                            .data(savedChildren)
+                            .data(request)
                             .build()
             );
         } catch (Exception e) {

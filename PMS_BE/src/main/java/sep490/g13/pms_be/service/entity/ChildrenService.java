@@ -69,6 +69,7 @@ public class ChildrenService {
         // Tìm user dựa trên createdBy ID
         User createdByUser = userRepo.findById(c.getCreatedBy())
                 .orElseThrow(() -> new DataNotFoundException("User not found with id: " + c.getCreatedBy()));
+
         // Thiết lập createdBy cho đối tượng Children
         c.setCreatedBy(createdByUser.getId());
 
@@ -76,7 +77,6 @@ public class ChildrenService {
         if (createdByUser.getRole() != RoleEnums.ADMIN && createdByUser.getRole() != RoleEnums.CLASS_MANAGER) {
             throw new PermissionNotAcceptException("Just Admin and Class_Manager can create children");
         }
-
 
         // Xử lý relationship nếu có
         Set<Relationship> relationships = new HashSet<>();
@@ -86,36 +86,25 @@ public class ChildrenService {
                 User parent = userRepo.findById(request.getParentId())
                         .orElseThrow(() -> new DataNotFoundException("Parent not found with id: " + request.getParentId()));
 
-
                 // Tạo mới Relationship
                 Relationship relationship = new Relationship();
                 relationship.setParentId(parent);
-                relationship.setChildrenId(c);
+                relationship.setChildrenId(c); // Gán Children cho Relationship
                 relationship.setRelationship(request.getRelationship());
                 relationship.setIsRepresentative(request.getIsRepresentative());
 
                 // Thêm từng Relationship vào danh sách của Children
-                if (request.getIsRepresentative()) {
-                    // Chuẩn bị đối tượng cập nhật
-                    UpdateUserNameAndPasswordRequest updateUserRequest = new UpdateUserNameAndPasswordRequest();
-                    updateUserRequest.setFullName(parent.getFullName());
-                    updateUserRequest.setUserName(parent.getUsername());
-                    updateUserRequest.setEmail(parent.getEmail());
-
-
-                    // Cập nhật thông tin người dùng
-                    User updatedUser = userService.updateUserNameAndPassword(updateUserRequest);
-                    relationships.add(relationship);
-                    System.out.println("User updated with new password: " + updatedUser.getPassword());
-                }
+                relationships.add(relationship); // Thêm vào danh sách
             }
         }
-        System.out.println(relationships.size());
 
+        // Gán danh sách relationships cho Children
+        c.setRelationships(relationships); // Giả sử bạn đã thêm trường relationships vào Children
 
         // Lưu đối tượng Children vào database
         return childrenRepo.save(c);
     }
+
 
 
     @Transactional
