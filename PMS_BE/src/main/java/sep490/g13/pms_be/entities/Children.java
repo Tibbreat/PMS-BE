@@ -3,6 +3,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -26,4 +28,7 @@ public class Children extends Auditable<String> {
     @ManyToOne
     @JoinColumn(name = "class_id", nullable = false)
     private Classes schoolClass;
+
+    @OneToMany(mappedBy = "childrenId", cascade = CascadeType.ALL)
+    private Set<Relationship> relationships = new HashSet<>();
 }

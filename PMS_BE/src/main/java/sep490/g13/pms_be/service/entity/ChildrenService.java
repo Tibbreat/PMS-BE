@@ -18,8 +18,10 @@ import sep490.g13.pms_be.model.request.children.UpdateChildrenRequest;
 import sep490.g13.pms_be.model.request.user.UpdateUserNameAndPasswordRequest;
 import sep490.g13.pms_be.model.response.CloudinaryResponse;
 import sep490.g13.pms_be.model.response.children.ChildrenDetailResponse;
+import sep490.g13.pms_be.model.response.children.ChildrenListResponse;
 import sep490.g13.pms_be.repository.ChildrenRepo;
 import sep490.g13.pms_be.repository.ClassRepo;
+import sep490.g13.pms_be.repository.RelationshipRepo;
 import sep490.g13.pms_be.repository.UserRepo;
 import sep490.g13.pms_be.service.utils.CloudinaryService;
 import sep490.g13.pms_be.utils.FileUploadUtil;
@@ -40,6 +42,8 @@ public class ChildrenService {
     private UserRepo userRepo;
     @Autowired
     private ClassRepo classRepo;
+    @Autowired
+    private RelationshipRepo relationshipRepo;
 
     public List<Children> findAllById(List<String> childrenId) {
         List<Children> childrenList = childrenRepo.findAllById(childrenId);
@@ -65,6 +69,7 @@ public class ChildrenService {
         // Tìm user dựa trên createdBy ID
         User createdByUser = userRepo.findById(c.getCreatedBy())
                 .orElseThrow(() -> new DataNotFoundException("User not found with id: " + c.getCreatedBy()));
+
         // Thiết lập createdBy cho đối tượng Children
         c.setCreatedBy(createdByUser.getId());
 
@@ -72,7 +77,6 @@ public class ChildrenService {
         if (createdByUser.getRole() != RoleEnums.ADMIN && createdByUser.getRole() != RoleEnums.CLASS_MANAGER) {
             throw new PermissionNotAcceptException("Just Admin and Class_Manager can create children");
         }
-
 
         // Xử lý relationship nếu có
         Set<Relationship> relationships = new HashSet<>();
@@ -82,36 +86,25 @@ public class ChildrenService {
                 User parent = userRepo.findById(request.getParentId())
                         .orElseThrow(() -> new DataNotFoundException("Parent not found with id: " + request.getParentId()));
 
-
                 // Tạo mới Relationship
                 Relationship relationship = new Relationship();
                 relationship.setParentId(parent);
-                relationship.setChildrenId(c);
+                relationship.setChildrenId(c); // Gán Children cho Relationship
                 relationship.setRelationship(request.getRelationship());
                 relationship.setIsRepresentative(request.getIsRepresentative());
 
                 // Thêm từng Relationship vào danh sách của Children
-                if (request.getIsRepresentative()) {
-                    // Chuẩn bị đối tượng cập nhật
-                    UpdateUserNameAndPasswordRequest updateUserRequest = new UpdateUserNameAndPasswordRequest();
-                    updateUserRequest.setFullName(parent.getFullName());
-                    updateUserRequest.setUserName(parent.getUsername());
-                    updateUserRequest.setEmail(parent.getEmail());
-
-
-                    // Cập nhật thông tin người dùng
-                    User updatedUser = userService.updateUserNameAndPassword(updateUserRequest);
-                    relationships.add(relationship);
-                    System.out.println("User updated with new password: " + updatedUser.getPassword());
-                }
+                relationships.add(relationship); // Thêm vào danh sách
             }
         }
-        System.out.println(relationships.size());
 
+        // Gán danh sách relationships cho Children
+        c.setRelationships(relationships); // Giả sử bạn đã thêm trường relationships vào Children
 
         // Lưu đối tượng Children vào database
         return childrenRepo.save(c);
     }
+
 
 
     @Transactional
@@ -146,11 +139,27 @@ public class ChildrenService {
             Children child = childOptional.get();
 
             // Tạo và trả về ChildrenDetailResponse
+            List<Relationship> relationships = relationshipRepo.findByChildrenId(child);
+
+            // Chuyển đổi List<Relationship> thành List<RelationshipRequest>
+            List<RelationshipRequest> relationshipRequests = relationships.stream()
+                    .map(relationship -> RelationshipRequest.builder()
+                            .parentId(relationship.getParentId().getId()) // hoặc phương thức lấy ID phù hợp
+                            .relationship(relationship.getRelationship())
+                            .isRepresentative(relationship.getIsRepresentative())
+                            .build())
+                    .collect(Collectors.toList());
+
+            // Tạo và trả về ChildrenDetailResponse
             return ChildrenDetailResponse.builder()
                     .childName(child.getChildName())
                     .childAge(child.getChildAge())
                     .childBirthDate(child.getChildBirthDate())
                     .childAddress(child.getChildAddress())
+                    .isRegisterForTransport(child.getIsRegisteredForTransport())
+                    .isRegisterForBoarding(child.getIsRegisteredForBoarding())
+                    .imageUrl(child.getImageUrl())
+                    .relationships(relationshipRequests)
                     .classId(child.getSchoolClass().getId())
                     .build();
         } else {
@@ -222,7 +231,7 @@ public class ChildrenService {
         return childrenRepo.save(existingChild);
     }
 
-    public Page<Children> getChildrenByClass(String classId, int size, int page){
+    public Page<ChildrenListResponse> getChildrenByClass(String classId, int size, int page){
         Pageable pageable = PageRequest.of(page, size);
         return childrenRepo.findAllBySchoolClassId(classId, pageable);
     }
