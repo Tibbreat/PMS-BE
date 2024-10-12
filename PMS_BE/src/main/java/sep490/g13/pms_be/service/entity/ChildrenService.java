@@ -236,5 +236,8 @@ public class ChildrenService {
         return childrenRepo.findAllBySchoolClassId(classId, pageable);
     }
 
+    public List<ChildrenListResponse> getChildrenByClassId(String classId) {
+        return childrenRepo.findAllByClassId(classId);
+    }
 
 }

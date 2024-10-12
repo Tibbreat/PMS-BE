@@ -41,38 +41,25 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) {
-        // Fetch user details from the repository
         User userData = userRepo.findByUsername(loginRequest.getUsername());
-
-        // Check if the user exists
         if (userData == null) {
             throw new BadCredentialsException("Thông tin đăng nhập không chính xác");
         }
-
-        // If the user is active, proceed with authentication
-        if (Boolean.TRUE.equals(userData.getIsActive())) {
-            // Authenticate the user and generate a token
-            String token = authService.login(loginRequest.getUsername(), loginRequest.getPassword());
-            if (token == null) {
-                throw new BadCredentialsException("Thông tin đăng nhập không chính xác");
-            }
-
-            // Return a successful response with the token and role
+        if (Boolean.FALSE.equals(userData.getIsActive())) {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(AuthResponse.builder()
-                            .role(userData.getRole().name())  // Include the role here
-                            .token(token)
-                            .message("Đăng nhập thành công")
+                            .role(userData.getRole().name())
+                            .token(null)
+                            .message("Tài khoản của bạn đã bị hạn chế, liên hệ quản lý để xử lý")
                             .tokenType("Bearer")
                             .build());
-        }
-        // If the user is inactive, return a message without a token
-        else {
+        }else{
+            String token = authService.login(loginRequest.getUsername(), loginRequest.getPassword());
             return ResponseEntity.status(HttpStatus.OK)
                     .body(AuthResponse.builder()
-                            .message("Tài khoản của bạn đã bị hạn chế, liên hệ quản lý để xử lý")
-                            .role(userData.getRole().name())  // Include the role here as well
-                            .token(null)  // No token for inactive users
+                            .role(userData.getRole().name())
+                            .token(token)
+                            .message("Đăng nhập thành công")
                             .tokenType("Bearer")
                             .build());
         }

@@ -9,6 +9,7 @@ import sep490.g13.pms_be.entities.Children;
 import org.springframework.data.domain.Pageable;
 import sep490.g13.pms_be.model.response.children.ChildrenListResponse;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -26,7 +27,13 @@ public interface ChildrenRepo extends JpaRepository<Children, String> {
 
     @Query("SELECT new sep490.g13.pms_be.model.response.children.ChildrenListResponse("
             + "c.id, c.childName, c.childAge, c.childBirthDate, c.childAddress, "
-            + "c.schoolClass.id) "
+            + "c.schoolClass.id, c.imageUrl) "
             + "FROM Children c WHERE c.schoolClass.id = :classId")
     Page<ChildrenListResponse> findAllBySchoolClassId(String classId, Pageable pageable);
+
+    @Query("SELECT new sep490.g13.pms_be.model.response.children.ChildrenListResponse("
+            + "c.id, c.childName, c.childAge, c.childBirthDate, c.childAddress, "
+            + "c.schoolClass.id, c.imageUrl) "
+            + "FROM Children c WHERE c.schoolClass.id = :classId")
+    List<ChildrenListResponse> findAllByClassId(String classId);
 }

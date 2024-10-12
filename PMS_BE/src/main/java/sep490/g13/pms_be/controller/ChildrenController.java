@@ -190,4 +190,10 @@ public class ChildrenController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
     }
+
+    @GetMapping("/class/{classId}")
+    public ResponseEntity<ResponseModel<?>> getChildrenByClass(@PathVariable String classId) {
+        List<ChildrenListResponse> children = childrenService.getChildrenByClassId(classId);
+        return ResponseEntity.ok(new ResponseModel<>("Get children by class successful", children));
+    }
 }

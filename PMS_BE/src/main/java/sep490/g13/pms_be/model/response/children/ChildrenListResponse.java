@@ -22,5 +22,6 @@ public class ChildrenListResponse {
 
     private String childAddress;
 
-    private String classId; // ID của lớp mà đứa trẻ sẽ được thêm vào
+    private String classId;
+    private String imageLink;
 }
