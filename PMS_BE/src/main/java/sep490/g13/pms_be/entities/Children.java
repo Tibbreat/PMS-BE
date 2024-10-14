@@ -24,7 +24,9 @@ public class Children extends Auditable<String> {
     private String imageUrl;
 
     private String cloudinaryImageId;
-
+    private String people;
+    private String birthAddress;
+    private String nationality;
     @ManyToOne
     @JoinColumn(name = "class_id", nullable = false)
     private Classes schoolClass;

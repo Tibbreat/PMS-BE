@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -19,7 +20,7 @@ public class UpdateClassRequest {
     private Date closingDay;
     @NotNull(message = "Quản lý lớp không được để trống")
     private String managerId;
-
+    private List<String> teacherId;
     @NotNull(message = "Last Modify By Không được để trống")
     private String lastModifyById;
 }

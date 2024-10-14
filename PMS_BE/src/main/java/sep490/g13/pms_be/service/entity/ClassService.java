@@ -20,6 +20,7 @@ import sep490.g13.pms_be.model.response.classes.ClassListResponse;
 import sep490.g13.pms_be.model.response.classes.ClassOption;
 import sep490.g13.pms_be.model.response.user.TeacherOfClassResponse;
 import sep490.g13.pms_be.repository.ClassRepo;
+import sep490.g13.pms_be.repository.ClassTeacherRepo;
 import sep490.g13.pms_be.repository.UserRepo;
 import sep490.g13.pms_be.utils.ExcelUtils;
 import sep490.g13.pms_be.utils.LocalDateUtils;
@@ -40,6 +41,8 @@ public class ClassService {
     private UserRepo userRepo;
     @Autowired
     private LocalDateUtils dateUtils;
+    @Autowired
+    private ClassTeacherRepo classTeacherRepo;
 
     public Classes createNewClass(AddClassRequest classRequest) {
         Classes newClass = new Classes();
@@ -124,11 +127,31 @@ public class ClassService {
         User manager = userRepo.findById(updateClassRequest.getManagerId())
                 .orElseThrow(() -> new DataNotFoundException("Manager not found with id: " + updateClassRequest.getManagerId()));
         existingClass.setManager(manager);
-        User lastMofifyBy = userRepo.findById(updateClassRequest.getManagerId()).get();
-        if(lastMofifyBy.getRole() != RoleEnums.ADMIN) {
-            throw new PermissionNotAcceptException("Cant update class with other role");
-        }else {
+
+        if (updateClassRequest.getTeacherId() != null && !updateClassRequest.getTeacherId().isEmpty()) {
+            // Xóa danh sách giáo viên cũ
+            classTeacherRepo.deleteBySchoolClasses(existingClass);
+
+            // Thêm giáo viên mới
+            for (String teacherId : updateClassRequest.getTeacherId()) {
+                User teacher = userRepo.findById(teacherId)
+                        .orElseThrow(() -> new DataNotFoundException("Teacher not found with id: " + teacherId));
+
+                // Tạo đối tượng ClassTeacher mới
+                ClassTeacher classTeacher = ClassTeacher.builder()
+                        .schoolClasses(existingClass)
+                        .teacherId(teacher)
+                        .build();
+
+                // Lưu vào repository
+                classTeacherRepo.save(classTeacher);
+            }
+        }
+        User lastMofifyBy = userRepo.findById(updateClassRequest.getLastModifyById()).get();
+        if(lastMofifyBy.getRole() == RoleEnums.ADMIN) {
             existingClass.setLastModifiedBy(updateClassRequest.getLastModifyById());
+        }else {
+            throw new PermissionNotAcceptException("Cant update class with other role");
         }
         classRepo.save(existingClass);
     }
@@ -148,7 +171,7 @@ public class ClassService {
         if (openingDay.isBefore(LocalDate.now()) || closingDay.isAfter(LocalDate.now())) {
             clazz.setStatus(true);  // Active
         } else {
-            throw new PermissionNotAcceptException("Cannot change class status");
+            clazz.setStatus(false);
         }
         classRepo.save(clazz);
     }
