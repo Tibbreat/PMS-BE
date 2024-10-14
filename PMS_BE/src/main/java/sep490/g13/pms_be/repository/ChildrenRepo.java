@@ -31,9 +31,9 @@ public interface ChildrenRepo extends JpaRepository<Children, String> {
             + "FROM Children c WHERE c.schoolClass.id = :classId")
     Page<ChildrenListResponse> findAllBySchoolClassId(String classId, Pageable pageable);
 
-    @Query("SELECT new sep490.g13.pms_be.model.response.children.ChildrenListResponse("
-            + "c.id, c.childName, c.childAge, c.childBirthDate, c.childAddress, "
-            + "c.schoolClass.id, c.imageUrl) "
-            + "FROM Children c WHERE c.schoolClass.id = :classId")
+   @Query("SELECT new sep490.g13.pms_be.model.response.attendance.LogOfChildren(" +
+           "al.children.id, al.children.childName, al.children.imageUrl, " +
+           "al.checkinTime, al.checkoutTime, al.note) " +
+           "FROM AttendanceLog al WHERE al.classes.id = :classId")
     List<ChildrenListResponse> findAllByClassId(String classId);
 }

@@ -13,15 +13,10 @@ import java.util.List;
 @Builder
 public class ChildrenListResponse {
     private String id;
-
     private String childName;
-
     private Integer childAge;
-
     private LocalDate childBirthDate;
-
     private String childAddress;
-
     private String classId;
     private String imageLink;
 }
