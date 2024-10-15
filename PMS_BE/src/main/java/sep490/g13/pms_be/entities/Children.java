@@ -27,8 +27,9 @@ public class Children extends Auditable<String> {
     private String people;
     private String birthAddress;
     private String nationality;
+    private String identificationNumber;
     @ManyToOne
-    @JoinColumn(name = "class_id", nullable = false)
+    @JoinColumn(name = "class_id")
     private Classes schoolClass;
 
     @OneToMany(mappedBy = "childrenId", cascade = CascadeType.ALL)
