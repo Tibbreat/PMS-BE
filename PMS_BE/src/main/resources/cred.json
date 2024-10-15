@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "pms-fall24",
+  "private_key_id": "84ef2ae0320eca1c46172eebd2a83e7bc36ccb08",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCOi/c4YKC1WBQm\nedIIs9L1Vqt2HBxcUP1yO4MQgtzzbi/H6Xg/jQWZdsaUV2Au3Zc8THi0hR7xzM8O\nVNEpOE7P9yISroy6/+CAz1wYxH15W4Gth0SLcBDXx3+DFIo+05Zmk2XbGnUPMmHH\ngAVjpl8V0ZhT9C+tSKp6UWC7EdxP41z5UZmV4Q3ogXkuDUadtmcCVvOSG0MOUex8\nJJALsLHU4dSn1Hu74KkvJKr52fK/4BIh5jgLBqaAk6qSbtrho5TPU1AS7Wr/xrgE\nAGL5FSEjxh0k7bKVWDl1LSWj+axHu9y7LhrbKnaKMmZrOrF+zmSWEGHPhGsZ05vQ\nims40MEVAgMBAAECggEABqc/8tdzFivGMFU4yV5dVHAHFj7x0ERDzs26IcPokgsn\nUJvULevZjPlsg4wq1DJ/ES8vkMYdijiJRI25v9mzN1qSsk+yiArn52iQ+k33iPnN\nV8m2bbyyveOU+cu0YoIn5QybBorvAkvTdlyXw82GPCOO34JIVGdNymJF0yLJB0h6\nCVIPpr9Vb0Agd/X5MvN4ekOnc6n9lCZVbg7h17BdVFtH4MPZ8Z309uRApY27lQQq\nuJBs/5zOCk/G3afe8LE/fDdJ4DGkqm/KLqtXPl+1MXjk7iv12gjfYk7G176Ly+WE\n9zabE37waHb7RDCwmuWm1jGwFLjbXbxubmbbGfMsCQKBgQDCdpN95zDQnp9JdAG1\nAa4mjvenrjvljex9/QRchCA/LxmlvTM7zE+evcwSqyXPx4103efNtp0FGqJ4wuyk\nfyLCCk79xUnEjZ/I8czmjVcuKCL8GBCyQzEYLGSZt0gj21f0gHE+3p7/geN2yPB3\nH5F88qqdpsjzISwsnYUgtpcn/QKBgQC7p6YK7ru3suGTRn0J6bIyXwK7P2KXZWnh\npheVJAadwdf7IvnKPFw4AOsq2bjxwrENY/qaK088BrYoUwyUFYjkONBJZEvytV9k\nwZsfRSh5P4QoeOGL41CcsNE1tyQvOM3QagfJR8J6ZSLx2e7wixyYUDNsvR6T7EHL\nCO232gcM+QKBgCGWBz1Mi8LMUqiGD7Fqe+CO+rkMP64TCBBufa1Y6JThFqXoeovO\nasX48+EZjCtJxOW1Wc7OxmnWQs9moyZ6Cs/GpgPwaiA3caxsDr6XFMKVDg3KPj/7\nmOQa7rkZzazbumIxON3p5z4r+dRPOjDo0+DnrI4T+0r6pL2D6zVOM+clAoGBAIge\n1RgrEmnvTSfawsrVBVj6iG2xTeAKRWLUa1jY+B+pQ/U86rrjS/Wn3O6JXlmoY2wW\nMOtyLRiaubnIfGBSuqjp+VSzd1AIdrkMo2xsay6Af2ooPVuOuaPfsvJm9c13Q/xB\nXYKJFi5YfJ+4+VTtZAGsc5EWIj8k6pjP0jhB5ElpAoGAPM/vEZ59GxnCLTt7M51J\nTzTnli82r55OrlQzI54mRdaT7nEanctbqfAC0NdP8SaStVH9BuWIS26hwUNYQkv7\ndxtkNjQdyvHE7/bjHoD0i3WRw8TsCUJdV893b4tYB/oDRb9EYDnhzlWiUzSu/Jt3\n5ktWKSu64PP9P3liepYGPZ8=\n-----END PRIVATE KEY-----\n",
+  "client_email": "quanlh30@pms-fall24.iam.gserviceaccount.com",
+  "client_id": "111251496564389603215",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/quanlh30%40pms-fall24.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
