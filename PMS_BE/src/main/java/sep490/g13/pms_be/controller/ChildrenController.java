@@ -64,7 +64,10 @@ public class ChildrenController {
             child.setChildBirthDate(request.getChildBirthDate());
             child.setChildAddress(request.getChildAddress());
             child.setCreatedBy(request.getCreatedById());
-
+            child.setBirthAddress(request.getBirthAddress());
+            child.setIdentificationNumber(request.getIdentificationNumber());
+            child.setNationality(request.getNationality());
+            child.setPeople(request.getPeople());
             // Lưu đứa trẻ và các mối quan hệ (relationships)
             Children savedChildren = childrenService.addChildren(child, request.getRelationships(), addUserRequest1, addUserRequest2);
             if (childImage != null && !childImage.isEmpty()) {
@@ -90,7 +93,7 @@ public class ChildrenController {
     }
 
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<PagedResponseModel<Children>> getChildren(
             @RequestParam int page,
             @RequestParam(required = false) String fullname,
@@ -117,17 +120,17 @@ public class ChildrenController {
         return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
     }
 
-//    @GetMapping("/children-detail/{childId}")
-//    public ResponseEntity<ResponseModel<?>> getClassDetail(@PathVariable String childId) {
-//        ChildrenDetailResponse childrenDetailResponse = childrenService.getChildrenDetailById(childId);
-//
-//        return ResponseEntity
-//                .status(HttpStatus.OK)
-//                .body(ResponseModel.<ChildrenDetailResponse>builder()
-//                        .message("Lấy dữ liệu học sinh có id: " + childId)
-//                        .data(childrenDetailResponse)
-//                        .build());
-//    }
+    @GetMapping("/children-detail/{childId}")
+    public ResponseEntity<ResponseModel<?>> getClassDetail(@PathVariable String childId) {
+        ChildrenDetailResponse childrenDetailResponse = childrenService.getChildrenDetailById(childId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResponseModel.<ChildrenDetailResponse>builder()
+                        .message("Lấy dữ liệu học sinh có id: " + childId)
+                        .data(childrenDetailResponse)
+                        .build());
+    }
 
     @PutMapping("/update-transport/{childId}")
     public ResponseEntity<String> updateTransportRegistration(
@@ -144,27 +147,31 @@ public class ChildrenController {
         childrenService.updateBoardingRegistration(childId, isRegisteredForBoarding);
         return ResponseEntity.ok("Boarding registration updated successfully");
     }
-//    @PutMapping("/change-information/{childId}")
-//    public ResponseEntity<ResponseModel<?>> updateChildren(
-//            @PathVariable String childId,
-//            @RequestPart("updateRequest") UpdateChildrenRequest updateChildrenRequest,
-//            @RequestPart(value = "image", required = false) MultipartFile image) {
-//
-//        try {
-//            Children updateChildren = childrenService.updateChildrenInformation(childId, updateChildrenRequest);
-//            if (image != null && !image.isEmpty()) {
-//                CloudinaryResponse cloudinaryResponse = cloudinaryService.uploadFile(image, childId);
-//
-//                updateChildren.setImageUrl(cloudinaryResponse.getUrl());
-//                updateChildren.setCloudinaryImageId(cloudinaryResponse.getPublicId());
-//                // Lưu lại đối tượng Children đã cập nhật
-//                childrenService.updateChildren(updateChildren);
-//            }
-//            return ResponseEntity.ok(new ResponseModel<>("Update successful", updateChildrenRequest));
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().body(new ResponseModel<>(e.getMessage(), null));
-//        }
-//    }
+    @PutMapping("/change-information/{childId}")
+    public ResponseEntity<ResponseModel<?>> updateChildren(
+            @PathVariable String childId,
+            @RequestPart("updateRequest") UpdateChildrenRequest updateChildrenRequest,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+
+        try {
+            Children updateChildren = childrenService.updateChildrenInformation(childId, updateChildrenRequest);
+            if (image != null && !image.isEmpty()) {
+                CloudinaryResponse cloudinaryResponse = cloudinaryService.uploadFile(image, childId);
+
+                updateChildren.setImageUrl(cloudinaryResponse.getUrl());
+                updateChildren.setCloudinaryImageId(cloudinaryResponse.getPublicId());
+                // Lưu lại đối tượng Children đã cập nhật
+                childrenService.updateChildren(updateChildren);
+            }
+            return  ResponseEntity.status(HttpStatus.OK)
+                    .body(ResponseModel.<UpdateChildrenRequest>builder()
+                            .message("Updated Successfully")
+                            .data(updateChildrenRequest)
+                            .build());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ResponseModel<>(e.getMessage(), null));
+        }
+    }
 
 
     @GetMapping("/children-by-class/{classId}")
@@ -189,5 +196,10 @@ public class ChildrenController {
     public ResponseEntity<ResponseModel<?>> getChildrenByClass(@PathVariable String classId) {
         List<ChildrenListResponse> children = childrenService.getChildrenByClassId(classId);
         return ResponseEntity.ok(new ResponseModel<>("Get children by class successful", children));
+    }
+    @PutMapping("/{childId}/class/{classId}")
+    public ResponseEntity<String> updateChildrenClass(@PathVariable String childId, @PathVariable String classId) {
+        childrenService.updateChildrenClass(childId, classId);
+        return ResponseEntity.ok("Add Children to Class successfully");
     }
 }

@@ -23,9 +23,13 @@ public class ChildrenDetailResponse {
 
     private String childAddress;
 
-    private String classId; // ID của lớp mà đứa trẻ sẽ được thêm vào
+    private String classId;
     private Boolean isRegisterForBoarding;
     private Boolean isRegisterForTransport;
     private List<RelationshipRequest> relationships;
     private String imageUrl;
+    private String people;
+    private String identificationNumber;
+    private String nationality;
+    private String birthAddress;
 }

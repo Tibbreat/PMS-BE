@@ -16,7 +16,6 @@ import sep490.g13.pms_be.exception.other.PermissionNotAcceptException;
 import sep490.g13.pms_be.model.request.RelationshipRequest;
 import sep490.g13.pms_be.model.request.children.UpdateChildrenRequest;
 import sep490.g13.pms_be.model.request.user.AddUserRequest;
-import sep490.g13.pms_be.model.request.user.UpdateUserNameAndPasswordRequest;
 import sep490.g13.pms_be.model.response.CloudinaryResponse;
 import sep490.g13.pms_be.model.response.children.ChildrenDetailResponse;
 import sep490.g13.pms_be.model.response.children.ChildrenListResponse;
@@ -28,7 +27,10 @@ import sep490.g13.pms_be.service.utils.CloudinaryService;
 import sep490.g13.pms_be.utils.FileUploadUtil;
 import sep490.g13.pms_be.utils.enums.RoleEnums;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -90,10 +92,10 @@ public class ChildrenService {
                 relationship.setChildrenId(c); // Gán Children cho Relationship
                 relationship.setRelationship(request.getRelationship());
                 relationship.setIsRepresentative(request.getIsRepresentative());
-                if(request.getIsRepresentative()==true){
-                    User parent = userService.addUser(addUserRequest1,null);
+                if (request.getIsRepresentative() == true) {
+                    User parent = userService.addUser(addUserRequest1, null);
                     relationship.setParentId(parent);
-                }else{
+                } else {
                     User parentNo = User.
                             builder().
                             role(addUserRequest2.getRole()).
@@ -120,7 +122,6 @@ public class ChildrenService {
     }
 
 
-
     @Transactional
     public void uploadImage(final String id, final MultipartFile file) {
         final Children children = this.childrenRepo.findById(id)
@@ -144,42 +145,62 @@ public class ChildrenService {
         return childrenRepo.findChildrenByFilter(classId, fullname, pageable);
     }
 
-    // Trong ChildrenService.java
-//    public ChildrenDetailResponse getChildrenDetailById(String childId) {
-//        // Tìm đứa trẻ theo ID
-//        Optional<Children> childOptional = childrenRepo.findById(childId);
-//
-//        if (childOptional.isPresent()) {
-//            Children child = childOptional.get();
-//
-//            // Tạo và trả về ChildrenDetailResponse
-//            List<Relationship> relationships = relationshipRepo.findByChildrenId(child);
-//
-//            // Chuyển đổi List<Relationship> thành List<RelationshipRequest>
-//            List<RelationshipRequest> relationshipRequests = relationships.stream()
-//                    .map(relationship -> RelationshipRequest.builder()
-//                            .parentId(relationship.getParentId().getId()) // hoặc phương thức lấy ID phù hợp
-//                            .relationship(relationship.getRelationship())
-//                            .isRepresentative(relationship.getIsRepresentative())
-//                            .build())
-//                    .collect(Collectors.toList());
-//
-//            // Tạo và trả về ChildrenDetailResponse
-//            return ChildrenDetailResponse.builder()
-//                    .childName(child.getChildName())
-//                    .childAge(child.getChildAge())
-//                    .childBirthDate(child.getChildBirthDate())
-//                    .childAddress(child.getChildAddress())
-//                    .isRegisterForTransport(child.getIsRegisteredForTransport())
-//                    .isRegisterForBoarding(child.getIsRegisteredForBoarding())
-//                    .imageUrl(child.getImageUrl())
-//                    .relationships(relationshipRequests)
-//                    .classId(child.getSchoolClass().getId())
-//                    .build();
-//        } else {
-//            throw new RuntimeException("Children not found with ID: " + childId);
-//        }
-//    }
+
+    public ChildrenDetailResponse getChildrenDetailById(String childId) {
+        // Tìm đứa trẻ theo ID
+        Optional<Children> childOptional = childrenRepo.findById(childId);
+
+        if (childOptional.isPresent()) {
+            Children child = childOptional.get();
+
+            // Lấy danh sách Relationship của trẻ từ database
+            List<Relationship> relationships = relationshipRepo.findByChildrenId(child);
+
+            // Chuyển đổi List<Relationship> thành List<RelationshipRequest>
+            List<RelationshipRequest> relationshipRequests = relationships.stream()
+                    .map(relationship -> {
+                        // Lấy thông tin của cha mẹ từ relationship
+                        User parent = relationship.getParentId(); // Giả sử phương thức này trả về User
+
+                        // Chuyển đổi từ User thành AddUserRequest
+                        AddUserRequest parentRequest = AddUserRequest.builder()
+                                .fullName(parent.getFullName())
+                                .idCardNumber(parent.getIdCardNumber())
+                                .address(parent.getAddress())
+                                .phone(parent.getPhone())
+                                .role(parent.getRole())
+                                .build();
+
+                        // Tạo đối tượng RelationshipRequest
+                        return RelationshipRequest.builder()
+                                .parent(parentRequest) // Sử dụng AddUserRequest thay vì User
+                                .relationship(relationship.getRelationship())
+                                .isRepresentative(relationship.getIsRepresentative())
+                                .build();
+                    })
+                    .collect(Collectors.toList());
+
+            // Tạo và trả về ChildrenDetailResponse
+            return ChildrenDetailResponse.builder()
+                    .childName(child.getChildName())
+                    .childAge(child.getChildAge())
+                    .childBirthDate(child.getChildBirthDate())
+                    .childAddress(child.getChildAddress())
+                    .isRegisterForTransport(child.getIsRegisteredForTransport())
+                    .isRegisterForBoarding(child.getIsRegisteredForBoarding())
+                    .imageUrl(child.getImageUrl())
+                    .relationships(relationshipRequests) // Danh sách mối quan hệ đã được chuyển đổi
+                    .classId(child.getSchoolClass() != null ? child.getSchoolClass().getId() : null)
+                    .identificationNumber(child.getIdentificationNumber())
+                    .nationality(child.getNationality())
+                    .people(child.getPeople())
+                    .birthAddress(child.getBirthAddress())
+                    .build();
+        } else {
+            throw new RuntimeException("Children not found with ID: " + childId);
+        }
+    }
+
 
     @Transactional
     public void updateTransportRegistration(String childId, Boolean isRegisteredForTransport) {
@@ -205,47 +226,26 @@ public class ChildrenService {
         }
     }
 
-//    @Transactional
-//    public Children updateChildrenInformation(String childId, UpdateChildrenRequest updateChildrenRequest) {
-//
-//        Children existingChild = childrenRepo.findById(childId)
-//                .orElseThrow(() -> new DataNotFoundException("Child not found with id: " + childId));
-//
-//        existingChild.setChildName(updateChildrenRequest.getChildName());
-//        existingChild.setChildAge(updateChildrenRequest.getChildAge());
-//        existingChild.setChildBirthDate(updateChildrenRequest.getChildBirthDate());
-//        existingChild.setChildAddress(updateChildrenRequest.getChildAddress());
-//
-//        Classes schoolClass = classRepo.findById(updateChildrenRequest.getClassId())
-//                .orElseThrow(() -> new DataNotFoundException("Class not found with id: " + updateChildrenRequest.getClassId()));
-//        existingChild.setSchoolClass(schoolClass);
-//
-//
-//        User lastModifiedBy = userRepo.findById(updateChildrenRequest.getLastModifiedById())
-//                .orElseThrow(() -> new DataNotFoundException("User not found with id: " + updateChildrenRequest.getLastModifiedById()));
-//        if (!lastModifiedBy.getRole().equals(RoleEnums.ADMIN)) {
-//            throw new PermissionNotAcceptException("Only ADMIN can modify this child.");
-//        }
-//
-//        existingChild.setLastModifiedBy(updateChildrenRequest.getLastModifiedById());
-//
-//        if (updateChildrenRequest.getRelationships() != null) {
-//            updateChildrenRequest.getRelationships().forEach(relationshipRequest -> {
-//                Relationship relationship = new Relationship();
-//                User parent = userRepo.findById(relationshipRequest.getParentId())
-//                        .orElseThrow(() -> new DataNotFoundException("Parent not found with id: " + relationshipRequest.getParentId()));
-//
-//                relationship.setChildrenId(existingChild);
-//                relationship.setParentId(parent);
-//                relationship.setRelationship(relationshipRequest.getRelationship());
-//                relationship.setIsRepresentative(relationshipRequest.getIsRepresentative());
-//            });
-//        }
-//        // Lưu lại đối tượng Children đã được cập nhật
-//        return childrenRepo.save(existingChild);
-//    }
+    @Transactional
+    public Children updateChildrenInformation(String childId, UpdateChildrenRequest updateChildrenRequest) {
 
-    public Page<ChildrenListResponse> getChildrenByClass(String classId, int size, int page){
+        Children existingChild = childrenRepo.findById(childId)
+                .orElseThrow(() -> new DataNotFoundException("Child not found with id: " + childId));
+        existingChild.setChildName(updateChildrenRequest.getChildName());
+        existingChild.setChildAge(updateChildrenRequest.getChildAge());
+        existingChild.setChildBirthDate(updateChildrenRequest.getChildBirthDate());
+        existingChild.setChildAddress(updateChildrenRequest.getChildAddress());
+        User lastModifiedBy = userRepo.findById(updateChildrenRequest.getLastModifiedById())
+                .orElseThrow(() -> new DataNotFoundException("User not found with id: " + updateChildrenRequest.getLastModifiedById()));
+        if (!lastModifiedBy.getRole().equals(RoleEnums.ADMIN)) {
+            throw new PermissionNotAcceptException("Only ADMIN can modify this child.");
+        }
+        existingChild.setLastModifiedBy(updateChildrenRequest.getLastModifiedById());
+        // Lưu lại đối tượng Children đã được cập nhật
+        return childrenRepo.save(existingChild);
+    }
+
+    public Page<ChildrenListResponse> getChildrenByClass(String classId, int size, int page) {
         Pageable pageable = PageRequest.of(page, size);
         return childrenRepo.findAllBySchoolClassId(classId, pageable);
     }
@@ -253,5 +253,16 @@ public class ChildrenService {
     public List<ChildrenListResponse> getChildrenByClassId(String classId) {
         return childrenRepo.findAllByClassId(classId);
     }
+    @Transactional
+    public void updateChildrenClass(String childId, String classId) {
+        Children existingClazz = childrenRepo.findById(classId)
+                .orElseThrow(() -> new DataNotFoundException("Class not found with id: " + classId));
+
+        Children existingChild = childrenRepo.findById(childId)
+                .orElseThrow(() -> new DataNotFoundException("Child not found with id: " + childId));
+
+        childrenRepo.updateChildrenClass(childId, classId);
+    }
+
 
 }
