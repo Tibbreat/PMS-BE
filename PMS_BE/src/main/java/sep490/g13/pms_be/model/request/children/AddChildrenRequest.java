@@ -25,11 +25,14 @@ public class AddChildrenRequest {
     private LocalDate childBirthDate;
     @NotNull(message = "Children Address không được để trống")
     private String childAddress;
-    @NotNull(message = "Class Id không được để trống")
-    private String classId; // ID của lớp mà đứa trẻ sẽ được thêm vào
-
     private List<RelationshipRequest> relationships;
-
+    @NotNull(message = "Children people không được để để trống")
+    private String people;
+    @NotNull(message= "Birth Address không được để để trống")
+    private String birthAddress;
+    @NotNull(message= "Nationality không được để để trống")
+    private String nationality;
+    @NotNull(message= "Identification Number không được để để trống")
+    private String identificationNumber;
     private String createdById;
-    private MultipartFile image;
 }

@@ -24,11 +24,7 @@ public class UpdateChildrenRequest {
     private LocalDate childBirthDate;
     @NotNull(message = "Children Address không được để trống")
     private String childAddress;
-    @NotNull(message = "Class Id không được để trống")
-    private String classId; // ID của lớp mà đứa trẻ sẽ được thêm vào
-
-    private List<RelationshipRequest> relationships;
 
     private String lastModifiedById;
-    private MultipartFile image;
+
 }

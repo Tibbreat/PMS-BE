@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import sep490.g13.pms_be.entities.User;
+import sep490.g13.pms_be.model.request.user.AddUserRequest;
 
 @Data
 @NoArgsConstructor
@@ -11,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class RelationshipRequest {
 
-        private String parentId;
+        private AddUserRequest parent;
         private String relationship;
         private Boolean isRepresentative;
 }
