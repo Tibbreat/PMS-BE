@@ -46,7 +46,7 @@ public class AuthController {
             throw new BadCredentialsException("Thông tin đăng nhập không chính xác");
         }
         if (Boolean.FALSE.equals(userData.getIsActive())) {
-            return ResponseEntity.status(HttpStatus.OK)
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(AuthResponse.builder()
                             .role(userData.getRole().name())
                             .token(null)
