@@ -50,8 +50,8 @@ public class AttendanceService {
         if (logExists) {
             return;
         }
-        List<ChildrenListResponse> childrenList = childrenRepository.findAllByClassId(classId);
-        for (ChildrenListResponse childrenResponse : childrenList) {
+        List<LogOfChildren> childrenList = childrenRepository.findAllByClassId(classId);
+        for (LogOfChildren childrenResponse : childrenList) {
             Children currentChildren = childrenRepository.findById(childrenResponse.getId())
                     .orElseThrow(() -> new IllegalArgumentException("Invalid children ID"));
 

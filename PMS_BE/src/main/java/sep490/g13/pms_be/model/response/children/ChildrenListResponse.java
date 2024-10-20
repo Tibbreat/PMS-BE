@@ -14,9 +14,13 @@ import java.util.List;
 public class ChildrenListResponse {
     private String id;
     private String childName;
-    private Integer childAge;
     private LocalDate childBirthDate;
-    private String childAddress;
     private String classId;
-    private String imageLink;
+    private String className;
+
+    private String imageUrl;
+    private String gender;
+
+    private String fatherName;
+    private String motherName;
 }

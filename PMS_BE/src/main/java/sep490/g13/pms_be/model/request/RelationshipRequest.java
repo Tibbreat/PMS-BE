@@ -12,7 +12,6 @@ import sep490.g13.pms_be.model.request.user.AddUserRequest;
 @AllArgsConstructor
 @Builder
 public class RelationshipRequest {
-
         private AddUserRequest parent;
         private String relationship;
         private Boolean isRepresentative;

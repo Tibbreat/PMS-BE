@@ -26,6 +26,8 @@ public class Classes extends Auditable<String> {
 
     private Date closingDay;
 
+    private String schoolYear;
+
     @OneToMany(mappedBy = "schoolClass", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private Set<Children> children = new HashSet<>();

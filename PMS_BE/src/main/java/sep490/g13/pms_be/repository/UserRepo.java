@@ -40,4 +40,7 @@ public interface UserRepo extends JpaRepository<User, String> {
             "WHERE u.role = :role " +
             "AND u.isActive = true")
     List<GetUsersOptionResponse> findAllByRole(RoleEnums role);
+
+    @Query("SELECT u FROM User u WHERE u.idCardNumber = :idCardNumber")
+    User existByIdCardNumber(String idCardNumber);
 }
