@@ -1,39 +1,33 @@
 package sep490.g13.pms_be.entities;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import java.sql.Date;
-import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class TransportServiceProvider extends Auditable<String> {
-    private String representativeName;
     private String providerName;
+    private String providerAddress;
+    private String providerTaxCode;
     private String providerPhone;
     private String providerEmail;
-    private String providerAddress;
-    private String providerRegisterNumber;
-    private String providerLicenseNumber;
-    private String contractFile;
 
-    private String providerTaxNumber;
-    private Date contractStartDate;
-    private Date contractEndDate;
+    //Người đại diện
+    private String representativeName;
+    private String representativePosition;
 
-    private Integer numberOfVehicles;
-    @Column(nullable = false)
-    private Boolean isActive = false;
+    //Thông tin ngân hàng
+    private String bankName;
+    private String bankAccountNumber;
 
-    @OneToMany(mappedBy = "transport")
-    private Set<Vehicle> vehicles;
+    //Số lượng phương tiện
+    private Integer totalVehicle;
+
+    private Boolean isActive;
 }
+

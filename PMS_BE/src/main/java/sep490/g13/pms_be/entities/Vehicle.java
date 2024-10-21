@@ -13,11 +13,17 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class Vehicle extends Auditable<String> {
-    private String licensePlate;
-    private String color;
-    private String model;
-    private String brand;
-    private Boolean isActive = Boolean.FALSE;
+    private String vehicleName;          // Tên xe
+    private String manufacturer;         // Hãng xe
+    private int numberOfSeats;           // Số chỗ
+    private String color;                // Màu xe
+    private String licensePlate;         // Biển số xe
+    private String driverName;           // Tên tài xế
+    private String driverPhone;          // Số điện thoại tài xế
+
+    private Boolean isActive;
+    private String pickUpLocation;
+    private String timeStart;
 
     @ManyToOne
     @JoinColumn(name = "transportId", nullable = false)

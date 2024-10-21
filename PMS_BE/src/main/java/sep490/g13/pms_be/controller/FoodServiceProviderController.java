@@ -23,7 +23,6 @@ public class FoodServiceProviderController {
         Page<FoodServiceProvider> providers = foodServiceProviderService.getAllProvider(page - 1, 10);
         List<FoodServiceProvider> results = providers.getContent();
         String msg = results.isEmpty() ? "No provider found" : "Get all provider successfully";
-        System.out.println("results: " + results.size());
         return ResponseEntity.ok(PagedResponseModel.<FoodServiceProvider>builder()
                 .page(page)
                 .size(10)
@@ -36,6 +35,11 @@ public class FoodServiceProviderController {
     @PostMapping("/add")
     public ResponseEntity<FoodServiceProvider> add(@RequestBody AddProviderRequest request) {
         return ResponseEntity.ok(foodServiceProviderService.add(request));
+    }
+
+    @GetMapping("/{providerId}")
+    public ResponseEntity<FoodServiceProvider> getDetail(@PathVariable String providerId) {
+        return ResponseEntity.ok(foodServiceProviderService.getDetail(providerId));
     }
 }
 

@@ -12,28 +12,26 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class AddTransportProviderRequest {
-    @NotBlank(message = "Tên người đại diện không được bỏ trống")
-    private String representativeName;
-
-    @NotBlank(message = "Tên nhà cung cấp không được để trống")
     private String providerName;
-
-    @NotBlank(message = "Số điện thoại nhà cung cấp k")
+    private String providerAddress;
+    private String providerTaxCode;
     private String providerPhone;
-
-    @NotBlank(message = "Email không được để trống")
-    @Email(message = "Email phải đúng định dạng")
     private String providerEmail;
 
-    @NotBlank(message = "Địa chỉ nhà cung cấp không được để trống")
-    private String providerAddress;
+    //Người đại diện
+    private String representativeName;
+    private String representativePosition;
 
-    @NotBlank(message = "Số đăng ký kinh doanh không được để trống")
-    private String providerRegisterNumber;
+    //Thông tin ngân hàng
+    private String bankName;
+    private String bankAccountNumber;
 
-    @NotBlank(message = "Số giấy phép kinh doanh không được để trống")
-    private String providerLicenseNumber;
+    //Số lượng phương tiện
+    private Integer totalVehicle;
 
-    @NotNull(message= "Người tạo không được để trống")
+    private Boolean isActive;
+
     private String createdBy;
+
+
 }

@@ -4,12 +4,8 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import sep490.g13.pms_be.entities.ClassTeacher;
-import sep490.g13.pms_be.entities.Classes;
-import sep490.g13.pms_be.entities.User;
-import sep490.g13.pms_be.repository.ClassRepo;
-import sep490.g13.pms_be.repository.ClassTeacherRepo;
-import sep490.g13.pms_be.repository.UserRepo;
+import sep490.g13.pms_be.entities.*;
+import sep490.g13.pms_be.repository.*;
 import sep490.g13.pms_be.utils.enums.RoleEnums;
 
 import java.text.SimpleDateFormat;
@@ -21,18 +17,19 @@ public class DataInitializer {
 
     @Autowired
     private UserRepo userRepo;
-
-
     @Autowired
     private PasswordEncoder passwordEncoder;
+
     @Autowired
-    private ClassRepo classRepo;
+    private FoodServiceProviderRepo foodServiceProviderRepo;
+
     @Autowired
-    private ClassTeacherRepo classTeacherRepo;
+    private TransportServiceProviderRepo transportServiceProviderRepo;
+
 
     @PostConstruct
     public void init() {
-        if(userRepo.count() == 0) {
+        if (userRepo.count() == 0) {
             userRepo.save(User.builder()
                     .role(RoleEnums.TEACHER)
                     .isActive(true)
@@ -105,38 +102,6 @@ public class DataInitializer {
                     .password(passwordEncoder.encode("12345678"))
                     .build());
 
-            userRepo.save(User.builder()
-                    .role(RoleEnums.CLASS_MANAGER)
-                    .isActive(true)
-                    .email("vanlong@pms.com")
-                    .fullName("Lê Văn Long")
-                    .address("Đà Nẵng")
-                    .phone("0831556677")
-                    .username("LongLV")
-                    .password(passwordEncoder.encode("12345678"))
-                    .build());
-
-            userRepo.save(User.builder()
-                    .role(RoleEnums.CLASS_MANAGER)
-                    .isActive(true)
-                    .email("thuylinh@pms.com")
-                    .fullName("Trần Thùy Linh")
-                    .address("Hải Phòng")
-                    .phone("0841667788")
-                    .username("LinhTT")
-                    .password(passwordEncoder.encode("12345678"))
-                    .build());
-
-            userRepo.save(User.builder()
-                    .role(RoleEnums.CLASS_MANAGER)
-                    .isActive(true)
-                    .email("minhhoang@pms.com")
-                    .fullName("Vũ Minh Hoàng")
-                    .address("Cần Thơ")
-                    .phone("0851778899")
-                    .username("HoangVM")
-                    .password(passwordEncoder.encode("12345678"))
-                    .build());
 
             userRepo.save(User.builder()
                     .role(RoleEnums.CLASS_MANAGER)
@@ -159,28 +124,37 @@ public class DataInitializer {
                     .username("LamHD")
                     .password(passwordEncoder.encode("12345678"))
                     .build());
+        }
 
-            userRepo.save(User.builder()
-                    .role(RoleEnums.CLASS_MANAGER)
-                    .isActive(true)
-                    .email("ngocanh@pms.com")
-                    .fullName("Lê Ngọc Anh")
-                    .address("Vũng Tàu")
-                    .phone("0881223344")
-                    .username("AnhLN")
-                    .password(passwordEncoder.encode("12345678"))
-                    .build());
-
-            userRepo.save(User.builder()
-                    .role(RoleEnums.CLASS_MANAGER)
-                    .isActive(true)
-                    .email("khanhlinh@pms.com")
-                    .fullName("Đỗ Khánh Linh")
-                    .address("Huế")
-                    .phone("0891334455")
-                    .username("LinhDK")
-                    .password(passwordEncoder.encode("12345678"))
+        if (foodServiceProviderRepo.count() == 0) {
+            foodServiceProviderRepo.save(FoodServiceProvider.builder()
+                    .providerName("Công ty TNHH Thực phẩm Hà Nội")
+                    .providerTaxCode("0108765432")
+                    .providerPhone("02434567890")
+                    .providerEmail("contact@thucphamhn.com")
+                    .providerAddress("Số 20, Phố Láng Hạ, Quận Ba Đình, Hà Nội")
+                    .representativeName("Nguyễn Thị B")
+                    .representativePosition("Giám đốc")
+                    .bankName("VCB")
+                    .isActive(Boolean.TRUE)
+                    .bankAccountNumber("00234567890")
                     .build());
         }
+        if (transportServiceProviderRepo.count() == 0) {
+            transportServiceProviderRepo.save(TransportServiceProvider.builder()
+                    .providerName("Công ty TNHH Dịch vụ Đưa đón Hà Nội")
+                    .providerTaxCode("0108765432")
+                    .providerPhone("02434567890")
+                    .providerEmail("contact@dichvuduadonhn.com")
+                    .providerAddress("Số 20, Phố Láng Hạ, Quận Ba Đình, Hà Nội")
+                    .representativeName("Nguyễn Văn C")
+                    .representativePosition("Giám đốc")
+                    .bankName("VCB")  // Vietcombank
+                    .bankAccountNumber("00234567890")
+                    .isActive(Boolean.TRUE)
+                    .totalVehicle(10)
+                    .build());
+        }
+
     }
 }

@@ -7,12 +7,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import sep490.g13.pms_be.entities.FoodServiceProvider;
+import sep490.g13.pms_be.exception.other.DataNotFoundException;
 import sep490.g13.pms_be.model.request.foodsupplier.AddProviderRequest;
 
 import sep490.g13.pms_be.repository.FoodServiceProviderRepo;
-import sep490.g13.pms_be.repository.UserRepo;
-import sep490.g13.pms_be.service.utils.DriveService;
-
 
 
 @Service
@@ -20,12 +18,6 @@ public class FoodServiceProviderService {
 
     @Autowired
     private FoodServiceProviderRepo foodServiceProviderRepo;
-
-    @Autowired
-    private UserRepo userRepo;
-
-    @Autowired
-    private DriveService driveService;
 
     public FoodServiceProvider add(AddProviderRequest request) {
         FoodServiceProvider provider = new FoodServiceProvider();
@@ -38,5 +30,9 @@ public class FoodServiceProviderService {
     public Page<FoodServiceProvider> getAllProvider(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return foodServiceProviderRepo.getAllProvider(pageable);
+    }
+
+    public FoodServiceProvider getDetail(String providerId) {
+        return foodServiceProviderRepo.findById(providerId).orElseThrow(() -> new DataNotFoundException("Provider not found"));
     }
 }

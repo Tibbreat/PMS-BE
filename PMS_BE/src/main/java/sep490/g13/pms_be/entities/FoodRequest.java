@@ -1,8 +1,6 @@
 package sep490.g13.pms_be.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Lob;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,17 +14,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FoodRequest extends Auditable<String> {
-    private LocalDate requestDate;
+    private LocalDate dayNeeded;
 
-    private String item;
-
-    private String quantity;
-
-    private String unit;
-
-    private String deliveryAddress;
-
-    @Lob
-    @Column(columnDefinition = "TEXT")
-    private String note;
+    @ManyToOne
+    @JoinColumn(name = "provider_id")
+    private FoodServiceProvider foodServiceProvider;
 }
