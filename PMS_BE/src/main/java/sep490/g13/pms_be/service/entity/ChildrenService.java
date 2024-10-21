@@ -102,4 +102,19 @@ public class ChildrenService {
     public ChildrenDetailResponse getChildrenDetail(String childrenId) {
         return childrenRepo.findChildrenDetailById(childrenId);
     }
+
+    @Transactional
+    public void updateServiceStatus(String childrenId, String service) {
+        Children children = childrenRepo.findById(childrenId)
+                .orElseThrow(() -> new RuntimeException("Data not found"));
+
+        switch (service) {
+            case "transport" ->
+                    childrenRepo.updateTransportServiceStatus(childrenId, !children.getIsRegisteredForTransport());
+            case "boarding" ->
+                    childrenRepo.updateBoardingServiceStatus(childrenId, !children.getIsRegisteredForBoarding());
+            default -> throw new IllegalArgumentException("Invalid service type: " + service);
+        }
+    }
+
 }

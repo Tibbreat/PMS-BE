@@ -51,4 +51,12 @@ public interface ChildrenRepo extends JpaRepository<Children, String> {
             "WHERE ch.id = :childrenId")
     ChildrenDetailResponse findChildrenDetailById(@Param("childrenId") String childrenId);
 
+    @Modifying
+    @Query("UPDATE Children ch SET ch.isRegisteredForTransport = :status WHERE ch.id = :childrenId")
+    int updateTransportServiceStatus(@Param("childrenId") String childrenId, @Param("status") Boolean status);
+
+    @Modifying
+    @Query("UPDATE Children ch SET ch.isRegisteredForBoarding = :status WHERE ch.id = :childrenId")
+    int updateBoardingServiceStatus(@Param("childrenId") String childrenId, @Param("status") Boolean status);
+
 }

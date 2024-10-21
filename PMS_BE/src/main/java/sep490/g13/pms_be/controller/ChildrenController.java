@@ -82,4 +82,15 @@ public class ChildrenController {
                         .data(childrenService.getChildrenDetail(childrenId))
                         .build());
     }
+
+    @PutMapping("/service/{childrenId}/{service}")
+    public ResponseEntity<ResponseModel<?>> updateServiceStatus(@PathVariable String childrenId,
+                                                                @PathVariable String service) {
+        childrenService.updateServiceStatus(childrenId, service);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseModel.<String>builder()
+                        .message("Update service status successfully")
+                        .data("Update " + service + " service status successfully")
+                        .build());
+    }
 }

@@ -1,17 +1,15 @@
-package sep490.g13.pms_be.entities;
+package sep490.g13.pms_be.model.request.foodsupplier;
 
-import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class FoodServiceProvider extends Auditable<String> {
+public class AddProviderRequest {
     private String providerName;
     private String providerAddress;
     private String providerTaxCode;
@@ -22,9 +20,7 @@ public class FoodServiceProvider extends Auditable<String> {
     private String representativeName;
     private String representativePosition;
 
-    //Thông tin ngân hàng
-    private String bankName;
-    private String bankAccountNumber;
-
     private Boolean isActive;
+
+    private String createdBy;
 }
