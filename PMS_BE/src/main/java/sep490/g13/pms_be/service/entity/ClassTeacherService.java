@@ -26,29 +26,21 @@ public class ClassTeacherService {
 
     @Autowired
     private ClassRepo classesRepo;
-    @Autowired
-    private ClassRepo classRepo;
 
-    public void addTeacherIntoClass(String classId, List<String> teacherIds) {
-        Optional<Classes> schoolClassOpt = classesRepo.findById(classId);
 
-        if (schoolClassOpt.isPresent()) {
-            Classes schoolClass = schoolClassOpt.get();
+    public void addTeacherIntoClass(String classId, String teacherId) {
+        Classes schoolClass = classesRepo.findById(classId)
+                .orElseThrow(() -> new IllegalArgumentException("Class not found: " + classId));
 
-            for (String teacherId : teacherIds) {
-                Optional<User> teacherOpt = userRepo.findById(teacherId);
+        User teacher = userRepo.findById(teacherId)
+                .orElseThrow(() -> new IllegalArgumentException("Teacher not found: " + teacherId));
 
-                if (teacherOpt.isPresent()) {
-                    User teacher = teacherOpt.get();
-                    ClassTeacher classTeacher = new ClassTeacher();
-                    classTeacher.setSchoolClasses(schoolClass);
-                    classTeacher.setTeacherId(teacher);
-
-                    classTeacherRepo.save(classTeacher);
-                }
-            }
-        }
+        ClassTeacher classTeacher = new ClassTeacher();
+        classTeacher.setSchoolClasses(schoolClass);
+        classTeacher.setTeacherId(teacher);
+        classTeacherRepo.save(classTeacher);
     }
+
 
     public Page<Classes> getClassByTeacherId(String teacherId, int size, int page){
         Pageable pageable = PageRequest.of(page, size);

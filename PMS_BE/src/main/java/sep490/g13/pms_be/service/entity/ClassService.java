@@ -115,6 +115,7 @@ public class ClassService {
         // Gọi repository để lấy danh sách lớp học theo bộ lọc
         return classRepo.findClassesByFilters(schoolYear, ageRange, managerId, pageable);
     }
+
     @Transactional
     public void updateClass(String classId, UpdateClassRequest updateClassRequest) {
         Classes existingClass = classRepo.findById(classId)
@@ -148,19 +149,19 @@ public class ClassService {
             }
         }
         User lastMofifyBy = userRepo.findById(updateClassRequest.getLastModifyById()).get();
-        if(lastMofifyBy.getRole() == RoleEnums.ADMIN) {
+        if (lastMofifyBy.getRole() == RoleEnums.ADMIN) {
             existingClass.setLastModifiedBy(updateClassRequest.getLastModifyById());
-        }else {
+        } else {
             throw new PermissionNotAcceptException("Cant update class with other role");
         }
         classRepo.save(existingClass);
     }
 
 
-
-    public Classes getClassById(String id){
+    public Classes getClassById(String id) {
         return classRepo.findById(id).get();
     }
+
     public void changeStatusClass(String classId) {
         Classes clazz = classRepo.findById(classId)
                 .orElseThrow(() -> new DataNotFoundException("Class not found"));
@@ -193,9 +194,11 @@ public class ClassService {
         classesToOpen.forEach(cls -> cls.setStatus(true));  // Set status to active
         classRepo.saveAll(classesToOpen);
     }
+
     public List<TeacherOfClassResponse> getTeachersOfClass(String classId) {
         return classRepo.getTeacherOfClass(classId);
     }
+
     public List<ClassOption> getClassesByTeacherIdOrManagerId(String teacherId, String managerId) {
         List<Classes> classesList = classRepo.findClassesByTeacherIdOrManagerId(teacherId, managerId);
         return classesList.stream()
@@ -222,8 +225,6 @@ public class ClassService {
             row.createCell(5).setCellValue(classes.isStatus() ? "Active" : "Inactive"); // Trạng thái
         });
     }
-
-
 
 
 }

@@ -14,22 +14,22 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class ChildrenDetailResponse {
-
     private String childName;
-
-    private Integer childAge;
-
     private LocalDate childBirthDate;
-
     private String childAddress;
-
-    private String classId;
-    private Boolean isRegisterForBoarding;
-    private Boolean isRegisterForTransport;
-    private List<RelationshipRequest> relationships;
+    private Boolean isRegisteredForTransport;
+    private Boolean isRegisteredForBoarding;
     private String imageUrl;
-    private String people;
-    private String identificationNumber;
-    private String nationality;
     private String birthAddress;
+    private String nationality;
+    private String religion;
+    private String gender;
+
+    private String fatherId;
+    private String fatherName;
+    private String fatherPhone;
+
+    private String motherId;
+    private String motherName;
+    private String motherPhone;
 }

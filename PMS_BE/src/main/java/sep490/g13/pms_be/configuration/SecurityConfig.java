@@ -39,11 +39,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/pms/auth/**").permitAll()  // Public endpoints
-                        .anyRequest().authenticated()  // All other endpoints require authentication
+                        .requestMatchers("/pms/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
+                        .anyRequest().permitAll()
+//                        .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults())  // Basic authentication for non-API requests
-                .cors(Customizer.withDefaults());  // Enable CORS
+                .httpBasic(Customizer.withDefaults())
+                .cors(Customizer.withDefaults());
 
         http.exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint));
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

@@ -1,4 +1,5 @@
 package sep490.g13.pms_be.entities;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,7 +15,6 @@ import java.util.Set;
 @Builder
 public class Children extends Auditable<String> {
     private String childName;
-    private Integer childAge;
     private LocalDate childBirthDate;
     private String childAddress;
 
@@ -24,10 +24,11 @@ public class Children extends Auditable<String> {
     private String imageUrl;
 
     private String cloudinaryImageId;
-    private String people;
     private String birthAddress;
     private String nationality;
-    private String identificationNumber;
+    private String religion;
+    private String gender;
+
     @ManyToOne
     @JoinColumn(name = "class_id")
     private Classes schoolClass;

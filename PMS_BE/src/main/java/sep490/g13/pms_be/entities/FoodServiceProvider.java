@@ -1,26 +1,31 @@
 package sep490.g13.pms_be.entities;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.OneToMany;
+import lombok.*;
+
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class FoodServiceProvider extends Auditable<String> {
-    private String representativeName;
     private String providerName;
+    private String providerAddress;
+    private String providerTaxCode;
     private String providerPhone;
     private String providerEmail;
-    private String providerAddress;
-    private String providerRegisterNumber;
-    private String providerLicenseNumber;
-    private String contractFile;
-    @Column(nullable = false)
-    private Boolean isActive = false;
+
+    //Người đại diện
+    private String representativeName;
+    private String representativePosition;
+
+    //Thông tin ngân hàng
+    private String bankName;
+    private String bankAccountNumber;
+
+    private Boolean isActive;
 }

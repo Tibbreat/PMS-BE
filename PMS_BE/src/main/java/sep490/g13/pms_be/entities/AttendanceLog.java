@@ -1,10 +1,7 @@
 package sep490.g13.pms_be.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -19,13 +16,16 @@ public class AttendanceLog extends Auditable<String>  {
     @ManyToOne
     private Children children;
 
-    @CreationTimestamp
     private LocalDate attendanceDate;
 
-    @CreationTimestamp
-    private LocalTime attendanceTime;
+    private LocalTime checkinTime;
 
+    private LocalTime checkoutTime;
+
+    @Lob
+    @Column(name = "note", columnDefinition = "TEXT")
+    private String note;
     @ManyToOne
-    @JoinColumn(name = "responsible_person_id")
-    private User user;
+    @JoinColumn(name = "class_id")
+    private Classes classes;
 }

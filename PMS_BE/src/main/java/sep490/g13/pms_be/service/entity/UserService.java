@@ -57,12 +57,9 @@ public class UserService {
 
 
     public User updateUserNameAndPassword(UpdateUserNameAndPasswordRequest request) {
-        // Tìm user dựa trên email (hoặc một định danh duy nhất khác)
         Optional<User> existingUserOpt = userRepo.findByEmail(request.getEmail());
-
-
         if (existingUserOpt.isPresent()) {
-            // Lấy user hiện tại
+
             User user = existingUserOpt.get();
             if(user.getUsername() !=null){
             // Nếu fullName có trong request, tạo lại username dựa trên fullName
