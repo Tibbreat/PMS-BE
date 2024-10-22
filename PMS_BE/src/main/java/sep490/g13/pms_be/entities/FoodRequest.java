@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -14,9 +13,12 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FoodRequest extends Auditable<String> {
-    private LocalDate dayNeeded;
+    private String dayNeeded;
+
+    private String status;
 
     @ManyToOne
     @JoinColumn(name = "provider_id")
     private FoodServiceProvider foodServiceProvider;
 }
+

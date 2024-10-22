@@ -60,38 +60,53 @@ public class ChildrenService {
         User motherExist = userRepo.existByIdCardNumber(request.getMother().getIdCardNumber());
 
         if (fatherExist != null || motherExist != null) {
-            relationshipRepo.save(Relationship.builder()
-                    .childrenId(children)
-                    .parentId(fatherExist)
-                    .relationship("Father")
-                    .build());
-            relationshipRepo.save(Relationship.builder()
-                    .childrenId(children)
-                    .parentId(motherExist)
-                    .relationship("Mother")
-                    .build());
+            if (fatherExist != null) {
+                relationshipRepo.save(Relationship.builder()
+                        .childrenId(children)
+                        .parentId(fatherExist)
+                        .relationship("Father")  // Set the relationship as Father
+                        .build());
+            }
+
+            if (motherExist != null) {
+                relationshipRepo.save(Relationship.builder()
+                        .childrenId(children)
+                        .parentId(motherExist)
+                        .relationship("Mother")  // Set the relationship as Mother
+                        .build());
+            }
         } else {
+            // For Father
+            User father = userRepo.save(User.builder()
+                    .username("parent." + StringUtils.generateUsername(request.getChildName()).toLowerCase())
+                    .password(passwordEncoder.encode("123456"))
+                    .fullName(request.getFather().getFullName())
+                    .idCardNumber(request.getFather().getIdCardNumber())
+                    .phone(request.getFather().getPhone())
+                    .isActive(Boolean.TRUE)
+                    .role(RoleEnums.PARENT).build());
+
             relationshipRepo.save(Relationship.builder()
                     .childrenId(children)
-                    .parentId(userRepo.save(User.builder()
-                            .username("parent." + StringUtils.generateUsername(request.getChildName()).toLowerCase())
-                            .password(passwordEncoder.encode("123456"))
-                            .fullName(request.getFather().getFullName())
-                            .idCardNumber(request.getFather().getIdCardNumber())
-                            .phone(request.getFather().getPhone())
-                            .isActive(Boolean.TRUE)
-                            .role(RoleEnums.PARENT).build()))
+                    .parentId(father)
+                    .relationship("Father")  // Explicitly set the relationship as Father
                     .build());
+
+            // For Mother
+            User mother = userRepo.save(User.builder()
+                    .fullName(request.getMother().getFullName())
+                    .idCardNumber(request.getMother().getIdCardNumber())
+                    .phone(request.getMother().getPhone())
+                    .isActive(Boolean.TRUE)
+                    .role(RoleEnums.PARENT).build());
+
             relationshipRepo.save(Relationship.builder()
                     .childrenId(children)
-                    .parentId(userRepo.save(User.builder()
-                            .fullName(request.getMother().getFullName())
-                            .idCardNumber(request.getMother().getIdCardNumber())
-                            .phone(request.getMother().getPhone())
-                            .isActive(Boolean.TRUE)
-                            .role(RoleEnums.PARENT).build()))
+                    .parentId(mother)
+                    .relationship("Mother")  // Explicitly set the relationship as Mother
                     .build());
         }
+
         return newChildren;
     }
 
@@ -116,5 +131,4 @@ public class ChildrenService {
             default -> throw new IllegalArgumentException("Invalid service type: " + service);
         }
     }
-
 }
