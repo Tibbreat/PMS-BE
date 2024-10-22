@@ -58,7 +58,7 @@ class ClassControllerTest {
         classRequest.setAgeRange("1-2");
         classRequest.setOpeningDay(openingDay);
         classRequest.setClosingDay(closingDay);
-        classRequest.setTeacherId(List.of("4028b2b4926cb0f301926cb1025a0000", "4028b2b4926cb0f301926cb103ea0002"));
+        classRequest.setTeacherId("4028b2b4926cb0f301926cb1025a0000");
         classRequest.setManagerId("4028b2b4926cb0f301926cb10a830006");
         classRequest.setCreatedBy("4028b2b4926cb0f301926cb109260004");
 
@@ -76,7 +76,7 @@ class ClassControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Thêm lớp học thành công", response.getBody().getMessage());
         verify(classService, times(1)).createNewClass(any(AddClassRequest.class));
-        verify(classTeacherService, times(1)).addTeacherIntoClass(eq("newClassId"), anyList());
+        verify(classTeacherService, times(1)).addTeacherIntoClass(eq("newClassId"), any());
     }
 
 
@@ -133,7 +133,7 @@ class ClassControllerTest {
     public void testAddNewClass_TeacherNotFound() {
         // Arrange
         AddClassRequest classRequest = new AddClassRequest();
-        classRequest.setTeacherId(List.of("123"));
+        classRequest.setTeacherId("123456");
 
         when(bindingResult.hasErrors()).thenReturn(false);
         when(classService.createNewClass(any(AddClassRequest.class)))

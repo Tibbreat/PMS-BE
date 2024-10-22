@@ -106,4 +106,16 @@ public ResponseEntity<ResponseModel<?>> addUser(
                         .data(userService.getUsers(role))
                         .build());
     }
+
+    @GetMapping("/option-username")
+    public ResponseEntity<ResponseModel<?>> getUsersOptionWithUserName(
+            @RequestParam String role
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseModel.<List<GetUsersOptionResponse>>builder()
+                        .message("Get users option successfully")
+                        .data(userService.getUserswithUserName(role))
+                        .build());
+    }
+
 }

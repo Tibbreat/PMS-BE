@@ -137,4 +137,12 @@ public class UserService {
             throw new IllegalArgumentException("Role không tồn tại: " + role, e);
         }
     }
+    public List<GetUsersOptionResponse> getUserswithUserName(String role) {
+        try {
+            RoleEnums roleEnum = RoleEnums.valueOf(role);
+            return userRepo.findAllByRoleWithUserName(roleEnum);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Role không tồn tại: " + role, e);
+        }
+    }
 }
