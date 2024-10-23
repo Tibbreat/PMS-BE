@@ -1,6 +1,7 @@
 package sep490.g13.pms_be.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -25,5 +26,6 @@ public class Relationship extends Auditable<String> {
     @JsonIgnore
     private User parentId;
 
+    @Column(name = "relationship", nullable = false)
     private String relationship;
 }
