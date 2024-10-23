@@ -85,8 +85,11 @@ public class ChildrenController {
 
     @PutMapping("/service/{childrenId}/{service}")
     public ResponseEntity<ResponseModel<?>> updateServiceStatus(@PathVariable String childrenId,
-                                                                @PathVariable String service) {
-        childrenService.updateServiceStatus(childrenId, service);
+                                                                @PathVariable String service,
+                                                                @RequestParam(required = false) String vehicleId) {
+
+        childrenService.updateServiceStatus(childrenId, service, vehicleId);
+
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ResponseModel.<String>builder()
                         .message("Update service status successfully")

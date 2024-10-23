@@ -7,15 +7,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import sep490.g13.pms_be.entities.Children;
-import sep490.g13.pms_be.entities.Relationship;
-import sep490.g13.pms_be.entities.User;
+import sep490.g13.pms_be.entities.*;
+import sep490.g13.pms_be.exception.other.DataNotFoundException;
 import sep490.g13.pms_be.model.request.children.AddChildrenRequest;
 import sep490.g13.pms_be.model.response.children.ChildrenDetailResponse;
 import sep490.g13.pms_be.model.response.children.ChildrenListResponse;
-import sep490.g13.pms_be.repository.ChildrenRepo;
-import sep490.g13.pms_be.repository.RelationshipRepo;
-import sep490.g13.pms_be.repository.UserRepo;
+import sep490.g13.pms_be.repository.*;
 import sep490.g13.pms_be.service.utils.CloudinaryService;
 import sep490.g13.pms_be.utils.StringUtils;
 import sep490.g13.pms_be.utils.enums.RoleEnums;
@@ -37,6 +34,10 @@ public class ChildrenService {
 
     @Autowired
     private CloudinaryService cloudinaryService;
+    @Autowired
+    private VehicleRepo vehicleRepo;
+    @Autowired
+    private ChildrenVehicleRegistrationRepo childrenVehicleRegistrationRepo;
 
     @Transactional
     public Children addChildren(AddChildrenRequest request, MultipartFile image) {
@@ -119,16 +120,34 @@ public class ChildrenService {
     }
 
     @Transactional
-    public void updateServiceStatus(String childrenId, String service) {
+    public void updateServiceStatus(String childrenId, String service, String vehicleId) {
         Children children = childrenRepo.findById(childrenId)
-                .orElseThrow(() -> new RuntimeException("Data not found"));
-
+                .orElseThrow(() -> new DataNotFoundException("Không tìm thấy dữ liệu của trẻ"));
         switch (service) {
-            case "transport" ->
-                    childrenRepo.updateTransportServiceStatus(childrenId, !children.getIsRegisteredForTransport());
-            case "boarding" ->
-                    childrenRepo.updateBoardingServiceStatus(childrenId, !children.getIsRegisteredForBoarding());
-            default -> throw new IllegalArgumentException("Invalid service type: " + service);
+            case "transport":
+                if (children.getIsRegisteredForTransport().equals(Boolean.TRUE)) {
+                    childrenVehicleRegistrationRepo.deleteByChildrenId(childrenId);
+                    childrenRepo.updateTransportServiceStatus(childrenId, Boolean.FALSE);
+                } else {
+                    Vehicle vehicle = vehicleRepo.findById(vehicleId)
+                            .orElseThrow(() -> new DataNotFoundException("Không tìm thấy phương tiện tương ứng"));
+
+                    //Check if the vehicle is already full
+                    if (childrenVehicleRegistrationRepo.countByVehicleId(vehicleId) >= vehicle.getNumberOfSeats()) {
+                        throw new IllegalArgumentException("Xe hiện tại không còn chỗ");
+                    }
+                    childrenRepo.updateTransportServiceStatus(childrenId, Boolean.TRUE);
+                    childrenVehicleRegistrationRepo.save(ChildrenVehicleRegistration.builder()
+                            .children(children)
+                            .vehicle(vehicle)
+                            .build());
+                }
+                break;
+            case "boarding":
+                childrenRepo.updateBoardingServiceStatus(childrenId, !children.getIsRegisteredForBoarding());
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid service type: " + service);
         }
     }
 }

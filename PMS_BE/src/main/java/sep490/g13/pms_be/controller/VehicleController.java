@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sep490.g13.pms_be.entities.Vehicle;
 import sep490.g13.pms_be.model.request.vehicle.AddVehicleRequest;
+import sep490.g13.pms_be.model.request.vehicle.AvailableVehicleOptions;
 import sep490.g13.pms_be.model.response.base.PagedResponseModel;
 import sep490.g13.pms_be.service.entity.VehicleService;
 
@@ -37,4 +38,8 @@ public class VehicleController {
         return ResponseEntity.ok(vehicleService.add(request));
     }
 
+    @GetMapping("/available")
+    public ResponseEntity<List<AvailableVehicleOptions>> getAvailableVehicle(){
+        return ResponseEntity.ok(vehicleService.getAvailableVehicle());
+    }
 }
