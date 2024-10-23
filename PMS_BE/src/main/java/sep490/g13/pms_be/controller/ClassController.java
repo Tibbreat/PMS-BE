@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import sep490.g13.pms_be.entities.Classes;
+import sep490.g13.pms_be.exception.handler.GlobalExceptionHandler;
 import sep490.g13.pms_be.exception.other.DataNotFoundException;
 import sep490.g13.pms_be.exception.other.PermissionNotAcceptException;
 import sep490.g13.pms_be.model.request.classes.AddClassRequest;
@@ -36,6 +37,7 @@ public class ClassController {
 
     @Autowired
     private ClassTeacherService classTeacherService;
+    private GlobalExceptionHandler globalExceptionHandler;
 
 
     @PostMapping("/add")
@@ -102,7 +104,7 @@ public class ClassController {
         return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
     }
     @PutMapping("/change-class-description/{classId}")
-    public ResponseEntity<ResponseModel<?>> updateClassDescription(
+    public ResponseEntity<ResponseModel<String>> updateClassDescription(
             @RequestBody @Valid UpdateClassRequest updateClassRequest,
             BindingResult bindingResult,
             @PathVariable String classId) {
@@ -113,13 +115,16 @@ public class ClassController {
                             .data(ValidationUtils.getValidationErrors(bindingResult))
                             .build());
         }
-
+        try{
         classService.updateClass(classId, updateClassRequest);
 
         return ResponseEntity.ok(ResponseModel.<String>builder()
                 .message("Cập nhật thông tin lớp học thành công")
                 .data(null)
-                .build());
+                .build());}
+        catch (Exception e) {
+            return globalExceptionHandler.handleDataNotFoundException(e);
+        }
     }
 
     @PutMapping("/change-class-status/{classId}")
