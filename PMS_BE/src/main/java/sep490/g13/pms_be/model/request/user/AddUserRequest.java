@@ -7,6 +7,9 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 import sep490.g13.pms_be.utils.enums.RoleEnums;
+
+import java.sql.Date;
+
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,4 +33,7 @@ public class AddUserRequest {
 
     @NotNull(message = "Role không được để trống")
     private RoleEnums role;
+
+    private Date dob;
+    private String schoolId;
 }

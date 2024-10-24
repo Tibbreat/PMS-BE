@@ -1,6 +1,7 @@
 package sep490.g13.pms_be.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.*;
 
@@ -26,6 +27,10 @@ public class FoodServiceProvider extends Auditable<String> {
     //Thông tin ngân hàng
     private String bankName;
     private String bankAccountNumber;
+    private String beneficiaryName;
 
     private Boolean isActive;
+
+    @ManyToOne
+    private School school;
 }

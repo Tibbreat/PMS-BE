@@ -12,7 +12,6 @@ import sep490.g13.pms_be.entities.User;
 import sep490.g13.pms_be.model.request.user.AddUserRequest;
 import sep490.g13.pms_be.model.response.base.PagedResponseModel;
 import sep490.g13.pms_be.model.response.base.ResponseModel;
-import sep490.g13.pms_be.model.response.user.GetParentOptionResponse;
 import sep490.g13.pms_be.model.response.user.GetUsersOptionResponse;
 import sep490.g13.pms_be.service.entity.UserService;
 import sep490.g13.pms_be.utils.ValidationUtils;
@@ -26,23 +25,20 @@ public class UserController {
     @Autowired
     private UserService userService;
 
- @PostMapping("/user")
-public ResponseEntity<ResponseModel<?>> addUser(
-        @RequestPart("user") @Valid AddUserRequest addUserRequest,
-        @RequestPart(value = "image", required = false) MultipartFile image,
-        BindingResult bindingResult) {
+    @PostMapping("/user")
+    public ResponseEntity<ResponseModel<?>> addUser(
+            @RequestPart("user") @Valid AddUserRequest addUserRequest,
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            BindingResult bindingResult) {
 
-    if (bindingResult.hasErrors()) {
-        String errorMessage = ValidationUtils.getValidationErrors(bindingResult);
-        return ResponseEntity.badRequest()
-                .body(ResponseModel.<String>builder()
-                        .message("Thêm người dùng không thành công")
-                        .data(errorMessage)
-                        .build());
-    }
-
-
-
+        if (bindingResult.hasErrors()) {
+            String errorMessage = ValidationUtils.getValidationErrors(bindingResult);
+            return ResponseEntity.badRequest()
+                    .body(ResponseModel.<String>builder()
+                            .message("Thêm người dùng không thành công")
+                            .data(errorMessage)
+                            .build());
+        }
         User newUser = userService.addUser(addUserRequest, image); // Pass the image to the service
 
         String message = newUser == null ? "Thêm người dùng không thành công" : "Thêm người dùng thành công";
@@ -56,14 +52,15 @@ public ResponseEntity<ResponseModel<?>> addUser(
     }
 
 
-    @GetMapping
+    @GetMapping("/school/{schoolId}")
     public ResponseEntity<PagedResponseModel<User>> getUsers(
+            @PathVariable String schoolId,
             @RequestParam int page,
             @RequestParam(required = false) List<String> role, // Accept multiple roles
             @RequestParam(required = false) Boolean isActive) {
 
         int size = 10;
-        Page<User> results = userService.getAllByRole(role, isActive, size, page - 1);
+        Page<User> results = userService.getAllByRole(role, isActive, schoolId, size, page - 1);
         List<User> users = results.getContent();
 
         String msg = users.isEmpty() ? "Không có dữ liệu" : "Tìm thấy " + results.getTotalElements();

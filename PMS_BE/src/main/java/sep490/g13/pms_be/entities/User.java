@@ -37,4 +37,10 @@ public class User extends Auditable<String> {
     @OneToMany(mappedBy = "teacherId")
     @JsonIgnore
     private Set<ClassTeacher> classTeachers = new HashSet<>();
+
+
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "school_id")
+    private School school;
 }

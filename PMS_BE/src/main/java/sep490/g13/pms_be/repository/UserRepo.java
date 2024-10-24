@@ -27,10 +27,13 @@ public interface UserRepo extends JpaRepository<User, String> {
 
     @Query("SELECT u FROM User u WHERE " +
             "(:roles IS NULL OR u.role IN :roles) AND " +
-            "(:isActive IS NULL OR u.isActive = :isActive)")
+            "(:isActive IS NULL OR u.isActive = :isActive) AND " +
+            "u.school.id = :schoolId")
     Page<User> getUsersByRoles(@Param("roles") List<RoleEnums> roles,
                                @Param("isActive") Boolean isActive,
+                               @Param("schoolId") String schoolId,
                                Pageable pageable);
+
 
     @Modifying
     @Transactional
@@ -44,6 +47,7 @@ public interface UserRepo extends JpaRepository<User, String> {
 
     @Query("SELECT u FROM User u WHERE u.idCardNumber = :idCardNumber")
     User existByIdCardNumber(String idCardNumber);
+
     @Query("SELECT new sep490.g13.pms_be.model.response.user.GetUsersOptionResponse(u.id, u.username) FROM User u " +
             "WHERE u.role = :role " +
             "AND u.isActive = true " +

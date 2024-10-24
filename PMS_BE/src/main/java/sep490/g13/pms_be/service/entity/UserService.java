@@ -15,6 +15,7 @@ import sep490.g13.pms_be.model.request.user.AddUserRequest;
 import sep490.g13.pms_be.model.request.user.UpdateUserNameAndPasswordRequest;
 import sep490.g13.pms_be.model.response.user.GetParentOptionResponse;
 import sep490.g13.pms_be.model.response.user.GetUsersOptionResponse;
+import sep490.g13.pms_be.repository.SchoolRepo;
 import sep490.g13.pms_be.repository.UserRepo;
 import sep490.g13.pms_be.service.utils.CloudinaryService;
 import sep490.g13.pms_be.utils.StringUtils;
@@ -34,9 +35,11 @@ public class UserService {
     PasswordEncoder passwordEncoder;
     @Autowired
     private CloudinaryService cloudinaryService;
+    @Autowired
+    private SchoolRepo schoolRepo;
 
     public User addUser(AddUserRequest request, MultipartFile image) {
-        String defaultPassword = StringUtils.randomString(8);
+
         String accountName = StringUtils.generateUsername(request.getFullName());
         int count = userRepo.countByUsernameContaining(accountName);
         String username = count == 0 ? accountName : accountName + (count + 1);
@@ -45,11 +48,11 @@ public class UserService {
         BeanUtils.copyProperties(request, user);
         user.setUsername(username.trim());
         user.setIsActive(true);
-        user.setPassword(passwordEncoder.encode(defaultPassword));
+        user.setPassword(passwordEncoder.encode("pms@" + request.getIdCardNumber()));
         user.setEmail(username.trim() + "@pms.com");
-
+        user.setSchool(schoolRepo.findById(request.getSchoolId()).orElseThrow(() -> new DataNotFoundException("Không tìm thấy trường học với id: " + request.getSchoolId())));
         if (image != null && !image.isEmpty()) {
-            String imagePath = cloudinaryService.saveImage(image) ;
+            String imagePath = cloudinaryService.saveImage(image);
             user.setImageLink(imagePath);
         }
 
@@ -62,20 +65,20 @@ public class UserService {
         if (existingUserOpt.isPresent()) {
 
             User user = existingUserOpt.get();
-            if(user.getUsername() !=null){
-            // Nếu fullName có trong request, tạo lại username dựa trên fullName
-            if (request.getFullName() != null && !request.getFullName().isEmpty()) {
+            if (user.getUsername() != null) {
+                // Nếu fullName có trong request, tạo lại username dựa trên fullName
+                if (request.getFullName() != null && !request.getFullName().isEmpty()) {
 
-                String accountName = StringUtils.generateUsername(request.getFullName());
-                int count = userRepo.countByUsernameContaining(accountName);
-                String username = "";
-                if (count == 0) {
-                    username += accountName;
-                } else {
-                    username += accountName + (count + 1);
+                    String accountName = StringUtils.generateUsername(request.getFullName());
+                    int count = userRepo.countByUsernameContaining(accountName);
+                    String username = "";
+                    if (count == 0) {
+                        username += accountName;
+                    } else {
+                        username += accountName + (count + 1);
+                    }
+                    user.setUsername(username.trim());
                 }
-                user.setUsername(username.trim());
-            }
             }
 
             // Cập nhật password nếu có trong request, hoặc tạo password mặc định
@@ -98,11 +101,12 @@ public class UserService {
     public User findByEmail(String email) {
         return userRepo.findByEmail(email).get();
     }
-    public User getUserById(String id){
+
+    public User getUserById(String id) {
         return userRepo.findById(id).orElseThrow(() -> new DataNotFoundException("Không tìm thấy người dùng với id: " + id));
     }
 
-    public Page<User> getAllByRole(List<String> roles, Boolean isActive, int size, int page) {
+    public Page<User> getAllByRole(List<String> roles, Boolean isActive, String schoolId, int size, int page) {
         Pageable pageable = PageRequest.of(page, size);
         List<RoleEnums> roleEnums = new ArrayList<>();
 
@@ -117,7 +121,7 @@ public class UserService {
             }
         }
 
-        return userRepo.getUsersByRoles(roleEnums, isActive, pageable);
+        return userRepo.getUsersByRoles(roleEnums, isActive, schoolId, pageable);
     }
 
 
@@ -138,6 +142,7 @@ public class UserService {
             throw new IllegalArgumentException("Role không tồn tại: " + role, e);
         }
     }
+
     public List<GetUsersOptionResponse> getUserswithUserName(String role) {
         try {
             RoleEnums roleEnum = RoleEnums.valueOf(role);

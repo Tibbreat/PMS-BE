@@ -53,7 +53,7 @@ public class AuthController {
                             .message("Tài khoản của bạn đã bị hạn chế, liên hệ quản lý để xử lý")
                             .tokenType("Bearer")
                             .build());
-        }else{
+        } else {
             String token = authService.login(loginRequest.getUsername(), loginRequest.getPassword());
             return ResponseEntity.status(HttpStatus.OK)
                     .body(AuthResponse.builder()
@@ -87,6 +87,7 @@ public class AuthController {
                         .isActive(userData.getIsActive())
                         .imageLink(userData.getImageLink())
                         .role(userData.getRole().name())
+                        .schoolId(userData.getSchool().getId())
                         .build());
     }
 
@@ -111,6 +112,7 @@ public class AuthController {
 
         return ResponseEntity.ok("Đăng xuất thành công");
     }
+
     @PostMapping("/reset-password")
     public ResponseEntity<ResponseModel<String>> sendCode(@RequestParam String email) {
         User user = userService.findByEmail(email);
@@ -129,6 +131,7 @@ public class AuthController {
                         .message("Reset password success!")
                         .build());
     }
+
     @PostMapping("/change-password")
     public ResponseEntity<ResponseModel<String>> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
         User user = userService.findByEmail(changePasswordRequest.getEmail());

@@ -1,6 +1,7 @@
 package sep490.g13.pms_be.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import lombok.*;
 
 
@@ -24,10 +25,14 @@ public class TransportServiceProvider extends Auditable<String> {
     //Thông tin ngân hàng
     private String bankName;
     private String bankAccountNumber;
+    private String beneficiaryName;
 
     //Số lượng phương tiện
     private Integer totalVehicle;
 
     private Boolean isActive;
+
+    @ManyToOne
+    private School school;
 }
 
