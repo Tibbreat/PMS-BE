@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 
@@ -18,6 +19,9 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class Classes extends Auditable<String> {
+    @Pattern(regexp = "^.{1,30}\\s[1-9][0-9]*$",
+            message = "Class name must be between 1 and 30 characters long followed by a space and a number")
+    @Column(nullable = false, length = 30)
     private String className;
 
     private String ageRange;
