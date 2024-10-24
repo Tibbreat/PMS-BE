@@ -40,6 +40,7 @@ public class User extends Auditable<String> {
 
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "school_id")
     private School school;
 }

@@ -46,6 +46,7 @@ public interface UserRepo extends JpaRepository<User, String> {
 
     @Query("SELECT u FROM User u WHERE u.idCardNumber = :idCardNumber")
     User existByIdCardNumber(String idCardNumber);
+
     @Query("SELECT new sep490.g13.pms_be.model.response.user.GetUsersOptionResponse(u.id, u.username) FROM User u " +
             "WHERE u.role = :role " +
             "AND u.isActive = true " +

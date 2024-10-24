@@ -14,6 +14,7 @@ import sep490.g13.pms_be.exception.other.DataNotFoundException;
 import sep490.g13.pms_be.model.request.user.AddUserRequest;
 import sep490.g13.pms_be.model.request.user.UpdateUserNameAndPasswordRequest;
 import sep490.g13.pms_be.model.response.user.GetUsersOptionResponse;
+import sep490.g13.pms_be.repository.SchoolRepo;
 import sep490.g13.pms_be.repository.UserRepo;
 import sep490.g13.pms_be.service.utils.CloudinaryService;
 import sep490.g13.pms_be.utils.StringUtils;
@@ -33,6 +34,8 @@ public class UserService {
     PasswordEncoder passwordEncoder;
     @Autowired
     private CloudinaryService cloudinaryService;
+    @Autowired
+    private SchoolRepo schoolRepo;
 
     public User addUser(AddUserRequest request, MultipartFile image) {
 
@@ -46,7 +49,7 @@ public class UserService {
         user.setIsActive(true);
         user.setPassword(passwordEncoder.encode("pms@" + request.getIdCardNumber()));
         user.setEmail(username.trim() + "@pms.com");
-
+        user.setSchool(schoolRepo.findById(request.getSchoolId()).orElseThrow(() -> new DataNotFoundException("Không tìm thấy trường học với id: " + request.getSchoolId())));
         if (image != null && !image.isEmpty()) {
             String imagePath = cloudinaryService.saveImage(image);
             user.setImageLink(imagePath);
