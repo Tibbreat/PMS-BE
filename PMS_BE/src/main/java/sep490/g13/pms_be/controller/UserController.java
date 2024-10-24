@@ -25,23 +25,20 @@ public class UserController {
     @Autowired
     private UserService userService;
 
- @PostMapping("/user")
-public ResponseEntity<ResponseModel<?>> addUser(
-        @RequestPart("user") @Valid AddUserRequest addUserRequest,
-        @RequestPart(value = "image", required = false) MultipartFile image,
-        BindingResult bindingResult) {
+    @PostMapping("/user")
+    public ResponseEntity<ResponseModel<?>> addUser(
+            @RequestPart("user") @Valid AddUserRequest addUserRequest,
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            BindingResult bindingResult) {
 
-    if (bindingResult.hasErrors()) {
-        String errorMessage = ValidationUtils.getValidationErrors(bindingResult);
-        return ResponseEntity.badRequest()
-                .body(ResponseModel.<String>builder()
-                        .message("Thêm người dùng không thành công")
-                        .data(errorMessage)
-                        .build());
-    }
-
-
-
+        if (bindingResult.hasErrors()) {
+            String errorMessage = ValidationUtils.getValidationErrors(bindingResult);
+            return ResponseEntity.badRequest()
+                    .body(ResponseModel.<String>builder()
+                            .message("Thêm người dùng không thành công")
+                            .data(errorMessage)
+                            .build());
+        }
         User newUser = userService.addUser(addUserRequest, image); // Pass the image to the service
 
         String message = newUser == null ? "Thêm người dùng không thành công" : "Thêm người dùng thành công";
@@ -87,6 +84,7 @@ public ResponseEntity<ResponseModel<?>> addUser(
                         .build());
 
     }
+
     @PutMapping("/user/{userId}/status")
     public ResponseEntity<ResponseModel<?>> changeUserStatus(@PathVariable String userId) {
         userService.changeUserStatus(userId);
@@ -117,5 +115,4 @@ public ResponseEntity<ResponseModel<?>> addUser(
                         .data(userService.getUserswithUserName(role))
                         .build());
     }
-
 }

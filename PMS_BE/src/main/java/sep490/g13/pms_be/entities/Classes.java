@@ -40,4 +40,8 @@ public class Classes extends Auditable<String> {
     private User manager;
 
     private boolean status = true;
+
+    @ManyToOne
+    @JoinColumn(name = "school_id")
+    private School school;
 }

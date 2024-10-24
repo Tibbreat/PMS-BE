@@ -26,6 +26,7 @@ public class FoodServiceProvider extends Auditable<String> {
     //Thông tin ngân hàng
     private String bankName;
     private String bankAccountNumber;
+    private String beneficiaryName;
 
     private Boolean isActive;
 }

@@ -19,8 +19,8 @@ public class AttendanceController {
     public ResponseEntity<ResponseModel<?>> checkin(@RequestBody AttendanceLogRequest request) {
 
         return ResponseEntity.ok(ResponseModel.<AttendanceLog>builder()
-                        .message("Checkin success")
-                        .data(attendanceService.saveAttendanceLog(request.getChildrenId(), request.getUserId()))
+                .message("Checkin success")
+                .data(attendanceService.saveAttendanceLog(request.getChildrenId(), request.getUserId()))
                 .build());
 
     }
