@@ -87,6 +87,7 @@ public class AuthController {
                         .isActive(userData.getIsActive())
                         .imageLink(userData.getImageLink())
                         .role(userData.getRole().name())
+                        .schoolId(userData.getSchool().getId())
                         .build());
     }
 

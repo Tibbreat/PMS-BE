@@ -17,5 +17,6 @@ public class UserDataResponse {
     private String phone;
     private String imageLink;
     private Boolean isActive;
+    private String schoolId;
     private String role;
 }

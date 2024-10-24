@@ -26,10 +26,13 @@ public interface UserRepo extends JpaRepository<User, String> {
 
     @Query("SELECT u FROM User u WHERE " +
             "(:roles IS NULL OR u.role IN :roles) AND " +
-            "(:isActive IS NULL OR u.isActive = :isActive)")
+            "(:isActive IS NULL OR u.isActive = :isActive) AND " +
+            "u.school.id = :schoolId")
     Page<User> getUsersByRoles(@Param("roles") List<RoleEnums> roles,
                                @Param("isActive") Boolean isActive,
+                               @Param("schoolId") String schoolId,
                                Pageable pageable);
+
 
     @Modifying
     @Transactional

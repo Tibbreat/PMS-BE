@@ -102,7 +102,7 @@ public class UserService {
         return userRepo.findById(id).orElseThrow(() -> new DataNotFoundException("Không tìm thấy người dùng với id: " + id));
     }
 
-    public Page<User> getAllByRole(List<String> roles, Boolean isActive, int size, int page) {
+    public Page<User> getAllByRole(List<String> roles, Boolean isActive, String schoolId, int size, int page) {
         Pageable pageable = PageRequest.of(page, size);
         List<RoleEnums> roleEnums = new ArrayList<>();
 
@@ -117,7 +117,7 @@ public class UserService {
             }
         }
 
-        return userRepo.getUsersByRoles(roleEnums, isActive, pageable);
+        return userRepo.getUsersByRoles(roleEnums, isActive, schoolId, pageable);
     }
 
 

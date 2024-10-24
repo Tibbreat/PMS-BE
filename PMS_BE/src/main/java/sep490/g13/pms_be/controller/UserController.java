@@ -52,14 +52,15 @@ public class UserController {
     }
 
 
-    @GetMapping
+    @GetMapping("/school/{schoolId}")
     public ResponseEntity<PagedResponseModel<User>> getUsers(
+            @PathVariable String schoolId,
             @RequestParam int page,
             @RequestParam(required = false) List<String> role, // Accept multiple roles
             @RequestParam(required = false) Boolean isActive) {
 
         int size = 10;
-        Page<User> results = userService.getAllByRole(role, isActive, size, page - 1);
+        Page<User> results = userService.getAllByRole(role, isActive, schoolId, size, page - 1);
         List<User> users = results.getContent();
 
         String msg = users.isEmpty() ? "Không có dữ liệu" : "Tìm thấy " + results.getTotalElements();
