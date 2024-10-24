@@ -29,9 +29,6 @@ public class DataInitializer {
     @PostConstruct
     public void init() {
         initializeSchool();
-        initializeAdminUser();
-        initializeFoodServiceProvider();
-        initializeTransportServiceProvider();
     }
 
     private void initializeSchool() {
@@ -43,13 +40,7 @@ public class DataInitializer {
                     .emailContact("mnthachhoa@edu.vn")
                     .build();
             schoolRepo.save(school);
-        }
-    }
-
-    private void initializeAdminUser() {
-        if (userRepo.count() == 0) {
-
-
+            if (userRepo.count() == 0) {
                 userRepo.save(User.builder()
                         .role(RoleEnums.ADMIN)
                         .isActive(true)
@@ -57,45 +48,44 @@ public class DataInitializer {
                         .phone("0943494158")
                         .username("admin")
                         .password(passwordEncoder.encode("admin"))
+                        .school(school)
                         .build());
-            
-        }
-    }
-
-    private void initializeFoodServiceProvider() {
-        if (foodServiceProviderRepo.count() == 0) {
-            foodServiceProviderRepo.save(FoodServiceProvider.builder()
-                    .providerName("Công ty TNHH Thực phẩm Hà Nội")
-                    .providerTaxCode("0108765432")
-                    .providerPhone("02434567890")
-                    .providerEmail("contact@thucphamhn.com")
-                    .providerAddress("Số 20, Phố Láng Hạ, Quận Ba Đình, Hà Nội")
-                    .representativeName("Nguyễn Thị B")
-                    .representativePosition("Giám đốc")
-                    .bankName("VCB")
-                    .isActive(true)
-                    .beneficiaryName("Nguyễn Thị B")
-                    .bankAccountNumber("00234567890")
-                    .build());
-        }
-    }
-
-    private void initializeTransportServiceProvider() {
-        if (transportServiceProviderRepo.count() == 0) {
-            transportServiceProviderRepo.save(TransportServiceProvider.builder()
-                    .providerName("Công ty TNHH Dịch vụ Đưa đón Hà Nội")
-                    .providerTaxCode("0108765432")
-                    .providerPhone("02434567890")
-                    .providerEmail("contact@dichvuduadonhn.com")
-                    .providerAddress("Số 20, Phố Láng Hạ, Quận Ba Đình, Hà Nội")
-                    .representativeName("Nguyễn Văn C")
-                    .representativePosition("Giám đốc")
-                    .bankName("VCB")  // Vietcombank
-                    .beneficiaryName("Nguyễn Văn C")
-                    .bankAccountNumber("00234567890")
-                    .isActive(true)
-                    .totalVehicle(10)
-                    .build());
+                school.setPrincipal(userRepo.findByUsername("admin"));
+                schoolRepo.save(school);
+            }
+            if (foodServiceProviderRepo.count() == 0) {
+                foodServiceProviderRepo.save(FoodServiceProvider.builder()
+                        .providerName("Công ty TNHH Thực phẩm Hà Nội")
+                        .providerTaxCode("0108765432")
+                        .providerPhone("02434567890")
+                        .providerEmail("contact@thucphamhn.com")
+                        .providerAddress("Số 20, Phố Láng Hạ, Quận Ba Đình, Hà Nội")
+                        .representativeName("Nguyễn Thị B")
+                        .representativePosition("Giám đốc")
+                        .bankName("VCB")
+                        .isActive(true)
+                        .beneficiaryName("Nguyễn Thị B")
+                        .bankAccountNumber("00234567890")
+                        .school(school)
+                        .build());
+            }
+            if (transportServiceProviderRepo.count() == 0) {
+                transportServiceProviderRepo.save(TransportServiceProvider.builder()
+                        .providerName("Công ty TNHH Dịch vụ Đưa đón Hà Nội")
+                        .providerTaxCode("0108765432")
+                        .providerPhone("02434567890")
+                        .providerEmail("contact@dichvuduadonhn.com")
+                        .providerAddress("Số 20, Phố Láng Hạ, Quận Ba Đình, Hà Nội")
+                        .representativeName("Nguyễn Văn C")
+                        .representativePosition("Giám đốc")
+                        .bankName("VCB")  // Vietcombank
+                        .beneficiaryName("Nguyễn Văn C")
+                        .bankAccountNumber("00234567890")
+                        .isActive(true)
+                        .totalVehicle(10)
+                        .school(school)
+                        .build());
+            }
         }
     }
 }

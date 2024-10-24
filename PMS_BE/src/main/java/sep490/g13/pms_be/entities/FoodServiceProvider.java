@@ -1,6 +1,7 @@
 package sep490.g13.pms_be.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.*;
 
@@ -29,4 +30,7 @@ public class FoodServiceProvider extends Auditable<String> {
     private String beneficiaryName;
 
     private Boolean isActive;
+
+    @ManyToOne
+    private School school;
 }

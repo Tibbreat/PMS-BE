@@ -35,7 +35,7 @@ public class UserService {
     private CloudinaryService cloudinaryService;
 
     public User addUser(AddUserRequest request, MultipartFile image) {
-        String defaultPassword = StringUtils.randomString(8);
+
         String accountName = StringUtils.generateUsername(request.getFullName());
         int count = userRepo.countByUsernameContaining(accountName);
         String username = count == 0 ? accountName : accountName + (count + 1);
@@ -44,11 +44,11 @@ public class UserService {
         BeanUtils.copyProperties(request, user);
         user.setUsername(username.trim());
         user.setIsActive(true);
-        user.setPassword(passwordEncoder.encode(defaultPassword));
+        user.setPassword(passwordEncoder.encode("pms@" + request.getIdCardNumber()));
         user.setEmail(username.trim() + "@pms.com");
 
         if (image != null && !image.isEmpty()) {
-            String imagePath = cloudinaryService.saveImage(image) ;
+            String imagePath = cloudinaryService.saveImage(image);
             user.setImageLink(imagePath);
         }
 
@@ -61,20 +61,20 @@ public class UserService {
         if (existingUserOpt.isPresent()) {
 
             User user = existingUserOpt.get();
-            if(user.getUsername() !=null){
-            // Nếu fullName có trong request, tạo lại username dựa trên fullName
-            if (request.getFullName() != null && !request.getFullName().isEmpty()) {
+            if (user.getUsername() != null) {
+                // Nếu fullName có trong request, tạo lại username dựa trên fullName
+                if (request.getFullName() != null && !request.getFullName().isEmpty()) {
 
-                String accountName = StringUtils.generateUsername(request.getFullName());
-                int count = userRepo.countByUsernameContaining(accountName);
-                String username = "";
-                if (count == 0) {
-                    username += accountName;
-                } else {
-                    username += accountName + (count + 1);
+                    String accountName = StringUtils.generateUsername(request.getFullName());
+                    int count = userRepo.countByUsernameContaining(accountName);
+                    String username = "";
+                    if (count == 0) {
+                        username += accountName;
+                    } else {
+                        username += accountName + (count + 1);
+                    }
+                    user.setUsername(username.trim());
                 }
-                user.setUsername(username.trim());
-            }
             }
 
             // Cập nhật password nếu có trong request, hoặc tạo password mặc định
@@ -97,7 +97,8 @@ public class UserService {
     public User findByEmail(String email) {
         return userRepo.findByEmail(email).get();
     }
-    public User getUserById(String id){
+
+    public User getUserById(String id) {
         return userRepo.findById(id).orElseThrow(() -> new DataNotFoundException("Không tìm thấy người dùng với id: " + id));
     }
 
@@ -137,6 +138,7 @@ public class UserService {
             throw new IllegalArgumentException("Role không tồn tại: " + role, e);
         }
     }
+
     public List<GetUsersOptionResponse> getUserswithUserName(String role) {
         try {
             RoleEnums roleEnum = RoleEnums.valueOf(role);
