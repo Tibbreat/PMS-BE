@@ -12,6 +12,7 @@ import sep490.g13.pms_be.entities.User;
 import sep490.g13.pms_be.model.request.user.AddUserRequest;
 import sep490.g13.pms_be.model.response.base.PagedResponseModel;
 import sep490.g13.pms_be.model.response.base.ResponseModel;
+import sep490.g13.pms_be.model.response.user.GetParentOptionResponse;
 import sep490.g13.pms_be.model.response.user.GetUsersOptionResponse;
 import sep490.g13.pms_be.service.entity.UserService;
 import sep490.g13.pms_be.utils.ValidationUtils;
@@ -117,5 +118,13 @@ public ResponseEntity<ResponseModel<?>> addUser(
                         .data(userService.getUserswithUserName(role))
                         .build());
     }
-
+    @GetMapping("/parents-by-teacher/{teacherId}")
+    public ResponseEntity<ResponseModel<?>> getParentsByTeacher(@PathVariable("teacherId") String teacherId) {
+        List<GetParentOptionResponse> parents = userService.getParentOptionsByTeacher(teacherId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseModel.<List<GetParentOptionResponse>>builder()
+                        .message("Get users option successfully")
+                        .data(parents)
+                        .build());
+    }
 }

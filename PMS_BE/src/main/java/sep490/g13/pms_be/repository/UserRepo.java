@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import sep490.g13.pms_be.entities.User;
+import sep490.g13.pms_be.model.response.user.GetParentOptionResponse;
 import sep490.g13.pms_be.model.response.user.GetUsersOptionResponse;
 import sep490.g13.pms_be.utils.enums.RoleEnums;
 
@@ -48,4 +49,16 @@ public interface UserRepo extends JpaRepository<User, String> {
             "AND u.isActive = true " +
             "AND u.username IS NOT NULL")
     List<GetUsersOptionResponse> findAllByRoleWithUserName(RoleEnums role);
+
+    @Query("SELECT new sep490.g13.pms_be.model.response.user.GetParentOptionResponse(p.id, p.username, p.fullName) " +
+            "FROM User t " +
+            "JOIN ClassTeacher ct ON ct.teacherId = t " +
+            "JOIN Classes c ON ct.schoolClasses.id = c.id " +
+            "JOIN Children ch ON ch.schoolClass.id = c.id " +
+            "JOIN Relationship r ON r.childrenId.id = ch.id " +
+            "JOIN User p ON r.parentId.id = p.id " +
+            "WHERE t.id = :teacherId " +
+            "AND p.username IS NOT NULL " +
+            "AND p.username <> ''")
+    List<GetParentOptionResponse> getParentsByTeacher(String teacherId);
 }
