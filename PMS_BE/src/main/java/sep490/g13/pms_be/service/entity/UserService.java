@@ -13,6 +13,7 @@ import sep490.g13.pms_be.entities.User;
 import sep490.g13.pms_be.exception.other.DataNotFoundException;
 import sep490.g13.pms_be.model.request.user.AddUserRequest;
 import sep490.g13.pms_be.model.request.user.UpdateUserNameAndPasswordRequest;
+import sep490.g13.pms_be.model.response.user.GetParentOptionResponse;
 import sep490.g13.pms_be.model.response.user.GetUsersOptionResponse;
 import sep490.g13.pms_be.repository.UserRepo;
 import sep490.g13.pms_be.service.utils.CloudinaryService;
@@ -143,6 +144,15 @@ public class UserService {
             return userRepo.findAllByRoleWithUserName(roleEnum);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Role không tồn tại: " + role, e);
+        }
+    }
+
+    public List<GetParentOptionResponse> getParentOptionsByTeacher(String teacherId) {
+
+        try{
+            return userRepo.getParentsByTeacher(teacherId);
+        }catch(DataNotFoundException e){
+            throw new DataNotFoundException("Không tìm thấy phụ huynh nào");
         }
     }
 }
