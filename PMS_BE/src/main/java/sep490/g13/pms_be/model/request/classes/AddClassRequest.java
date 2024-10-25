@@ -32,4 +32,6 @@ public class AddClassRequest {
     private String createdBy;
 
     private String schoolYear;
+
+    private String schoolId;
 }

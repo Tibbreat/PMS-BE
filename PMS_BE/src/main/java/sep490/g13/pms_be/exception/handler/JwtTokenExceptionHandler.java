@@ -34,20 +34,20 @@ public class JwtTokenExceptionHandler {
     }
 
     @ExceptionHandler(JwtTokenMalformedException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
     public ResponseEntity<String> handleJwtTokenMalformedException(JwtTokenMalformedException ex) {
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(HttpStatus.UNAUTHORIZED)
                 .body(ex.getMessage());
     }
 
     @ExceptionHandler(JwtTokenUnsupportedException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
     public ResponseEntity<String> handleJwtTokenUnsupportedException(JwtTokenUnsupportedException ex) {
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(HttpStatus.UNAUTHORIZED)
                 .body(ex.getMessage());
     }
 }

@@ -1,10 +1,14 @@
 package sep490.g13.pms_be.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -29,4 +33,9 @@ public class Vehicle extends Auditable<String> {
     @JoinColumn(name = "transportId", nullable = false)
     @JsonBackReference
     private TransportServiceProvider transport;
+
+
+    @OneToMany(mappedBy = "vehicle")
+    @JsonManagedReference
+    private List<VehicleImage> images;
 }

@@ -3,6 +3,7 @@ package sep490.g13.pms_be.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import sep490.g13.pms_be.entities.Vehicle;
@@ -22,7 +23,7 @@ public interface VehicleRepo extends JpaRepository<Vehicle, String> {
             "v.id, " +
             "v.vehicleName, " +
             "v.numberOfSeats, " +
-            "CAST((v.numberOfSeats - COALESCE(SUM(CASE WHEN cvr.id IS NOT NULL THEN 1 ELSE 0 END), 0)) AS int), " +  // Ép kiểu về int
+            "CAST((v.numberOfSeats - COALESCE(SUM(CASE WHEN cvr.id IS NOT NULL THEN 1 ELSE 0 END), 0)) AS int), " +
             "v.pickUpLocation, " +
             "v.timeStart," +
             "0 ) " +
@@ -32,4 +33,10 @@ public interface VehicleRepo extends JpaRepository<Vehicle, String> {
             "GROUP BY v.id, v.vehicleName, v.numberOfSeats, v.pickUpLocation, v.timeStart")
     List<AvailableVehicleOptions> findAllAvailableVehicle();
 
+    @Query("SELECT COUNT(v.id) FROM Vehicle v WHERE v.transport.id = :transportId")
+    int countByTransport_Id(String transportId);
+
+    @Modifying
+    @Query("UPDATE Vehicle v SET v.isActive = :status WHERE v.id = :vehicleId")
+    void updateStatus(String vehicleId, Boolean status);
 }

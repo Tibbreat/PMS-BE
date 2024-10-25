@@ -21,6 +21,7 @@ import sep490.g13.pms_be.model.response.classes.ClassOption;
 import sep490.g13.pms_be.model.response.user.TeacherOfClassResponse;
 import sep490.g13.pms_be.repository.ClassRepo;
 import sep490.g13.pms_be.repository.ClassTeacherRepo;
+import sep490.g13.pms_be.repository.SchoolRepo;
 import sep490.g13.pms_be.repository.UserRepo;
 import sep490.g13.pms_be.utils.ExcelUtils;
 import sep490.g13.pms_be.utils.LocalDateUtils;
@@ -43,6 +44,8 @@ public class ClassService {
     private LocalDateUtils dateUtils;
     @Autowired
     private ClassTeacherRepo classTeacherRepo;
+    @Autowired
+    private SchoolRepo schoolRepo;
 
     public Classes createNewClass(AddClassRequest classRequest) {
         Classes newClass = new Classes();
@@ -51,29 +54,14 @@ public class ClassService {
         newClass.setManager(manager);
         validateClassDates(newClass.getOpeningDay(), newClass.getClosingDay());
         validateCreatedBy(classRequest.getCreatedBy());
+        newClass.setSchool(schoolRepo.findById(classRequest.getSchoolId())
+                .orElseThrow(() -> new DataNotFoundException("Không tìm thấy trường học với id: " + classRequest.getSchoolId())));
         return classRepo.save(newClass);
     }
 
-    public Set<ClassTeacher> processTeachers(Classes newClass, List<String> teacherIds) {
-        Set<ClassTeacher> teachers = new HashSet<>();
-        for (String teacherId : teacherIds) {
-            User teacher = userRepo.getById(teacherId);
-            if (teacher == null) {
-                throw new DataNotFoundException("Giáo viên không tồn tại: " + teacherId);
-            }
-            ClassTeacher classTeacher = new ClassTeacher();
-            classTeacher.setSchoolClasses(newClass);
-            classTeacher.setTeacherId(teacher);
-            teachers.add(classTeacher);
-        }
-        return teachers;
-    }
 
     public User validateManager(String managerId) {
-        User manager = userRepo.getById(managerId);
-        if (manager == null) {
-            throw new DataNotFoundException("Quản lý không tồn tại: " + managerId);
-        }
+        User manager = userRepo.findById(managerId).orElseThrow(() -> new DataNotFoundException("Không tìm thấy người quản lý với id: " + managerId));
 
         if (!manager.getRole().equals(RoleEnums.CLASS_MANAGER)) {
             throw new PermissionNotAcceptException("Người này không có vai trò là Quản lý lớp (Class_Manager)");
@@ -83,10 +71,6 @@ public class ClassService {
     }
 
     public void validateCreatedBy(String createdBy) {
-        if (createdBy == null) {
-            throw new IllegalArgumentException("CreatedBy field is null or invalid");
-        }
-
         User createdByUser = userRepo.findById(createdBy)
                 .orElseThrow(() -> new DataNotFoundException("User not found with id: " + createdBy));
 
