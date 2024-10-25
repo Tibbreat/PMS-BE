@@ -26,7 +26,7 @@ public interface FoodRequestRepo extends JpaRepository<FoodRequest, String> {
     Page<ListFoodResponse> getAllByProviderId(String providerId, Pageable pageable);
 
     @Modifying
-    @Transactional
-    @Query("UPDATE FoodRequest f SET f.status = :status WHERE f.id = :foodRequestId")
-    int changeStatusOfRequest(String foodRequestId, String status);
+    @Query("UPDATE FoodRequest f SET f.status = :status, f.contractNumber = :contractNumber " +
+            "WHERE f.id = :foodRequestId")
+    void changeStatusOfRequest(String foodRequestId, String status, String contractNumber);
 }

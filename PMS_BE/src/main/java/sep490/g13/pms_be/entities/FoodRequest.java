@@ -17,6 +17,8 @@ public class FoodRequest extends Auditable<String> {
 
     private String status;
 
+    private String contractNumber;
+
     @ManyToOne
     @JoinColumn(name = "provider_id")
     private FoodServiceProvider foodServiceProvider;

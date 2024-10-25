@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sep490.g13.pms_be.entities.FoodRequest;
 import sep490.g13.pms_be.entities.FoodRequestItem;
 import sep490.g13.pms_be.entities.FoodServiceProvider;
@@ -14,6 +15,7 @@ import sep490.g13.pms_be.model.response.food.ListRequestItemsResponse;
 import sep490.g13.pms_be.repository.FoodRequestItemRepo;
 import sep490.g13.pms_be.repository.FoodRequestRepo;
 import sep490.g13.pms_be.repository.FoodServiceProviderRepo;
+import sep490.g13.pms_be.utils.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -65,12 +67,19 @@ public class FoodRequestService {
         return foodRequestRepo.getAllByProviderId(providerId, PageRequest.of(page, size));
     }
 
-   public List<ListRequestItemsResponse> getItems(String requestId){
+    public List<ListRequestItemsResponse> getItems(String requestId) {
         foodRequestRepo.findById(requestId).orElseThrow(() -> new DataNotFoundException("Request not found"));
         return foodRequestItemRepo.findByFoodRequestId(requestId);
     }
 
-    public int changeStatusOfRequest(String foodRequestId, String status) {
-        return foodRequestRepo.changeStatusOfRequest(foodRequestId, status);
+    @Transactional
+    public String changeStatusOfRequest(String foodRequestId, String status) {
+        FoodRequest request = foodRequestRepo.findById(foodRequestId).orElseThrow(() -> new DataNotFoundException("Request not found"));
+        if (request.getStatus().equals("APPROVED") || request.getStatus().equals("CANCELED")) {
+            throw new DataNotFoundException("Request has been approved or canceled");
+        }
+        String contractNumber = StringUtils.randomNumber(3);
+        foodRequestRepo.changeStatusOfRequest(foodRequestId, status, contractNumber );
+        return contractNumber;
     }
 }

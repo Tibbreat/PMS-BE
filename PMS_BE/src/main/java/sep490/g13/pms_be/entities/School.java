@@ -15,8 +15,10 @@ public class School extends Auditable<String> {
     private String schoolName;
     private String phoneContact;
     private String emailContact;
-    @Column(name = "address")
+
     private String schoolAddress;
+
+    private String schoolAddressCity;
 
 
     @OneToOne
