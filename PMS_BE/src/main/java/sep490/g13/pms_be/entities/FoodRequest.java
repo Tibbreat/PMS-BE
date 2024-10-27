@@ -19,8 +19,15 @@ public class FoodRequest extends Auditable<String> {
 
     private String contractNumber;
 
+    @Lob
+    @Column(name = "base64_contract_file", columnDefinition = "TEXT")
+    private String base64ContractFile;
+
     @ManyToOne
     @JoinColumn(name = "provider_id")
     private FoodServiceProvider foodServiceProvider;
+
+    @ManyToOne
+    private User receiver;
 }
 

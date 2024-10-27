@@ -26,6 +26,7 @@ public class DataInitializer {
     @Autowired
     private SchoolRepo schoolRepo;
 
+
     @PostConstruct
     public void init() {
         initializeSchool();
@@ -88,4 +89,5 @@ public class DataInitializer {
             }
         }
     }
+
 }

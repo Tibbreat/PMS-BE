@@ -15,23 +15,16 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class DailyMenu extends Auditable<String> {
 
-    @ManyToOne
-    @JoinColumn(name = "class_id")
-    private Classes schoolClasses;
+    private LocalDate date;
 
-    private LocalDate menuDate;
+    private String ageRange;
 
-    @Lob
-    @Column(columnDefinition = "TEXT")
     private String breakfast;
-
-    @Lob
-    @Column(columnDefinition = "TEXT")
     private String lunch;
+    private String afternoon;
 
     @Lob
     @Column(columnDefinition = "TEXT")
-    private String snacks;
-
     private String note;
+
 }

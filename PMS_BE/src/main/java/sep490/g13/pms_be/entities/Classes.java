@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -19,16 +20,13 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class Classes extends Auditable<String> {
-    @Pattern(regexp = "^.{1,30}\\s[1-9][0-9]*$",
-            message = "Class name must be between 1 and 30 characters long followed by a space and a number")
-    @Column(nullable = false, length = 30)
     private String className;
 
     private String ageRange;
 
     private Date openingDay;
 
-    private Date closingDay;
+    private String academicYear;
 
     private String schoolYear;
 
@@ -48,4 +46,17 @@ public class Classes extends Auditable<String> {
     @ManyToOne
     @JoinColumn(name = "school_id")
     private School school;
+
+    public void setAcademicYear() {
+        if (this.academicYear == null || this.academicYear.isEmpty()) {
+            Calendar calendar = Calendar.getInstance();
+            int currentYear = calendar.get(Calendar.YEAR);
+            this.academicYear = currentYear + "-" + (currentYear + 1);
+        }
+    }
+
+    @PrePersist
+    private void onPrePersist() {
+        setAcademicYear();
+    }
 }

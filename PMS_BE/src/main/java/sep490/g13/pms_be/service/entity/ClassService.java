@@ -52,7 +52,6 @@ public class ClassService {
         BeanUtils.copyProperties(classRequest, newClass);
         User manager = validateManager(classRequest.getManagerId());
         newClass.setManager(manager);
-        validateClassDates(newClass.getOpeningDay(), newClass.getClosingDay());
         validateCreatedBy(classRequest.getCreatedBy());
         newClass.setSchool(schoolRepo.findById(classRequest.getSchoolId())
                 .orElseThrow(() -> new DataNotFoundException("Không tìm thấy trường học với id: " + classRequest.getSchoolId())));
@@ -100,84 +99,15 @@ public class ClassService {
         return classRepo.findClassesByFilters(schoolYear, ageRange, managerId, pageable);
     }
 
-    @Transactional
-    public void updateClass(String classId, UpdateClassRequest updateClassRequest) {
-        Classes existingClass = classRepo.findById(classId)
-                .orElseThrow(() -> new DataNotFoundException("Class not found with id: " + classId));
 
-        existingClass.setOpeningDay(updateClassRequest.getOpeningDay());
-        existingClass.setClosingDay(updateClassRequest.getClosingDay());
-
-        // Cập nhật manager
-        User manager = userRepo.findById(updateClassRequest.getManagerId())
-                .orElseThrow(() -> new DataNotFoundException("Manager not found with id: " + updateClassRequest.getManagerId()));
-        existingClass.setManager(manager);
-
-        if (updateClassRequest.getTeacherId() != null && !updateClassRequest.getTeacherId().isEmpty()) {
-            // Xóa danh sách giáo viên cũ
-            classTeacherRepo.deleteBySchoolClasses(existingClass);
-
-            // Thêm giáo viên mới
-            for (String teacherId : updateClassRequest.getTeacherId()) {
-                User teacher = userRepo.findById(teacherId)
-                        .orElseThrow(() -> new DataNotFoundException("Teacher not found with id: " + teacherId));
-
-                // Tạo đối tượng ClassTeacher mới
-                ClassTeacher classTeacher = ClassTeacher.builder()
-                        .schoolClasses(existingClass)
-                        .teacherId(teacher)
-                        .build();
-
-                // Lưu vào repository
-                classTeacherRepo.save(classTeacher);
-            }
-        }
-        User lastMofifyBy = userRepo.findById(updateClassRequest.getLastModifyById()).get();
-        if (lastMofifyBy.getRole() == RoleEnums.ADMIN) {
-            existingClass.setLastModifiedBy(updateClassRequest.getLastModifyById());
-        } else {
-            throw new PermissionNotAcceptException("Cant update class with other role");
-        }
-        classRepo.save(existingClass);
-    }
 
 
     public Classes getClassById(String id) {
         return classRepo.findById(id).get();
     }
 
-    public void changeStatusClass(String classId) {
-        Classes clazz = classRepo.findById(classId)
-                .orElseThrow(() -> new DataNotFoundException("Class not found"));
-        LocalDate openingDay = dateUtils.convertToLocalDate(clazz.getOpeningDay());
-        LocalDate closingDay = dateUtils.convertToLocalDate(clazz.getClosingDay());
 
-        // Check if the opening day is in the future and update status accordingly
-        if (openingDay.isBefore(LocalDate.now()) || closingDay.isAfter(LocalDate.now())) {
-            clazz.setStatus(true);  // Active
-        } else {
-            clazz.setStatus(false);
-        }
-        classRepo.save(clazz);
-    }
 
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void closeClasses() {
-        LocalDate today = LocalDate.now();
-        List<Classes> classesToClose = classRepo.findByClosingDayBeforeAndStatus(today, true);
-
-        classesToClose.forEach(cls -> cls.setStatus(false));  // Set status to inactive
-        classRepo.saveAll(classesToClose);
-    }
-
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void openClasses() {
-        LocalDate today = LocalDate.now();
-        List<Classes> classesToOpen = classRepo.findByOpeningDayAfterAndStatus(today, false);
-
-        classesToOpen.forEach(cls -> cls.setStatus(true));  // Set status to active
-        classRepo.saveAll(classesToOpen);
-    }
 
     public List<TeacherOfClassResponse> getTeachersOfClass(String classId) {
         return classRepo.getTeacherOfClass(classId);
@@ -205,7 +135,6 @@ public class ClassService {
             row.createCell(1).setCellValue(classes.getClassName()); // Tên lớp
             row.createCell(2).setCellValue(classes.getAgeRange()); // Độ tuổi
             row.createCell(3).setCellValue(dateFormat.format(classes.getOpeningDay())); // Ngày mở lớp (dd-MM-yyyy)
-            row.createCell(4).setCellValue(dateFormat.format(classes.getClosingDay())); // Ngày kết thúc (dd-MM-yyyy)
             row.createCell(5).setCellValue(classes.isStatus() ? "Active" : "Inactive"); // Trạng thái
         });
     }

@@ -82,4 +82,9 @@ public class FoodRequestService {
         foodRequestRepo.changeStatusOfRequest(foodRequestId, status, contractNumber );
         return contractNumber;
     }
+
+    @Transactional
+    public void updateContractFile(String foodRequestId, String base64ContractFile) {
+        foodRequestRepo.updateContractFile(foodRequestId, base64ContractFile);
+    }
 }

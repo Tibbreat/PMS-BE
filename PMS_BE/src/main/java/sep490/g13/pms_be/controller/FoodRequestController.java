@@ -118,6 +118,7 @@ public class FoodRequestController {
 
                 String pdfBase64 = Base64.encodeBase64String(outputStream.toByteArray());
 
+                foodRequestService.updateContractFile(requestId, pdfBase64);
                 return ResponseEntity.ok().body(Map.of("pdfBase64", pdfBase64));
             } catch (Exception e) {
                 e.printStackTrace();

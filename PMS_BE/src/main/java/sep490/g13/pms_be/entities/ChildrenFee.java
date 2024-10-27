@@ -1,16 +1,13 @@
 package sep490.g13.pms_be.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.sql.Date;
 
 @Entity
 @Getter
@@ -20,17 +17,19 @@ import java.time.LocalDate;
 public class ChildrenFee extends Auditable<String> {
     @ManyToOne
     @JoinColumn(name = "children_id")
-    @JsonIgnore
     private Children children;
+
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "fee_id")
-
     private Fee fee;
 
     private Boolean isPayed;
 
-    private LocalDate dueDate;
+    private Date payedDate;
 
-    private String amount;
+    @Lob
+    @Column(name = "note", columnDefinition = "TEXT")
+    private String note;
 }

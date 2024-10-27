@@ -21,27 +21,4 @@ public class FeeService {
     @Autowired
     private ChildrenRepo childrenRepository;
 
-    public Fee addFee(String feeTitle, Boolean isActive) {
-        Fee newFee = new Fee();
-        newFee.setFeeTitle(feeTitle);
-        newFee.setIsActive(isActive);
-
-        return feeRepo.save(newFee);
-    }
-    public Page<Fee> getList(Pageable pageable) {
-        return feeRepo.findAll(pageable);
-    }
-    @Transactional
-    public Fee changeFeeStatus(String feeId, Boolean newStatus) {
-        Optional<Fee> optionalFee = feeRepo.findById(feeId);
-        if (optionalFee.isPresent()) {
-            Fee fee = optionalFee.get();
-            fee.setIsActive(newStatus);
-            return feeRepo.save(fee);
-        } else {
-            throw new IllegalArgumentException("Fee not found with ID: " + feeId);
-        }
-    }
-
-
 }

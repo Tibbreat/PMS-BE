@@ -28,17 +28,9 @@ import java.util.List;
 public class ClassController {
     @Autowired
     private ClassService classService;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private ChildrenService childrenService;
-    @Autowired
-    private TeacherService teacherService;
 
     @Autowired
     private ClassTeacherService classTeacherService;
-    private GlobalExceptionHandler globalExceptionHandler;
-
 
     @PostMapping("/add")
     public ResponseEntity<ResponseModel<?>> addNewClass(
@@ -103,48 +95,16 @@ public class ClassController {
 
         return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
     }
-    @PutMapping("/change-class-description/{classId}")
-    public ResponseEntity<ResponseModel<String>> updateClassDescription(
-            @RequestBody @Valid UpdateClassRequest updateClassRequest,
-            BindingResult bindingResult,
-            @PathVariable String classId) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest()
-                    .body(ResponseModel.<String>builder()
-                            .message("Cập nhật không thành công")
-                            .data(ValidationUtils.getValidationErrors(bindingResult))
-                            .build());
-        }
-        try{
-        classService.updateClass(classId, updateClassRequest);
 
-        return ResponseEntity.ok(ResponseModel.<String>builder()
-                .message("Cập nhật thông tin lớp học thành công")
-                .data(null)
-                .build());}
-        catch (Exception e) {
-            return globalExceptionHandler.handleDataNotFoundException(e);
-        }
-    }
-
-    @PutMapping("/change-class-status/{classId}")
-    public ResponseEntity<String> changStatusClass(@PathVariable String classId) {
-        try {
-            classService.changeStatusClass(classId);
-            return ResponseEntity.ok("Cập nhật thông tin lớp thành công");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
 
     @GetMapping("/class/teacher/{teacherId}")
     public ResponseEntity<PagedResponseModel<Classes>> getClassByTeacherId(
             @PathVariable String teacherId,
-            @RequestParam int page){
-    int size = 10;
-    Page<Classes> results = classTeacherService.getClassByTeacherId(teacherId, size, page - 1);
-    List<Classes> classes = results.getContent();
-    String msg = classes.isEmpty() ? "Không có dữ liệu" : "Tìm thấy" + results.getTotalElements() + "dữ liệu";
+            @RequestParam int page) {
+        int size = 10;
+        Page<Classes> results = classTeacherService.getClassByTeacherId(teacherId, size, page - 1);
+        List<Classes> classes = results.getContent();
+        String msg = classes.isEmpty() ? "Không có dữ liệu" : "Tìm thấy" + results.getTotalElements() + "dữ liệu";
 
         PagedResponseModel<Classes> pagedResponse = PagedResponseModel.<Classes>builder()
                 .page(page)
@@ -173,6 +133,7 @@ public class ClassController {
                 .data(teachers)
                 .build());
     }
+
     @GetMapping("/class-option")
     public ResponseEntity<ResponseModel<?>> getClassesByTeacherOrManagerId(
             @RequestParam(required = false) String teacherId,

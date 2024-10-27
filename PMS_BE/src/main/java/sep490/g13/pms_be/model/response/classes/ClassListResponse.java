@@ -11,9 +11,9 @@ public class ClassListResponse {
     private String id;
     private String className;
     private String ageRange;
-    private Date closingDay;
     private Date openingDay;
     private String managerId;
     private String managerName;
+    private String academicYear;
     private boolean status;
 }

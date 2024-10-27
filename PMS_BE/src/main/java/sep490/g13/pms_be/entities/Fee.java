@@ -1,9 +1,7 @@
 package sep490.g13.pms_be.entities;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,9 +17,11 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Fee extends Auditable<String> {
-    private String feeTitle;
-    private Boolean isActive;
-    @OneToMany(mappedBy = "fee", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private Set<ChildrenFee> childrenFees = new HashSet<>();
+    private String feeItemName;
+    private Double amount;
+
+    private String academicYear;
+    @Lob
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
 }

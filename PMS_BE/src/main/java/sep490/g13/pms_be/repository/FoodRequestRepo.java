@@ -29,4 +29,9 @@ public interface FoodRequestRepo extends JpaRepository<FoodRequest, String> {
     @Query("UPDATE FoodRequest f SET f.status = :status, f.contractNumber = :contractNumber " +
             "WHERE f.id = :foodRequestId")
     void changeStatusOfRequest(String foodRequestId, String status, String contractNumber);
+
+    @Modifying
+    @Query("UPDATE FoodRequest f SET f.base64ContractFile = :base64ContractFile " +
+            "WHERE f.id = :foodRequestId")
+    void updateContractFile(String foodRequestId, String base64ContractFile);
 }
